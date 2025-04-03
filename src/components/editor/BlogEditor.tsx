@@ -213,7 +213,7 @@ const BlogEditor = ({
           .from('blogs')
           .update({ 
             title, 
-            content: outputData,
+            content: outputData as unknown as Json,
             cover_image: coverImage,
             slug: slug,
             updated_at: new Date().toISOString()
@@ -232,7 +232,7 @@ const BlogEditor = ({
           .from('blogs')
           .insert({ 
             title, 
-            content: outputData,
+            content: outputData as unknown as Json,
             cover_image: coverImage,
             slug: slug,
             created_at: new Date().toISOString()
