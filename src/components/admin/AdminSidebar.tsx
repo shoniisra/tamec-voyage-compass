@@ -42,22 +42,22 @@ const AdminSidebar = () => {
     },
     { 
       icon: FileText, 
-      title: 'CRUD de Blog', 
+      title: 'Blogs', 
       path: '/admin/blog/posts' 
     },
     { 
       icon: Map, 
-      title: 'CRUD de Tours',
+      title: 'Tours',
       path: '/admin/tours' 
     },
     { 
       icon: CreditCard, 
-      title: 'CRUD de Precios de Visa', 
+      title: 'Precios de Visa', 
       path: '/admin/visas' 
     },
     { 
       icon: Tag, 
-      title: 'CRUD de Etiquetas', 
+      title: 'Etiquetas', 
       path: '/admin/tags' 
     },
     { 
