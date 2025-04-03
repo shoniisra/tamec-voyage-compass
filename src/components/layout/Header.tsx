@@ -1,17 +1,43 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut, User, Settings } from "lucide-react";
 import LanguageSwitch from '../language/LanguageSwitch';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t } = useLanguage();
+  const { user, signOut, isAdmin } = useAuth();
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleAdminDashboard = () => {
+    navigate('/admin');
+    if (isMenuOpen) setIsMenuOpen(false);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    if (isMenuOpen) setIsMenuOpen(false);
+  };
+
+  const handleLogin = () => {
+    navigate('/auth');
+    if (isMenuOpen) setIsMenuOpen(false);
   };
 
   return (
@@ -36,9 +62,33 @@ const Header = () => {
           <Link to="/contact" className="text-gray-700 hover:text-tamec-600 transition-colors">
             {t('nav.contact')}
           </Link>
-          <Button className="bg-tamec-600 hover:bg-tamec-700 text-white">
-            {t('nav.bookNow')}
-          </Button>
+          
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="rounded-full">
+                  <User size={18} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {isAdmin && (
+                  <DropdownMenuItem onClick={handleAdminDashboard} className="cursor-pointer">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Admin Dashboard</span>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>{t('nav.logout')}</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button onClick={handleLogin}>{t('nav.login')}</Button>
+          )}
+          
           <LanguageSwitch />
         </nav>
         
@@ -88,9 +138,36 @@ const Header = () => {
             >
               {t('nav.contact')}
             </Link>
-            <Button className="bg-tamec-600 hover:bg-tamec-700 text-white w-full">
-              {t('nav.bookNow')}
-            </Button>
+            
+            {user ? (
+              <>
+                {isAdmin && (
+                  <Button 
+                    variant="outline" 
+                    className="w-full flex justify-start"
+                    onClick={handleAdminDashboard}
+                  >
+                    <Settings className="mr-2 h-4 w-4" />
+                    Admin Dashboard
+                  </Button>
+                )}
+                <Button 
+                  variant="outline" 
+                  className="w-full flex justify-start"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  {t('nav.logout')}
+                </Button>
+              </>
+            ) : (
+              <Button 
+                className="w-full"
+                onClick={handleLogin}
+              >
+                {t('nav.login')}
+              </Button>
+            )}
           </div>
         </div>
       )}

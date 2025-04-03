@@ -1,231 +1,189 @@
 
-import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
-import { Language, TranslationDictionary } from '@/types/language';
-import { BlogPost } from '@/types/blog';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { TranslationType } from '@/types/language';
+
+type LanguageType = 'en' | 'es';
 
 interface LanguageContextType {
-  language: Language;
-  setLanguage: (language: Language) => void;
+  language: LanguageType;
+  setLanguage: (language: LanguageType) => void;
   t: (key: string) => string;
-  formatBlogPost: (post: BlogPost) => {
-    title: string;
-    excerpt: string;
-    content: string;
-    category: string;
-  };
 }
 
-const translations = {
-  // Header translations
-  'nav.home': {
-    en: 'Home',
-    es: 'Inicio'
+const translations: Record<LanguageType, TranslationType> = {
+  en: {
+    nav: {
+      home: 'Home',
+      destinations: 'Destinations',
+      blog: 'Blog',
+      contact: 'Contact',
+      bookNow: 'Book Now',
+      login: 'Login',
+      logout: 'Logout',
+    },
+    home: {
+      heroTitle: 'Discover the World with TAMEC Travels',
+      heroSubtitle: 'Exceptional travel experiences tailored to your desires',
+      exploreCta: 'Explore Destinations',
+      featuredDestinations: 'Featured Destinations',
+      viewAllDestinations: 'View All Destinations',
+      testimonialsTitle: 'What Our Travelers Say',
+      testimonialsSubtitle: 'Hear from our satisfied clients about their experiences',
+      packagesTitle: 'Popular Travel Packages',
+      packagesSubtitle: 'Curated travel experiences for your next adventure',
+      newsletterTitle: 'Subscribe to Our Newsletter',
+      newsletterSubtitle: 'Receive travel tips, exclusive offers, and inspiration',
+      subscribeButton: 'Subscribe',
+      emailPlaceholder: 'Your email address',
+    },
+    blog: {
+      title: 'Our Travel Blog',
+      subtitle: 'Stories, tips, and inspiration for your next journey',
+      readMore: 'Read More',
+      comments: 'Comments',
+      commentsSectionTitle: 'Comments',
+      leaveComment: 'Leave a Comment',
+      yourName: 'Your Name',
+      yourEmail: 'Your Email',
+      yourComment: 'Your Comment',
+      submitComment: 'Post Comment',
+      loadingComments: 'Loading comments...',
+      noComments: 'No comments yet. Be the first to comment!',
+      commentSubmitted: 'Your comment was submitted successfully!',
+    },
+    contact: {
+      title: 'Contact Us',
+      subtitle: 'Have questions? Reach out to us and we\'ll be happy to help.',
+      formName: 'Your Name',
+      formEmail: 'Your Email',
+      formSubject: 'Subject',
+      formMessage: 'Message',
+      formSubmit: 'Send Message',
+      infoTitle: 'Get In Touch',
+      infoAddressLabel: 'Address',
+      infoEmailLabel: 'Email',
+      infoPhoneLabel: 'Phone',
+      infoSocialLabel: 'Follow Us',
+    },
+    auth: {
+      login: 'Login',
+      register: 'Register',
+      email: 'Email',
+      password: 'Password',
+      confirmPassword: 'Confirm Password',
+      welcomeBack: 'Welcome Back',
+      loginDescription: 'Enter your credentials to access your account',
+      createAccount: 'Create Account',
+      registerDescription: 'Sign up to join our community',
+      loggingIn: 'Logging in...',
+      registering: 'Creating account...',
+    },
   },
-  'nav.destinations': {
-    en: 'Destinations',
-    es: 'Destinos'
+  es: {
+    nav: {
+      home: 'Inicio',
+      destinations: 'Destinos',
+      blog: 'Blog',
+      contact: 'Contacto',
+      bookNow: 'Reservar',
+      login: 'Iniciar Sesión',
+      logout: 'Cerrar Sesión',
+    },
+    home: {
+      heroTitle: 'Descubre el mundo con TAMEC Viajes',
+      heroSubtitle: 'Experiencias de viaje excepcionales adaptadas a tus deseos',
+      exploreCta: 'Explorar Destinos',
+      featuredDestinations: 'Destinos Destacados',
+      viewAllDestinations: 'Ver Todos los Destinos',
+      testimonialsTitle: 'Lo que dicen nuestros viajeros',
+      testimonialsSubtitle: 'Escucha a nuestros clientes satisfechos sobre sus experiencias',
+      packagesTitle: 'Paquetes de Viaje Populares',
+      packagesSubtitle: 'Experiencias de viaje seleccionadas para tu próxima aventura',
+      newsletterTitle: 'Suscríbete a nuestro boletín',
+      newsletterSubtitle: 'Recibe consejos de viaje, ofertas exclusivas e inspiración',
+      subscribeButton: 'Suscribirse',
+      emailPlaceholder: 'Tu correo electrónico',
+    },
+    blog: {
+      title: 'Nuestro Blog de Viajes',
+      subtitle: 'Historias, consejos e inspiración para tu próximo viaje',
+      readMore: 'Leer Más',
+      comments: 'Comentarios',
+      commentsSectionTitle: 'Comentarios',
+      leaveComment: 'Dejar un Comentario',
+      yourName: 'Tu Nombre',
+      yourEmail: 'Tu Email',
+      yourComment: 'Tu Comentario',
+      submitComment: 'Publicar Comentario',
+      loadingComments: 'Cargando comentarios...',
+      noComments: '¡No hay comentarios todavía. Sé el primero en comentar!',
+      commentSubmitted: '¡Tu comentario fue enviado con éxito!',
+    },
+    contact: {
+      title: 'Contáctanos',
+      subtitle: '¿Tienes preguntas? Comunícate con nosotros y estaremos encantados de ayudarte.',
+      formName: 'Tu Nombre',
+      formEmail: 'Tu Email',
+      formSubject: 'Asunto',
+      formMessage: 'Mensaje',
+      formSubmit: 'Enviar Mensaje',
+      infoTitle: 'Ponte en Contacto',
+      infoAddressLabel: 'Dirección',
+      infoEmailLabel: 'Email',
+      infoPhoneLabel: 'Teléfono',
+      infoSocialLabel: 'Síguenos',
+    },
+    auth: {
+      login: 'Iniciar Sesión',
+      register: 'Registrarse',
+      email: 'Correo Electrónico',
+      password: 'Contraseña',
+      confirmPassword: 'Confirmar Contraseña',
+      welcomeBack: 'Bienvenido de Nuevo',
+      loginDescription: 'Introduce tus credenciales para acceder a tu cuenta',
+      createAccount: 'Crear Cuenta',
+      registerDescription: 'Regístrate para unirte a nuestra comunidad',
+      loggingIn: 'Iniciando sesión...',
+      registering: 'Creando cuenta...',
+    },
   },
-  'nav.blog': {
-    en: 'Blog',
-    es: 'Blog'
-  },
-  'nav.contact': {
-    en: 'Contact',
-    es: 'Contacto'
-  },
-  'nav.bookNow': {
-    en: 'Book Now',
-    es: 'Reservar Ahora'
-  },
-  
-  // Footer translations
-  'footer.description': {
-    en: 'Discover the world with TAMEC Travel Agency. We offer exceptional travel experiences tailored to your needs.',
-    es: 'Descubre el mundo con TAMEC Travel Agency. Ofrecemos experiencias de viaje excepcionales adaptadas a tus necesidades.'
-  },
-  'footer.quickLinks': {
-    en: 'Quick Links',
-    es: 'Enlaces Rápidos'
-  },
-  'footer.popularDestinations': {
-    en: 'Popular Destinations',
-    es: 'Destinos Populares'
-  },
-  'footer.contactUs': {
-    en: 'Contact Us',
-    es: 'Contáctanos'
-  },
-  'footer.terms': {
-    en: 'Terms & Conditions',
-    es: 'Términos y Condiciones'
-  },
-  'footer.privacy': {
-    en: 'Privacy Policy',
-    es: 'Política de Privacidad'
-  },
-  'footer.rights': {
-    en: 'All rights reserved.',
-    es: 'Todos los derechos reservados.'
-  },
-  
-  // Home page translations
-  'home.hero.title': {
-    en: 'Discover the World with TAMEC',
-    es: 'Descubre el Mundo con TAMEC'
-  },
-  'home.hero.subtitle': {
-    en: 'Extraordinary destinations and unforgettable experiences tailored just for you.',
-    es: 'Destinos extraordinarios y experiencias inolvidables hechas a tu medida.'
-  },
-  'home.hero.search': {
-    en: 'Where do you want to go?',
-    es: '¿Adónde quieres ir?'
-  },
-  'home.hero.searchButton': {
-    en: 'Search',
-    es: 'Buscar'
-  },
-  'home.featured.title': {
-    en: 'Featured Destinations',
-    es: 'Destinos Destacados'
-  },
-  'home.featured.subtitle': {
-    en: 'Explore our handpicked selection of stunning destinations around the world.',
-    es: 'Explora nuestra selección de impresionantes destinos alrededor del mundo.'
-  },
-  'home.featured.viewAll': {
-    en: 'View All Destinations',
-    es: 'Ver Todos los Destinos'
-  },
-  'home.destinations.exploreNow': {
-    en: 'Explore Now',
-    es: 'Explorar Ahora'
-  },
-  
-  // Blog page translations
-  'blog.title': {
-    en: 'Travel Blog',
-    es: 'Blog de Viajes'
-  },
-  'blog.subtitle': {
-    en: 'Discover travel tips, destination guides, and stories from around the world.',
-    es: 'Descubre consejos de viaje, guías de destinos e historias de todo el mundo.'
-  },
-  'blog.readMore': {
-    en: 'Read More',
-    es: 'Leer Más'
-  },
-  
-  // Contact page translations
-  'contact.title': {
-    en: 'Contact Us',
-    es: 'Contáctanos'
-  },
-  'contact.subtitle': {
-    en: 'Have questions or ready to plan your next adventure? Get in touch with our travel experts.',
-    es: '¿Tienes preguntas o estás listo para planificar tu próxima aventura? Ponte en contacto con nuestros expertos en viajes.'
-  },
-  'contact.form.title': {
-    en: 'Send Us a Message',
-    es: 'Envíanos un Mensaje'
-  },
-  'contact.form.description': {
-    en: 'Fill out the form below and our team will get back to you as soon as possible.',
-    es: 'Completa el formulario a continuación y nuestro equipo se pondrá en contacto contigo lo antes posible.'
-  },
-  'contact.form.fullName': {
-    en: 'Full Name',
-    es: 'Nombre Completo'
-  },
-  'contact.form.email': {
-    en: 'Email',
-    es: 'Correo Electrónico'
-  },
-  'contact.form.subject': {
-    en: 'Subject',
-    es: 'Asunto'
-  },
-  'contact.form.message': {
-    en: 'Message',
-    es: 'Mensaje'
-  },
-  'contact.form.submit': {
-    en: 'Send Message',
-    es: 'Enviar Mensaje'
-  },
-  'contact.form.namePlaceholder': {
-    en: 'John Doe',
-    es: 'Juan Pérez'
-  },
-  'contact.form.emailPlaceholder': {
-    en: 'john@example.com',
-    es: 'juan@ejemplo.com'
-  },
-  'contact.form.subjectPlaceholder': {
-    en: 'How can we help you?',
-    es: '¿Cómo podemos ayudarte?'
-  },
-  'contact.form.messagePlaceholder': {
-    en: 'Your message here...',
-    es: 'Tu mensaje aquí...'
-  },
-  'contact.findUs': {
-    en: 'Find Us',
-    es: 'Encuéntranos'
-  },
-  
-  // Language switcher
-  'language.english': {
-    en: 'English',
-    es: 'Inglés'
-  },
-  'language.spanish': {
-    en: 'Spanish',
-    es: 'Español'
-  }
 };
 
-export const LanguageContext = createContext<LanguageContextType>({
-  language: 'en',
-  setLanguage: () => {},
-  t: (key: string) => key,
-  formatBlogPost: () => ({ title: '', excerpt: '', content: '', category: '' }),
-});
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<Language>('en');
+export const LanguageProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
+  const [language, setLanguage] = useState<LanguageType>(localStorage.getItem('tamec-language') as LanguageType || 'en');
 
-  const t = useCallback((key: string): string => {
-    if (!translations[key]) {
-      console.warn(`Translation key not found: ${key}`);
-      return key;
-    }
-    return translations[key][language];
+  useEffect(() => {
+    localStorage.setItem('tamec-language', language);
   }, [language]);
 
-  const formatBlogPost = useCallback((post: BlogPost) => {
-    if (language === 'en') {
-      return {
-        title: post.title_en,
-        excerpt: post.excerpt_en,
-        content: post.content_en,
-        category: post.category_en
-      };
-    } else {
-      return {
-        title: post.title_es,
-        excerpt: post.excerpt_es,
-        content: post.content_es,
-        category: post.category_es
-      };
+  const t = (key: string): string => {
+    const keys = key.split('.');
+    let value: any = translations[language];
+    
+    for (const k of keys) {
+      if (value && value[k] !== undefined) {
+        value = value[k];
+      } else {
+        return key; // Return the key if translation not found
+      }
     }
-  }, [language]);
+    
+    return value as string;
+  };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, formatBlogPost }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );
 };
 
-export const useLanguage = () => useContext(LanguageContext);
+export const useLanguage = (): LanguageContextType => {
+  const context = useContext(LanguageContext);
+  if (context === undefined) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
+  return context;
+};
