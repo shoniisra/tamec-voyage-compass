@@ -11,7 +11,7 @@ export type Database = {
     Tables: {
       blog_comments: {
         Row: {
-          blog_post_id: string
+          blog_id: string | null
           content: string
           created_at: string
           email: string
@@ -19,7 +19,7 @@ export type Database = {
           name: string
         }
         Insert: {
-          blog_post_id: string
+          blog_id?: string | null
           content: string
           created_at?: string
           email: string
@@ -27,94 +27,47 @@ export type Database = {
           name: string
         }
         Update: {
-          blog_post_id?: string
+          blog_id?: string | null
           content?: string
           created_at?: string
           email?: string
           id?: string
           name?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "blog_comments_blog_post_id_fkey"
-            columns: ["blog_post_id"]
-            isOneToOne: false
-            referencedRelation: "blog_posts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      blog_posts: {
-        Row: {
-          category_en: string
-          category_es: string
-          content_en: string
-          content_es: string
-          cover_image: string
-          date: string
-          excerpt_en: string
-          excerpt_es: string
-          id: string
-          slug: string
-          title_en: string
-          title_es: string
-        }
-        Insert: {
-          category_en: string
-          category_es: string
-          content_en: string
-          content_es: string
-          cover_image: string
-          date?: string
-          excerpt_en: string
-          excerpt_es: string
-          id?: string
-          slug: string
-          title_en: string
-          title_es: string
-        }
-        Update: {
-          category_en?: string
-          category_es?: string
-          content_en?: string
-          content_es?: string
-          cover_image?: string
-          date?: string
-          excerpt_en?: string
-          excerpt_es?: string
-          id?: string
-          slug?: string
-          title_en?: string
-          title_es?: string
-        }
         Relationships: []
       }
       blogs: {
         Row: {
           content: Json
+          content_en: Json | null
           cover_image: string | null
           created_at: string | null
           id: string
           slug: string | null
           title: string
+          title_en: string | null
           updated_at: string | null
         }
         Insert: {
           content: Json
+          content_en?: Json | null
           cover_image?: string | null
           created_at?: string | null
           id?: string
           slug?: string | null
           title: string
+          title_en?: string | null
           updated_at?: string | null
         }
         Update: {
           content?: Json
+          content_en?: Json | null
           cover_image?: string | null
           created_at?: string | null
           id?: string
           slug?: string | null
           title?: string
+          title_en?: string | null
           updated_at?: string | null
         }
         Relationships: []
