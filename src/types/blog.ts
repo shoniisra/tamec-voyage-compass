@@ -13,3 +13,12 @@ export interface BlogPost {
   category_es: string;
   slug: string;
 }
+
+export interface Comment {
+  id: string;
+  blog_post_id: string;
+  name: string;
+  email: string;
+  content: string;
+  created_at: string;
+}
