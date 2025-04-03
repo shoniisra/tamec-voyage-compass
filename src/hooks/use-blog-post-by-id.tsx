@@ -22,7 +22,7 @@ export function useBlogPostById(id: string | undefined) {
         setLoading(true);
         
         const { data, error } = await supabase
-          .from('blog_posts')
+          .from('blogs')
           .select('*')
           .eq('id', id)
           .maybeSingle();
@@ -44,8 +44,8 @@ export function useBlogPostById(id: string | undefined) {
         // Convert to BlogPost type with title field
         const blogPost: BlogPost = {
           ...data,
-          title: data.title_en || data.title_es || '',
-          isLegacy: true
+          title: data.title_en || data.title || '',
+          isLegacy: false
         };
 
         setPost(blogPost);

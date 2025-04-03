@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { BlogPost } from '@/types/blog';
 import { useToast } from '@/components/ui/use-toast';
+import { toKebabCase } from '@/utils/stringUtils';
 
 export function useRecentPosts(currentPostId: string, limit: number = 3) {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -14,21 +15,22 @@ export function useRecentPosts(currentPostId: string, limit: number = 3) {
       try {
         setLoading(true);
         const { data, error } = await supabase
-          .from('blog_posts')
+          .from('blogs')
           .select('*')
           .neq('id', currentPostId)
-          .order('date', { ascending: false })
+          .order('created_at', { ascending: false })
           .limit(limit);
 
         if (error) {
           throw error;
         }
 
-        // Map the data to include the required title field
+        // Map the data to include the required fields
         const mappedPosts = (data || []).map(post => ({
           ...post,
-          title: post.title_en || post.title_es || '',
-          isLegacy: true
+          title: post.title_en || post.title || '',
+          slug: post.slug || `${post.id}-${toKebabCase(post.title)}`,
+          isLegacy: false
         }));
 
         setPosts(mappedPosts as BlogPost[]);
