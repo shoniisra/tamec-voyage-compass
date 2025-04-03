@@ -57,7 +57,7 @@ const packages = [
 
 const TravelPackages = () => {
   return (
-    <section className="py-16">
+    <section className="py-16 bg-[#f8f8f8]">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-3">Popular Travel Packages</h2>
