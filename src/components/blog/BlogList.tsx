@@ -57,9 +57,10 @@ const BlogList = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {posts.map((post) => {
-            const title = language === 'en' 
-              ? post.title_en || post.title 
-              : post.title_es || post.title;
+            // Ensure title is a string, not an object
+            const title = typeof post.title === 'string' ? post.title :
+                         language === 'en' && post.title_en ? post.title_en : 
+                         'Untitled Post';
             
             const excerpt = language === 'en' 
               ? post.excerpt_en || '' 
@@ -68,6 +69,9 @@ const BlogList = () => {
             const category = language === 'en' 
               ? post.category_en || '' 
               : post.category_es || '';
+            
+            // Use slug if available, otherwise fall back to ID
+            const postSlug = post.slug || post.id;
               
             return (
               <BlogCard
@@ -82,7 +86,7 @@ const BlogList = () => {
                   day: 'numeric'
                 })}
                 category={category}
-                slug={post.slug || post.id}
+                slug={postSlug}
               />
             );
           })}

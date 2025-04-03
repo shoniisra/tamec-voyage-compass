@@ -39,10 +39,15 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
     );
   }
 
-  const title = post.title_en || post.title;
+  // Make sure we always have a string title
+  const title = typeof post.title === 'string' ? post.title : 
+                 (language === 'en' && post.title_en ? post.title_en : 
+                 (typeof post.title === 'object' ? JSON.stringify(post.title) : 'Untitled Post'));
+  
   const content = post.isLegacy 
     ? (language === 'en' ? post.content_en : post.content)
     : post.content || post.newContent;
+    
   const formattedDate = post.date 
     ? new Date(post.date).toLocaleDateString() 
     : post.created_at 
@@ -64,7 +69,7 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
 
       {post.isLegacy ? (
         // Render legacy content as HTML
-        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: content }} />
+        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: typeof content === 'string' ? content : JSON.stringify(content) }} />
       ) : (
         // Render new content with EditorJS renderer
         <BlogRenderer content={content} />

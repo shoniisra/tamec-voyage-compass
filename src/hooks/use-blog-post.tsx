@@ -1,10 +1,8 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { supabaseExtended } from '@/integrations/supabase/client-extended';
 import { BlogPost } from '@/types/blog';
 import { useToast } from '@/components/ui/use-toast';
-import { toKebabCase } from '@/utils/stringUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export function useBlogPost(slug: string) {
@@ -18,58 +16,51 @@ export function useBlogPost(slug: string) {
       try {
         setLoading(true);
         
-        // Check if the slug starts with a UUID pattern (new format: id-kebab-title)
-        const idMatch = slug.match(/^([0-9a-fA-F-]+)/);
-        
-        if (idMatch) {
-          // This is likely a new format post with ID-kebab-title
-          const postId = idMatch[1];
-          
-          // Try to fetch from the blogs table
-          const { data: newPost, error: newPostError } = await supabaseExtended
-            .from('blogs')
-            .select('*')
-            .eq('id', postId)
-            .maybeSingle();
-          
-          if (newPost) {
-            // Found in the blogs table
-            setPost({
-              id: newPost.id,
-              title: language === 'en' ? (newPost.title_en || newPost.title) : newPost.title,
-              content_en: '',
-              cover_image: newPost.cover_image || '',
-              date: newPost.created_at || '',
-              slug: newPost.slug || `${newPost.id}-${toKebabCase(newPost.title)}`,
-              isLegacy: false,
-              newContent: newPost.content
-            });
-            setLoading(false);
-            return;
-          }
-        }
-        
-        // Try to find the post with exact slug in the blogs table
-        const { data: postBySlug } = await supabaseExtended
+        // Try to find the post with the provided slug in the blogs table
+        const { data: postBySlug, error: slugError } = await supabaseExtended
           .from('blogs')
           .select('*')
           .eq('slug', slug)
           .maybeSingle();
           
         if (postBySlug) {
+          // Found the post by slug
           setPost({
             id: postBySlug.id,
             title: language === 'en' ? (postBySlug.title_en || postBySlug.title) : postBySlug.title,
             cover_image: postBySlug.cover_image || '',
             date: postBySlug.created_at || '',
-            slug: postBySlug.slug || `${postBySlug.id}-${toKebabCase(postBySlug.title)}`,
+            slug: postBySlug.slug || '',
             isLegacy: false,
             newContent: postBySlug.content
           });
-        } else {
-          // Post not found in either table
-          setPost(null);
+          return;
         }
+        
+        // If not found by slug, check if the slug is actually an ID
+        const { data: postById, error: idError } = await supabaseExtended
+          .from('blogs')
+          .select('*')
+          .eq('id', slug)
+          .maybeSingle();
+          
+        if (postById) {
+          // Found by ID
+          setPost({
+            id: postById.id,
+            title: language === 'en' ? (postById.title_en || postById.title) : postById.title,
+            cover_image: postById.cover_image || '',
+            date: postById.created_at || '',
+            slug: postById.slug || '',
+            isLegacy: false,
+            newContent: postById.content
+          });
+          return;
+        }
+        
+        // Post not found
+        setPost(null);
+        
       } catch (error) {
         console.error('Error fetching blog post:', error);
         toast({
