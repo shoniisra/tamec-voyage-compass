@@ -1,84 +1,18 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Skeleton } from '@/components/ui/skeleton';
-import { supabase } from '@/integrations/supabase/client';
-import { supabaseExtended } from '@/integrations/supabase/client-extended';
 import BlogRenderer from '@/components/editor/BlogRenderer';
 import RecentPosts from './RecentPosts';
+import { useBlogPost } from '@/hooks/use-blog-post';
 
 interface BlogDetailProps {
   slug: string;
 }
 
 const BlogDetail = ({ slug }: BlogDetailProps) => {
-  const { t, language } = useLanguage();
-  const [post, setPost] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchBlogPost = async () => {
-      try {
-        setLoading(true);
-        
-        // Extract the ID from the slug if it contains a hyphen (new format)
-        const idMatch = slug.match(/^([0-9a-fA-F-]+)/);
-        const postId = idMatch ? idMatch[1] : slug;
-        
-        // First check if there's a post with this slug in the old structure
-        const { data: oldPostData, error: oldPostError } = await supabase
-          .from('blog_posts')
-          .select('*')
-          .eq(idMatch ? 'id' : 'slug', idMatch ? postId : slug)
-          .maybeSingle();
-
-        if (oldPostData) {
-          setPost({
-            id: oldPostData.id,
-            title: language === 'en' ? oldPostData.title_en : oldPostData.title_es,
-            content: language === 'en' ? oldPostData.content_en : oldPostData.content_es,
-            date: new Date(oldPostData.date).toLocaleDateString(),
-            coverImage: oldPostData.cover_image,
-            isLegacy: true
-          });
-          setLoading(false);
-          return;
-        }
-
-        // Then check for a post in the new blogs table
-        const { data: newPostData, error: newPostError } = await supabaseExtended
-          .from('blogs')
-          .select('*')
-          .eq('id', postId) // Using the extracted ID for new blog structure
-          .maybeSingle();
-
-        if (newPostError && !oldPostError) throw newPostError;
-        
-        if (newPostData) {
-          setPost({
-            id: newPostData.id,
-            title: newPostData.title,
-            content: newPostData.content,
-            date: new Date(newPostData.created_at).toLocaleDateString(),
-            coverImage: newPostData.cover_image,
-            isLegacy: false
-          });
-        } else if (!oldPostData) {
-          setError('Blog post not found');
-        }
-      } catch (err: any) {
-        console.error('Error fetching blog post:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (slug) {
-      fetchBlogPost();
-    }
-  }, [slug, language]);
+  const { language } = useLanguage();
+  const { post, loading } = useBlogPost(slug);
 
   if (loading) {
     return (
@@ -95,34 +29,40 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
     );
   }
 
-  if (error || !post) {
+  if (!post) {
     return (
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold text-red-500 mb-4">Error</h1>
-        <p>{error || 'Blog post not found'}</p>
+        <p>Blog post not found</p>
       </div>
     );
   }
 
+  const title = language === 'en' ? post.title_en : post.title_es;
+  const content = post.isLegacy 
+    ? (language === 'en' ? post.content_en : post.content_es)
+    : post.newContent;
+  const formattedDate = new Date(post.date).toLocaleDateString();
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl md:text-4xl font-bold mb-4">{post.title}</h1>
-      <div className="text-gray-500 mb-8">{post.date}</div>
+      <h1 className="text-3xl md:text-4xl font-bold mb-4">{title}</h1>
+      <div className="text-gray-500 mb-8">{formattedDate}</div>
       
-      {post.coverImage && (
+      {post.cover_image && (
         <img 
-          src={post.coverImage} 
-          alt={post.title} 
+          src={post.cover_image} 
+          alt={title} 
           className="w-full h-auto max-h-96 object-cover rounded-lg mb-8"
         />
       )}
 
       {post.isLegacy ? (
         // Render legacy content as HTML
-        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: post.content }} />
+        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: content }} />
       ) : (
         // Render new content with EditorJS renderer
-        <BlogRenderer content={post.content} />
+        <BlogRenderer content={content} />
       )}
 
       {/* Recent Posts Section */}

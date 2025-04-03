@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import BlogCard from './BlogCard';
 import { useBlogPosts } from '@/hooks/use-blog-posts';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -58,8 +57,10 @@ const BlogList = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {posts.map((post) => {
-            // Create kebab case URL for new posts
-            const slug = post.isLegacy ? post.slug : `${post.id}-${toKebabCase(post.title_en || post.title_es)}`;
+            // Generate proper slug based on post type
+            const slug = post.isLegacy 
+              ? post.slug 
+              : `${post.id}-${toKebabCase(post.title_en || post.title_es)}`;
             
             return (
               <BlogCard
