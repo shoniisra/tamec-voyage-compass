@@ -92,6 +92,7 @@ export type Database = {
       blogs: {
         Row: {
           content: Json
+          cover_image: string | null
           created_at: string | null
           id: string
           title: string
@@ -99,6 +100,7 @@ export type Database = {
         }
         Insert: {
           content: Json
+          cover_image?: string | null
           created_at?: string | null
           id?: string
           title: string
@@ -106,6 +108,7 @@ export type Database = {
         }
         Update: {
           content?: Json
+          cover_image?: string | null
           created_at?: string | null
           id?: string
           title?: string

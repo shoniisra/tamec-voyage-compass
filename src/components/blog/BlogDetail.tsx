@@ -5,6 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/integrations/supabase/client';
 import { supabaseExtended } from '@/integrations/supabase/client-extended';
 import BlogRenderer from '@/components/editor/BlogRenderer';
+import RecentPosts from './RecentPosts';
 
 interface BlogDetailProps {
   slug: string;
@@ -20,11 +21,16 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
     const fetchBlogPost = async () => {
       try {
         setLoading(true);
+        
+        // Extract the ID from the slug if it contains a hyphen (new format)
+        const idMatch = slug.match(/^([0-9a-fA-F-]+)/);
+        const postId = idMatch ? idMatch[1] : slug;
+        
         // First check if there's a post with this slug in the old structure
         const { data: oldPostData, error: oldPostError } = await supabase
           .from('blog_posts')
           .select('*')
-          .eq('slug', slug)
+          .eq(idMatch ? 'id' : 'slug', idMatch ? postId : slug)
           .maybeSingle();
 
         if (oldPostData) {
@@ -44,7 +50,7 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
         const { data: newPostData, error: newPostError } = await supabaseExtended
           .from('blogs')
           .select('*')
-          .eq('id', slug) // Assuming slug is the ID for new blog structure
+          .eq('id', postId) // Using the extracted ID for new blog structure
           .maybeSingle();
 
         if (newPostError && !oldPostError) throw newPostError;
@@ -118,6 +124,11 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
         // Render new content with EditorJS renderer
         <BlogRenderer content={post.content} />
       )}
+
+      {/* Recent Posts Section */}
+      <div className="mt-12 border-t pt-8">
+        <RecentPosts currentPostId={post.id} />
+      </div>
     </div>
   );
 };

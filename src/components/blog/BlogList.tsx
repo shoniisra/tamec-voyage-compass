@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { PlusCircle } from 'lucide-react';
+import { toKebabCase } from '@/utils/stringUtils';
 
 const BlogList = () => {
   const { posts, loading } = useBlogPosts();
@@ -56,22 +57,27 @@ const BlogList = () => {
         )}
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {posts.map((post) => (
-            <BlogCard
-              key={post.id}
-              id={post.id}
-              title={language === 'en' ? post.title_en : post.title_es}
-              excerpt={language === 'en' ? post.excerpt_en : post.excerpt_es}
-              coverImage={post.cover_image}
-              date={new Date(post.date).toLocaleDateString('en-US', { 
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
-              category={language === 'en' ? post.category_en : post.category_es}
-              slug={post.slug}
-            />
-          ))}
+          {posts.map((post) => {
+            // Create kebab case URL for new posts
+            const slug = post.isLegacy ? post.slug : `${post.id}-${toKebabCase(post.title_en || post.title_es)}`;
+            
+            return (
+              <BlogCard
+                key={post.id}
+                id={post.id}
+                title={language === 'en' ? post.title_en : post.title_es}
+                excerpt={language === 'en' ? post.excerpt_en : post.excerpt_es}
+                coverImage={post.cover_image}
+                date={new Date(post.date).toLocaleDateString('en-US', { 
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+                category={language === 'en' ? post.category_en : post.category_es}
+                slug={slug}
+              />
+            );
+          })}
         </div>
         
         {/* Simple pagination for future expansion */}

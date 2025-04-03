@@ -4,11 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { supabaseExtended } from '@/integrations/supabase/client-extended';
 import { BlogPost } from '@/types/blog';
 import { useToast } from '@/components/ui/use-toast';
+import { toKebabCase } from '@/utils/stringUtils';
 
 interface BlogPostNew {
   id: string;
   title: string;
   content: any;
+  cover_image?: string;
   created_at: string;
 }
 
@@ -53,14 +55,14 @@ export function useBlogPosts() {
           id: post.id,
           title_en: post.title, // Map to existing schema for compatibility
           title_es: post.title,
-          slug: post.id, // Use ID as slug for new posts
+          slug: `${post.id}-${toKebabCase(post.title)}`, // Generate kebab case slug
           excerpt_en: '',
           excerpt_es: '',
           content_en: '',
           content_es: '',
           category_en: '',
           category_es: '',
-          cover_image: '',
+          cover_image: post.cover_image || '',
           date: post.created_at,
           newContent: post.content, // Store the new content format
           isLegacy: false
