@@ -24,11 +24,11 @@ const RecentPosts = ({ currentPostId, limit = 3 }: RecentPostsProps) => {
         setLoading(true);
         
         // Fetch legacy blog posts
-        const { data: legacyPosts } = await supabase
-          .from('blog_posts')
-          .select('id, title_en, title_es, excerpt_en, excerpt_es, cover_image, date, slug')
+        const { data: legacyPosts } = await supabaseExtended
+          .from('blogs')
+          .select('id, title_en, title_es, content, cover_image, created_at, slug')
           .neq('id', currentPostId)
-          .order('date', { ascending: false })
+          .order('created_at', { ascending: false })
           .limit(limit);
         
         // Fetch new blog posts
@@ -48,20 +48,18 @@ const RecentPosts = ({ currentPostId, limit = 3 }: RecentPostsProps) => {
         const formattedLegacyPosts = (legacyPosts || []).map((post) => ({
           id: post.id,
           title: language === 'en' ? post.title_en : post.title_es,
-          excerpt: language === 'en' ? post.excerpt_en : post.excerpt_es,
           cover_image: post.cover_image,
-          date: new Date(post.date).toLocaleDateString(),
-          slug: post.slug,
+          date: new Date(post.created_at).toLocaleDateString(),
+          slug: post.slug || `${post.id}-${toKebabCase(post.title_en || post.title_es)}`,
           isLegacy: true
         }));
         
         const formattedNewPosts = (newPosts || []).map((post) => ({
           id: post.id,
           title: post.title,
-          excerpt: '',
           cover_image: post.cover_image || '',
           date: new Date(post.created_at || '').toLocaleDateString(),
-          slug: post.slug || `${post.id}-${toKebabCase(post.title)}`, // Generate slug if not available
+          slug: post.slug || `${post.id}-${toKebabCase(post.title)}`,
           isLegacy: false
         }));
         
