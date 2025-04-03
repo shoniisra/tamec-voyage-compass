@@ -8,7 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 const BlogList = () => {
   const { posts, loading } = useBlogPosts();
-  const { formatBlogPost } = useLanguage();
+  const { t, language } = useLanguage();
   
   // Display loading skeletons when data is being fetched
   if (loading) {
@@ -38,25 +38,22 @@ const BlogList = () => {
     <section className="py-16">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {posts.map((post) => {
-            const formattedPost = formatBlogPost(post);
-            return (
-              <BlogCard
-                key={post.id}
-                id={post.id}
-                title={formattedPost.title}
-                excerpt={formattedPost.excerpt}
-                coverImage={post.cover_image}
-                date={new Date(post.date).toLocaleDateString('en-US', { 
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-                category={formattedPost.category}
-                slug={post.slug}
-              />
-            );
-          })}
+          {posts.map((post) => (
+            <BlogCard
+              key={post.id}
+              id={post.id}
+              title={language === 'en' ? post.title_en : post.title_es}
+              excerpt={language === 'en' ? post.excerpt_en : post.excerpt_es}
+              coverImage={post.cover_image}
+              date={new Date(post.date).toLocaleDateString('en-US', { 
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+              category={language === 'en' ? post.category_en : post.category_es}
+              slug={post.slug}
+            />
+          ))}
         </div>
         
         {/* Simple pagination for future expansion */}

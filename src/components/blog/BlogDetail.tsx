@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useBlogPost } from '@/hooks/use-blog-post';
 import { useComments } from '@/hooks/use-comments';
@@ -35,7 +34,7 @@ const CommentSchema = z.object({
 
 const BlogDetail = ({ slug }: BlogDetailProps) => {
   const { post, loading } = useBlogPost(slug);
-  const { formatBlogPost, t } = useLanguage();
+  const { t, language } = useLanguage();
   const [liked, setLiked] = useState(false);
   const { toast } = useToast();
   const { comments, loading: commentsLoading, addComment } = useComments(post?.id || '');
@@ -79,8 +78,6 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
       </div>
     );
   }
-
-  const formattedPost = formatBlogPost(post);
   
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -109,17 +106,22 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
     }
   };
 
+  const title = language === 'en' ? post.title_en : post.title_es;
+  const content = language === 'en' ? post.content_en : post.content_es;
+  const excerpt = language === 'en' ? post.excerpt_en : post.excerpt_es;
+  const category = language === 'en' ? post.category_en : post.category_es;
+
   return (
     <div className="container mx-auto py-10 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
-            {formattedPost.title}
+            {title}
           </h1>
           <div className="flex items-center text-gray-500 mb-6 flex-wrap gap-4">
             <span className="bg-tamec-50 text-tamec-700 px-3 py-1 rounded-full text-sm">
-              {formattedPost.category}
+              {category}
             </span>
             <div className="flex items-center">
               <Clock className="h-4 w-4 mr-1" />
@@ -134,7 +136,7 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
         <div className="mb-8 rounded-lg overflow-hidden">
           <img 
             src={post.cover_image} 
-            alt={formattedPost.title} 
+            alt={title} 
             className="w-full h-auto object-cover"
           />
         </div>
@@ -171,14 +173,14 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
 
         {/* Content */}
         <div className="prose max-w-none mb-12">
-          {formattedPost.content.split('\n\n').map((paragraph, idx) => (
+          {content.split('\n\n').map((paragraph, idx) => (
             <p key={idx} className="mb-4">{paragraph}</p>
           ))}
         </div>
 
         {/* Comments Section */}
         <div className="mb-12">
-          <h3 className="text-2xl font-bold mb-6">Comments</h3>
+          <h3 className="text-2xl font-bold mb-6">{t('blog.commentsSectionTitle')}</h3>
           
           {/* Comment Form */}
           <Form {...form}>
@@ -189,9 +191,9 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Name</FormLabel>
+                      <FormLabel>{t('blog.yourName')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Your name" {...field} />
+                        <Input placeholder={t('blog.yourName')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -202,7 +204,7 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t('blog.yourEmail')}</FormLabel>
                       <FormControl>
                         <Input placeholder="your.email@example.com" {...field} />
                       </FormControl>
@@ -216,16 +218,16 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
                 name="comment"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Comment</FormLabel>
+                    <FormLabel>{t('blog.yourComment')}</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Share your thoughts..." {...field} />
+                      <Textarea placeholder={t('blog.yourComment')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <Button type="submit" className="bg-tamec-600 hover:bg-tamec-700">
-                Post Comment
+                {t('blog.submitComment')}
               </Button>
             </form>
           </Form>
@@ -244,7 +246,7 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
               </div>
             ) : comments.length === 0 ? (
               <div className="text-center py-8 border rounded-lg">
-                <p className="text-gray-500">Be the first to comment on this post!</p>
+                <p className="text-gray-500">{t('blog.noComments')}</p>
               </div>
             ) : (
               comments.map((comment) => (
@@ -279,20 +281,22 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
               ))
             ) : (
               recentPosts.map((post) => {
-                const recentPost = formatBlogPost(post);
+                const recentPostTitle = language === 'en' ? post.title_en : post.title_es;
+                const recentPostExcerpt = language === 'en' ? post.excerpt_en : post.excerpt_es;
+                
                 return (
                   <Link to={`/blog/${post.slug}`} key={post.id}>
                     <Card className="overflow-hidden h-full hover:-translate-y-1 transition-all duration-300">
                       <div className="h-36 overflow-hidden">
                         <img
                           src={post.cover_image}
-                          alt={recentPost.title}
+                          alt={recentPostTitle}
                           className="w-full h-full object-cover"
                         />
                       </div>
                       <div className="p-4">
-                        <h4 className="font-semibold mb-2 line-clamp-2">{recentPost.title}</h4>
-                        <p className="text-gray-600 text-sm line-clamp-2">{recentPost.excerpt}</p>
+                        <h4 className="font-semibold mb-2 line-clamp-2">{recentPostTitle}</h4>
+                        <p className="text-gray-600 text-sm line-clamp-2">{recentPostExcerpt}</p>
                       </div>
                     </Card>
                   </Link>
