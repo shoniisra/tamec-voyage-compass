@@ -41,6 +41,11 @@ const AdminSidebar = () => {
       path: '/admin' 
     },
     { 
+      icon: Users, 
+      title: 'Clientes', 
+      path: '/admin/customers' 
+    },
+    { 
       icon: FileText, 
       title: 'Blogs', 
       path: '/admin/blog/posts' 
@@ -59,11 +64,6 @@ const AdminSidebar = () => {
       icon: Tag, 
       title: 'Etiquetas', 
       path: '/admin/tags' 
-    },
-    { 
-      icon: Users, 
-      title: 'CRUD y Seguimiento a Clientes', 
-      path: '/admin/customers' 
     }
   ];
 
