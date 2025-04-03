@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { BlogPost } from '@/types/blog';
 import { useToast } from '@/components/ui/use-toast';
+import { Database } from '@/integrations/supabase/types';
 
 export function useBlogPosts() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
