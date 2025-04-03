@@ -45,7 +45,7 @@ const BlogList = () => {
         {isAdmin && (
           <div className="mb-8 flex justify-end">
             <Button 
-              onClick={() => navigate('/admin/blog/create')}
+              onClick={() => navigate('/admin/blog/posts/create')}
               className="bg-tamec-600 hover:bg-tamec-700"
             >
               <PlusCircle className="mr-2 h-4 w-4" />
