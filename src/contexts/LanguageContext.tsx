@@ -39,51 +39,18 @@ const translations: Translations = {
       title: 'Our Travel Blog',
       subtitle: 'Stories, tips, and inspiration for your next journey',
       readMore: 'Read More',
-      comments: {
-        en: 'Comments',
-        es: 'Comentarios'
-      },
+      comments: 'Comments',
       commentsSectionTitle: 'Comments',
-      leaveComment: {
-        en: 'Leave a Comment',
-        es: 'Deja un Comentario'
-      },
-      name: {
-        en: 'Name',
-        es: 'Nombre'
-      },
-      namePlaceholder: {
-        en: 'Enter your name',
-        es: 'Ingresa tu nombre'
-      },
-      email: {
-        en: 'Email',
-        es: 'Correo electrónico'
-      },
-      emailPlaceholder: {
-        en: 'Enter your email',
-        es: 'Ingresa tu correo electrónico'
-      },
-      comment: {
-        en: 'Comment',
-        es: 'Comentario'
-      },
-      commentPlaceholder: {
-        en: 'Write your comment here...',
-        es: 'Escribe tu comentario aquí...'
-      },
-      postComment: {
-        en: 'Post Comment',
-        es: 'Publicar Comentario'
-      },
-      posting: {
-        en: 'Posting...',
-        es: 'Publicando...'
-      },
-      noComments: {
-        en: 'No comments yet. Be the first to comment!',
-        es: '¡No hay comentarios aún. Sé el primero en comentar!'
-      },
+      leaveComment: 'Leave a Comment',
+      name: 'Name',
+      namePlaceholder: 'Enter your name',
+      email: 'Email',
+      emailPlaceholder: 'Enter your email',
+      comment: 'Comment',
+      commentPlaceholder: 'Write your comment here...',
+      postComment: 'Post Comment',
+      posting: 'Posting...',
+      noComments: 'No comments yet. Be the first to comment!',
     },
     contact: {
       title: 'Contact Us',
@@ -160,51 +127,18 @@ const translations: Translations = {
       title: 'Nuestro Blog de Viajes',
       subtitle: 'Historias, consejos e inspiración para tu próximo viaje',
       readMore: 'Leer Más',
-      comments: {
-        en: 'Comments',
-        es: 'Comentarios'
-      },
+      comments: 'Comentarios',
       commentsSectionTitle: 'Comentarios',
-      leaveComment: {
-        en: 'Leave a Comment',
-        es: 'Deja un Comentario'
-      },
-      name: {
-        en: 'Name',
-        es: 'Nombre'
-      },
-      namePlaceholder: {
-        en: 'Enter your name',
-        es: 'Ingresa tu nombre'
-      },
-      email: {
-        en: 'Email',
-        es: 'Correo electrónico'
-      },
-      emailPlaceholder: {
-        en: 'Enter your email',
-        es: 'Ingresa tu correo electrónico'
-      },
-      comment: {
-        en: 'Comment',
-        es: 'Comentario'
-      },
-      commentPlaceholder: {
-        en: 'Write your comment here...',
-        es: 'Escribe tu comentario aquí...'
-      },
-      postComment: {
-        en: 'Post Comment',
-        es: 'Publicar Comentario'
-      },
-      posting: {
-        en: 'Posting...',
-        es: 'Publicando...'
-      },
-      noComments: {
-        en: 'No comments yet. Be the first to comment!',
-        es: '¡No hay comentarios aún. Sé el primero en comentar!'
-      },
+      leaveComment: 'Deja un Comentario',
+      name: 'Nombre',
+      namePlaceholder: 'Ingresa tu nombre',
+      email: 'Correo electrónico',
+      emailPlaceholder: 'Ingresa tu correo electrónico',
+      comment: 'Comentario',
+      commentPlaceholder: 'Escribe tu comentario aquí...',
+      postComment: 'Publicar Comentario',
+      posting: 'Publicando...',
+      noComments: '¡No hay comentarios aún. Sé el primero en comentar!',
     },
     contact: {
       title: 'Contáctanos',
