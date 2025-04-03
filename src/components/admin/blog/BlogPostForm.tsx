@@ -152,22 +152,21 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ post, isLoading, onSave }) 
                           <Input placeholder="https://example.com/image.jpg" {...field} />
                         </FormControl>
                         <FormMessage />
+                        {field.value && (
+                          <div className="mt-2 aspect-video rounded-md overflow-hidden bg-muted">
+                            <img 
+                              src={field.value} 
+                              alt="Cover preview" 
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.src = '/placeholder.svg';
+                              }}
+                            />
+                          </div>
+                        )}
                       </FormItem>
                     )}
                   />
-
-                  {field.value && (
-                    <div className="mt-2 aspect-video rounded-md overflow-hidden bg-muted">
-                      <img 
-                        src={form.getValues("cover_image")} 
-                        alt="Cover preview" 
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = '/placeholder.svg';
-                        }}
-                      />
-                    </div>
-                  )}
                 </div>
               </CardContent>
             </Card>
