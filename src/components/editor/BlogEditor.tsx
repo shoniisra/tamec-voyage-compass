@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from "react";
 import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
@@ -6,9 +7,9 @@ import Image from "@editorjs/image";
 import { supabaseExtended } from "@/integrations/supabase/client-extended";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { Image as ImageIcon } from "lucide-react";
+import { Image as ImageIcon, Save } from "lucide-react";
 import { toKebabCase } from "@/utils/stringUtils";
 
 interface BlogEditorProps {
@@ -39,10 +40,10 @@ const BlogEditor = ({
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
-    if ((!slug || !isEdit) && title) {
+    if ((!slug || slug === '') && title) {
       setSlug(toKebabCase(title));
     }
-  }, [title, slug, isEdit]);
+  }, [title, slug]);
 
   useEffect(() => {
     if (!editorRef.current) {
@@ -112,7 +113,7 @@ const BlogEditor = ({
             }
           }
         },
-        data: initialContent
+        data: Object.keys(initialContent).length > 0 ? initialContent : {}
       });
       
       editorRef.current = editor;
@@ -135,12 +136,6 @@ const BlogEditor = ({
         }
       }
     };
-  }, [initialContent]);
-
-  useEffect(() => {
-    if (editorRef.current && initialContent && Object.keys(initialContent).length > 0) {
-      editorRef.current.render(initialContent);
-    }
   }, [initialContent]);
 
   const handleCoverImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -218,7 +213,7 @@ const BlogEditor = ({
           .from('blogs')
           .update({ 
             title, 
-            content: outputData as any,
+            content: outputData,
             cover_image: coverImage,
             slug: slug,
             updated_at: new Date().toISOString()
@@ -237,7 +232,7 @@ const BlogEditor = ({
           .from('blogs')
           .insert({ 
             title, 
-            content: outputData as any,
+            content: outputData,
             cover_image: coverImage,
             slug: slug,
             created_at: new Date().toISOString()
@@ -273,8 +268,9 @@ const BlogEditor = ({
         <Button 
           onClick={handleSave} 
           disabled={isSaving}
-          className="bg-tamec-600 hover:bg-tamec-700 text-white"
+          className="bg-tamec-600 hover:bg-tamec-700 text-white flex items-center gap-2"
         >
+          <Save className="h-4 w-4" />
           {isSaving ? "Saving..." : "Save Blog Post"}
         </Button>
       </div>
