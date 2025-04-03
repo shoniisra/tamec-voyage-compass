@@ -4,7 +4,7 @@ import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 import List from "@editorjs/list";
 import Image from "@editorjs/image";
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseExtended } from "@/integrations/supabase/client-extended";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
@@ -51,7 +51,7 @@ const BlogEditor = ({ initialTitle = "", initialContent = {}, blogId, isEdit = f
                     const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
                     const filePath = `blog-images/${fileName}`;
                     
-                    const { error: uploadError } = await supabase.storage
+                    const { error: uploadError } = await supabaseExtended.storage
                       .from('blog-content')
                       .upload(filePath, file);
                       
@@ -59,7 +59,7 @@ const BlogEditor = ({ initialTitle = "", initialContent = {}, blogId, isEdit = f
                       throw uploadError;
                     }
                     
-                    const { data } = supabase.storage
+                    const { data } = supabaseExtended.storage
                       .from('blog-content')
                       .getPublicUrl(filePath);
                       
@@ -126,7 +126,7 @@ const BlogEditor = ({ initialTitle = "", initialContent = {}, blogId, isEdit = f
       
       if (isEdit && blogId) {
         // Update existing blog
-        const { error } = await supabase
+        const { error } = await supabaseExtended
           .from('blogs')
           .update({ 
             title, 
@@ -143,13 +143,13 @@ const BlogEditor = ({ initialTitle = "", initialContent = {}, blogId, isEdit = f
         });
       } else {
         // Create new blog
-        const { error } = await supabase
+        const { error } = await supabaseExtended
           .from('blogs')
-          .insert([{ 
+          .insert({ 
             title, 
             content: outputData,
             created_at: new Date().toISOString()
-          }]);
+          });
           
         if (error) throw error;
         

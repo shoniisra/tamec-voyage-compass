@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Output as EditorOutput } from "editorjs-react-renderer";
+import { Output } from "editorjs-react-renderer";
 
 interface BlogRendererProps {
   content: any;
@@ -51,7 +51,7 @@ const BlogRenderer = ({ content }: BlogRendererProps) => {
 
   return (
     <div className="blog-content prose max-w-none">
-      <EditorOutput data={content} renderers={renderers} />
+      <Output data={content} renderers={renderers} />
     </div>
   );
 };

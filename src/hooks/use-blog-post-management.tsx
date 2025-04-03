@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { BlogPost } from '@/types/blog';
 import { supabase } from '@/integrations/supabase/client';
+import { supabaseExtended } from '@/integrations/supabase/client-extended';
 import { useToast } from '@/hooks/use-toast';
 
 // Interface for create/update blog post data
@@ -89,7 +90,7 @@ export function useBlogPostManagement() {
       setIsLoading(true);
       
       // Insert new post
-      const { error } = await supabase
+      const { error } = await supabaseExtended
         .from('blogs')
         .insert({
           title: data.title,
@@ -179,7 +180,7 @@ export function useBlogPostManagement() {
       setIsLoading(true);
       
       // Update post
-      const { error } = await supabase
+      const { error } = await supabaseExtended
         .from('blogs')
         .update({
           title: data.title,
@@ -229,7 +230,7 @@ export function useBlogPostManagement() {
       }
       
       // If it wasn't in the legacy table, try the new blogs table
-      let { error: blogsError } = await supabase
+      let { error: blogsError } = await supabaseExtended
         .from('blogs')
         .delete()
         .eq('id', id);

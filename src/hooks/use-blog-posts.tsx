@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { supabaseExtended } from '@/integrations/supabase/client-extended';
 import { BlogPost } from '@/types/blog';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -32,7 +33,7 @@ export function useBlogPosts() {
         }
         
         // Fetch new blog posts
-        const { data: newData, error: newError } = await supabase
+        const { data: newData, error: newError } = await supabaseExtended
           .from('blogs')
           .select('*')
           .order('created_at', { ascending: false });

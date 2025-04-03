@@ -8,6 +8,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import BlogEditor from '@/components/editor/BlogEditor';
 import { supabase } from '@/integrations/supabase/client';
+import { supabaseExtended } from '@/integrations/supabase/client-extended';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const EditBlogPostPage = () => {
@@ -23,7 +24,7 @@ const EditBlogPostPage = () => {
       try {
         if (!id) return;
         
-        const { data, error } = await supabase
+        const { data, error } = await supabaseExtended
           .from('blogs')
           .select('*')
           .eq('id', id)

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/integrations/supabase/client';
+import { supabaseExtended } from '@/integrations/supabase/client-extended';
 import BlogRenderer from '@/components/editor/BlogRenderer';
 
 interface BlogDetailProps {
@@ -40,7 +41,7 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
         }
 
         // Then check for a post in the new blogs table
-        const { data: newPostData, error: newPostError } = await supabase
+        const { data: newPostData, error: newPostError } = await supabaseExtended
           .from('blogs')
           .select('*')
           .eq('id', slug) // Assuming slug is the ID for new blog structure
