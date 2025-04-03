@@ -38,6 +38,7 @@ const BlogEditor = ({ initialTitle = "", initialContent = {}, blogId, isEdit = f
             }
           },
           list: {
+            // @ts-ignore - EditorJS type definitions are not perfect
             class: List,
             inlineToolbar: true
           },
@@ -103,6 +104,13 @@ const BlogEditor = ({ initialTitle = "", initialContent = {}, blogId, isEdit = f
         editorRef.current = null;
       }
     };
+  }, [initialContent]);
+
+  // Update editor content when value prop changes
+  useEffect(() => {
+    if (editorRef.current && initialContent && Object.keys(initialContent).length > 0) {
+      editorRef.current.render(initialContent);
+    }
   }, [initialContent]);
 
   const handleSave = async () => {

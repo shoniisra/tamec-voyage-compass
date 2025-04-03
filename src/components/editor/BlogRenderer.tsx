@@ -32,7 +32,7 @@ const renderers = {
     return (
       <div className="my-6">
         <img 
-          src={data.file.url} 
+          src={data.file?.url} 
           alt={data.caption || ''} 
           className="max-w-full rounded-md" 
         />
