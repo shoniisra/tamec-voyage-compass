@@ -151,7 +151,7 @@ const BlogEditor = ({ initialTitle = "", initialContent = {}, blogId, isEdit = f
           .from('blogs')
           .update({ 
             title, 
-            content: outputData,
+            content: outputData as any,
             updated_at: new Date().toISOString()
           })
           .eq('id', blogId);
@@ -168,7 +168,7 @@ const BlogEditor = ({ initialTitle = "", initialContent = {}, blogId, isEdit = f
           .from('blogs')
           .insert({ 
             title, 
-            content: outputData,
+            content: outputData as any,
             created_at: new Date().toISOString()
           });
           
