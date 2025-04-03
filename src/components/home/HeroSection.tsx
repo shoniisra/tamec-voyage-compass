@@ -3,8 +3,11 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const HeroSection = () => {
+  const { t } = useLanguage();
+  
   return (
     <div className="relative h-[600px] overflow-hidden">
       <div 
@@ -20,10 +23,10 @@ const HeroSection = () => {
       <div className="relative container mx-auto h-full flex flex-col justify-center px-4">
         <div className="max-w-xl animate-fade-up opacity-0" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
-            Discover the World with TAMEC
+            {t('home.hero.title')}
           </h1>
           <p className="text-lg text-white/90 mb-8">
-            Extraordinary destinations and unforgettable experiences tailored just for you.
+            {t('home.hero.subtitle')}
           </p>
           
           <div className="bg-white p-4 rounded-lg shadow-xl">
@@ -31,12 +34,12 @@ const HeroSection = () => {
               <div className="flex-grow">
                 <Input 
                   type="text" 
-                  placeholder="Where do you want to go?" 
+                  placeholder={t('home.hero.search')}
                   className="border-gray-300 focus:ring-tamec-500"
                 />
               </div>
               <Button className="bg-tamec-600 hover:bg-tamec-700">
-                <Search className="mr-2 h-4 w-4" /> Search
+                <Search className="mr-2 h-4 w-4" /> {t('home.hero.searchButton')}
               </Button>
             </div>
           </div>

@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MapPin } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface DestinationCardProps {
   name: string;
@@ -13,6 +14,8 @@ interface DestinationCardProps {
 }
 
 const DestinationCard = ({ name, location, image, price, rating }: DestinationCardProps) => {
+  const { t } = useLanguage();
+  
   return (
     <Card className="overflow-hidden h-full transition-transform hover:-translate-y-1 duration-300">
       <div className="relative h-48 overflow-hidden">
@@ -47,7 +50,7 @@ const DestinationCard = ({ name, location, image, price, rating }: DestinationCa
       
       <CardFooter className="p-4 pt-0">
         <Button variant="outline" className="w-full border-tamec-600 text-tamec-600 hover:bg-tamec-50">
-          Explore Now
+          {t('home.destinations.exploreNow')}
         </Button>
       </CardFooter>
     </Card>

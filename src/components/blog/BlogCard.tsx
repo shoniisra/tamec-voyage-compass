@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface BlogCardProps {
   id: number;
@@ -15,6 +16,8 @@ interface BlogCardProps {
 }
 
 const BlogCard = ({ id, title, excerpt, coverImage, date, category, slug }: BlogCardProps) => {
+  const { t } = useLanguage();
+  
   return (
     <Card className="overflow-hidden h-full transition-transform hover:-translate-y-1 duration-300">
       <Link to={`/blog/${slug}`} className="block h-48 overflow-hidden">
@@ -50,7 +53,7 @@ const BlogCard = ({ id, title, excerpt, coverImage, date, category, slug }: Blog
           to={`/blog/${slug}`}
           className="inline-flex text-tamec-600 hover:text-tamec-700 font-medium"
         >
-          Read More
+          {t('blog.readMore')}
         </Link>
       </CardContent>
     </Card>

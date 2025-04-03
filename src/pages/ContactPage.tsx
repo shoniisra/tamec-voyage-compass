@@ -3,15 +3,18 @@ import React from 'react';
 import Layout from '@/components/layout/Layout';
 import ContactForm from '@/components/contact/ContactForm';
 import ContactInfo from '@/components/contact/ContactInfo';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const ContactPage = () => {
+  const { t } = useLanguage();
+  
   return (
     <Layout>
       <div className="bg-tamec-600 py-16">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl font-bold text-white mb-4">Contact Us</h1>
+          <h1 className="text-4xl font-bold text-white mb-4">{t('contact.title')}</h1>
           <p className="text-tamec-100 max-w-2xl mx-auto">
-            Have questions or ready to plan your next adventure? Get in touch with our travel experts.
+            {t('contact.subtitle')}
           </p>
         </div>
       </div>
@@ -19,9 +22,9 @@ const ContactPage = () => {
       <div className="container mx-auto px-4 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div>
-            <h2 className="text-2xl font-bold mb-6">Send Us a Message</h2>
+            <h2 className="text-2xl font-bold mb-6">{t('contact.form.title')}</h2>
             <p className="text-gray-600 mb-6">
-              Fill out the form below and our team will get back to you as soon as possible.
+              {t('contact.form.description')}
             </p>
             <ContactForm />
           </div>
@@ -32,7 +35,7 @@ const ContactPage = () => {
         </div>
         
         <div className="mt-16">
-          <h2 className="text-2xl font-bold mb-6">Find Us</h2>
+          <h2 className="text-2xl font-bold mb-6">{t('contact.findUs')}</h2>
           <div className="h-96 bg-gray-200 rounded-lg overflow-hidden">
             {/* Replace with an actual map component if desired */}
             <iframe

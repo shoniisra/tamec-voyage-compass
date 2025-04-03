@@ -2,8 +2,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Footer = () => {
+  const { t } = useLanguage();
+  const currentYear = new Date().getFullYear();
+  
   return (
     <footer className="bg-gray-900 text-white">
       <div className="container mx-auto px-4 py-12">
@@ -11,7 +15,7 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-bold text-tamec-300 mb-4">TAMEC Travel</h3>
             <p className="text-gray-400 mb-4">
-              Discover the world with TAMEC Travel Agency. We offer exceptional travel experiences tailored to your needs.
+              {t('footer.description')}
             </p>
             <div className="flex space-x-4">
               <a href="https://facebook.com" className="text-gray-400 hover:text-tamec-300 transition-colors">
@@ -27,25 +31,25 @@ const Footer = () => {
           </div>
           
           <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('footer.quickLinks')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/" className="text-gray-400 hover:text-tamec-300 transition-colors">Home</Link>
+                <Link to="/" className="text-gray-400 hover:text-tamec-300 transition-colors">{t('nav.home')}</Link>
               </li>
               <li>
-                <Link to="/destinations" className="text-gray-400 hover:text-tamec-300 transition-colors">Destinations</Link>
+                <Link to="/destinations" className="text-gray-400 hover:text-tamec-300 transition-colors">{t('nav.destinations')}</Link>
               </li>
               <li>
-                <Link to="/blog" className="text-gray-400 hover:text-tamec-300 transition-colors">Travel Blog</Link>
+                <Link to="/blog" className="text-gray-400 hover:text-tamec-300 transition-colors">{t('nav.blog')}</Link>
               </li>
               <li>
-                <Link to="/contact" className="text-gray-400 hover:text-tamec-300 transition-colors">Contact Us</Link>
+                <Link to="/contact" className="text-gray-400 hover:text-tamec-300 transition-colors">{t('nav.contact')}</Link>
               </li>
             </ul>
           </div>
           
           <div>
-            <h3 className="text-lg font-semibold mb-4">Popular Destinations</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('footer.popularDestinations')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/destinations/bali" className="text-gray-400 hover:text-tamec-300 transition-colors">Bali, Indonesia</Link>
@@ -63,7 +67,7 @@ const Footer = () => {
           </div>
           
           <div>
-            <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('footer.contactUs')}</h3>
             <ul className="space-y-3">
               <li className="flex items-start">
                 <MapPin className="mr-2 h-5 w-5 text-tamec-300" />
@@ -83,14 +87,14 @@ const Footer = () => {
         
         <div className="border-t border-gray-800 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            &copy; {new Date().getFullYear()} TAMEC Travel Agency. All rights reserved.
+            &copy; {currentYear} TAMEC Travel Agency. {t('footer.rights')}
           </p>
           <div className="flex space-x-4 mt-4 md:mt-0">
             <Link to="/terms" className="text-gray-400 hover:text-tamec-300 text-sm transition-colors">
-              Terms & Conditions
+              {t('footer.terms')}
             </Link>
             <Link to="/privacy" className="text-gray-400 hover:text-tamec-300 text-sm transition-colors">
-              Privacy Policy
+              {t('footer.privacy')}
             </Link>
           </div>
         </div>

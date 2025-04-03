@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface FormValues {
   name: string;
@@ -15,6 +16,7 @@ interface FormValues {
 }
 
 const ContactForm = () => {
+  const { t } = useLanguage();
   const { register, handleSubmit, formState: { errors }, reset } = useForm<FormValues>();
   
   const onSubmit = (data: FormValues) => {
@@ -28,10 +30,10 @@ const ContactForm = () => {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="name">Full Name</Label>
+          <Label htmlFor="name">{t('contact.form.fullName')}</Label>
           <Input 
             id="name" 
-            placeholder="John Doe" 
+            placeholder={t('contact.form.namePlaceholder')}
             {...register('name', { required: 'Name is required' })}
           />
           {errors.name && (
@@ -40,11 +42,11 @@ const ContactForm = () => {
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{t('contact.form.email')}</Label>
           <Input 
             id="email" 
             type="email" 
-            placeholder="john@example.com" 
+            placeholder={t('contact.form.emailPlaceholder')}
             {...register('email', { 
               required: 'Email is required',
               pattern: {
@@ -60,10 +62,10 @@ const ContactForm = () => {
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="subject">Subject</Label>
+        <Label htmlFor="subject">{t('contact.form.subject')}</Label>
         <Input 
           id="subject" 
-          placeholder="How can we help you?" 
+          placeholder={t('contact.form.subjectPlaceholder')}
           {...register('subject', { required: 'Subject is required' })}
         />
         {errors.subject && (
@@ -72,10 +74,10 @@ const ContactForm = () => {
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="message">Message</Label>
+        <Label htmlFor="message">{t('contact.form.message')}</Label>
         <Textarea 
           id="message" 
-          placeholder="Your message here..." 
+          placeholder={t('contact.form.messagePlaceholder')}
           rows={5}
           {...register('message', { required: 'Message is required' })}
         />
@@ -85,7 +87,7 @@ const ContactForm = () => {
       </div>
       
       <Button type="submit" className="bg-tamec-600 hover:bg-tamec-700 w-full sm:w-auto">
-        Send Message
+        {t('contact.form.submit')}
       </Button>
     </form>
   );

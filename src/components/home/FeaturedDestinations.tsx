@@ -3,6 +3,7 @@ import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import DestinationCard from './DestinationCard';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const destinations = [
   {
@@ -40,18 +41,20 @@ const destinations = [
 ];
 
 const FeaturedDestinations = () => {
+  const { t } = useLanguage();
+  
   return (
     <section className="py-16 bg-gray-50 hero-pattern">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-10">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Featured Destinations</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">{t('home.featured.title')}</h2>
             <p className="text-gray-600 max-w-2xl">
-              Explore our handpicked selection of stunning destinations around the world.
+              {t('home.featured.subtitle')}
             </p>
           </div>
           <Button variant="link" className="text-tamec-600 flex items-center mt-4 md:mt-0 p-0">
-            View All Destinations <ArrowRight className="ml-2 h-4 w-4" />
+            {t('home.featured.viewAll')} <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>
         
