@@ -5,11 +5,13 @@ import { supabaseExtended } from '@/integrations/supabase/client-extended';
 import { BlogPost } from '@/types/blog';
 import { useToast } from '@/components/ui/use-toast';
 import { toKebabCase } from '@/utils/stringUtils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export function useBlogPost(slug: string) {
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { language } = useLanguage();
 
   useEffect(() => {
     async function fetchPost() {
@@ -34,8 +36,7 @@ export function useBlogPost(slug: string) {
             // Found in the blogs table
             setPost({
               id: newPost.id,
-              title: newPost.title,
-              title_en: newPost.title_en || newPost.title,
+              title: language === 'en' ? (newPost.title_en || newPost.title) : newPost.title,
               content_en: '',
               cover_image: newPost.cover_image || '',
               date: newPost.created_at || '',
@@ -58,8 +59,7 @@ export function useBlogPost(slug: string) {
         if (postBySlug) {
           setPost({
             id: postBySlug.id,
-            title: postBySlug.title,
-            title_en: postBySlug.title_en || postBySlug.title,
+            title: language === 'en' ? (postBySlug.title_en || postBySlug.title) : postBySlug.title,
             cover_image: postBySlug.cover_image || '',
             date: postBySlug.created_at || '',
             slug: postBySlug.slug || `${postBySlug.id}-${toKebabCase(postBySlug.title)}`,
@@ -85,7 +85,7 @@ export function useBlogPost(slug: string) {
     if (slug) {
       fetchPost();
     }
-  }, [slug, toast]);
+  }, [slug, toast, language]);
 
   return { post, loading };
 }

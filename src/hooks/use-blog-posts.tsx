@@ -5,11 +5,13 @@ import { supabaseExtended } from '@/integrations/supabase/client-extended';
 import { BlogPost } from '@/types/blog';
 import { useToast } from '@/components/ui/use-toast';
 import { toKebabCase } from '@/utils/stringUtils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export function useBlogPosts() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { language } = useLanguage();
 
   useEffect(() => {
     async function fetchPosts() {
@@ -29,9 +31,7 @@ export function useBlogPosts() {
         // Process posts
         const formattedPosts = (data || []).map((post) => ({
           id: post.id,
-          title: post.title || '',
-          title_en: post.title_en || post.title || '',
-          title_es: post.title || '',
+          title: language === 'en' ? (post.title_en || post.title) : post.title,
           slug: post.slug || `${post.id}-${toKebabCase(post.title)}`,
           excerpt_en: '',
           excerpt_es: '',
@@ -59,7 +59,7 @@ export function useBlogPosts() {
     }
 
     fetchPosts();
-  }, [toast]);
+  }, [toast, language]);
 
   return { posts, loading };
 }

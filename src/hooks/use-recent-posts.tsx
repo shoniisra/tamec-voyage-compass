@@ -4,11 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { BlogPost } from '@/types/blog';
 import { useToast } from '@/components/ui/use-toast';
 import { toKebabCase } from '@/utils/stringUtils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export function useRecentPosts(currentPostId: string, limit: number = 3) {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { language } = useLanguage();
 
   useEffect(() => {
     async function fetchPosts() {
@@ -28,11 +30,10 @@ export function useRecentPosts(currentPostId: string, limit: number = 3) {
         // Map the data to include the required fields
         const mappedPosts = (data || []).map(post => ({
           ...post,
-          title: post.title || '',
-          title_en: post.title_en || post.title || '',
-          title_es: post.title || '',
+          title: language === 'en' ? (post.title_en || post.title) : post.title,
           slug: post.slug || `${post.id}-${toKebabCase(post.title)}`,
-          isLegacy: false
+          isLegacy: false,
+          date: post.created_at ? new Date(post.created_at).toLocaleDateString() : ''
         }));
 
         setPosts(mappedPosts as BlogPost[]);
@@ -51,7 +52,7 @@ export function useRecentPosts(currentPostId: string, limit: number = 3) {
     if (currentPostId) {
       fetchPosts();
     }
-  }, [currentPostId, limit, toast]);
+  }, [currentPostId, limit, toast, language]);
 
   return { posts, loading };
 }

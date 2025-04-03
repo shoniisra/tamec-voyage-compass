@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toKebabCase } from '@/utils/stringUtils';
+import { useRecentPosts } from '@/hooks/use-recent-posts';
 
 interface RecentPostsProps {
   currentPostId: string;
@@ -13,50 +14,8 @@ interface RecentPostsProps {
 }
 
 const RecentPosts = ({ currentPostId, limit = 3 }: RecentPostsProps) => {
-  const [posts, setPosts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const { language } = useLanguage();
-
-  useEffect(() => {
-    const fetchRecentPosts = async () => {
-      try {
-        setLoading(true);
-        
-        // Fetch blog posts from the blogs table
-        const { data, error } = await supabase
-          .from('blogs')
-          .select('id, title, title_en, content, cover_image, created_at, slug')
-          .neq('id', currentPostId)
-          .order('created_at', { ascending: false })
-          .limit(limit);
-        
-        if (error) {
-          console.error('Error fetching posts:', error);
-          throw error;
-        }
-        
-        // Process posts
-        const formattedPosts = (data || []).map((post) => ({
-          id: post.id,
-          title: language === 'en' ? (post.title_en || post.title) : post.title,
-          cover_image: post.cover_image,
-          date: new Date(post.created_at || '').toLocaleDateString(),
-          slug: post.slug || `${post.id}-${toKebabCase(post.title)}`,
-          isLegacy: false
-        }));
-        
-        setPosts(formattedPosts);
-      } catch (error) {
-        console.error('Error fetching recent posts:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (currentPostId) {
-      fetchRecentPosts();
-    }
-  }, [currentPostId, limit, language]);
+  const { posts, loading } = useRecentPosts(currentPostId, limit);
 
   if (loading) {
     return (
