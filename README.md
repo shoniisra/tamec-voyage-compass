@@ -1,73 +1,97 @@
-# Welcome to your Lovable project
+# Tamec Viajes
 
-## Project info
+## Overview
+Tamec viajes is a modern web application built with React and TypeScript, designed to provide an intuitive and responsive user interface. The project focuses on delivering a seamless user experience while maintaining high code quality and performance standards.
 
-**URL**: https://lovable.dev/projects/f437ee9c-2158-4c23-a7d7-2f7136033694
+## Features
+- Modern and responsive UI using shadcn-ui components
+- Multi-language support
+- Blog functionality
+- Contact form integration
+- Mobile-friendly design
 
-## How can I edit this code?
+## Technology Stack
+- **Frontend Framework**: React with TypeScript
+- **Build Tool**: Vite
+- **UI Components**: shadcn-ui
+- **Styling**: Tailwind CSS
+- **Development Platform**: Lovable
 
-There are several ways of editing your application.
+## Getting Started
 
-**Use Lovable**
+### Prerequisites
+- Node.js (Latest LTS version recommended)
+- npm or yarn package manager
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f437ee9c-2158-4c23-a7d7-2f7136033694) and start prompting.
+### Installation
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
+1. Clone the repository:
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+git clone <repository-url>
+cd tamec-voyage-compass
 ```
 
-**Edit a file directly in GitHub**
+2. Install dependencies:
+```sh
+npm install
+# or
+yarn install
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+3. Start the development server:
+```sh
+npm run dev
+# or
+yarn dev
+```
 
-**Use GitHub Codespaces**
+The application will be available at `http://localhost:8080`
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Development
 
-## What technologies are used for this project?
+### Project Structure
+```
+src/
+  ├── components/     # Reusable UI components
+  ├── contexts/       # React context providers
+  ├── hooks/          # Custom React hooks
+  ├── lib/            # Utility functions
+  ├── pages/          # Page components
+  └── types/          # TypeScript type definitions
+```
 
-This project is built with:
+### Development with Lovable
+This project is integrated with Lovable for enhanced development workflow:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1. Visit [Lovable Project](https://lovable.dev/projects/f437ee9c-2158-4c23-a7d7-2f7136033694)
+2. Make changes through the Lovable interface
+3. Changes will be automatically committed to the repository
 
-## How can I deploy this project?
+## Deployment
 
-Simply open [Lovable](https://lovable.dev/projects/f437ee9c-2158-4c23-a7d7-2f7136033694) and click on Share -> Publish.
+### Production Build
+```sh
+npm run build
+# or
+yarn build
+```
 
-## Can I connect a custom domain to my Lovable project?
+### Deployment Options
+1. **Via Lovable**: 
+   - Open [Lovable](https://lovable.dev/projects/f437ee9c-2158-4c23-a7d7-2f7136033694)
+   - Navigate to Share -> Publish
 
-Yes it is!
+2. **Custom Domain Setup**:
+   - Go to Project > Settings > Domains
+   - Click Connect Domain
+   - Follow the [custom domain setup guide](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Contributing
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## License
+This project is licensed under the MIT License - see the LICENSE file for details.
