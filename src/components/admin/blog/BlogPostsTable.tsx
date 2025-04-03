@@ -108,7 +108,7 @@ const BlogPostsTable: React.FC<BlogPostsTableProps> = ({ posts, isLoading, onDel
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Blog Posts</h2>
         <Button onClick={() => navigate('/admin/blog/posts/create')}>
-          <Plus className="mr-2 h-4 w-4" /> New Post
+          <Plus className="mr-2 h-4 w-4" />  Nuevo Artículo
         </Button>
       </div>
       
