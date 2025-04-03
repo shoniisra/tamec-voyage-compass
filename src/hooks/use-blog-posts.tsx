@@ -12,6 +12,7 @@ interface BlogPostNew {
   content: any;
   cover_image?: string;
   created_at: string;
+  slug?: string;
 }
 
 export function useBlogPosts() {
@@ -55,7 +56,7 @@ export function useBlogPosts() {
           id: post.id,
           title_en: post.title, // Map to existing schema for compatibility
           title_es: post.title,
-          slug: `${post.id}-${toKebabCase(post.title)}`, // Generate kebab case slug
+          slug: post.slug || `${post.id}-${toKebabCase(post.title)}`, // Use custom slug if available
           excerpt_en: '',
           excerpt_es: '',
           content_en: '',

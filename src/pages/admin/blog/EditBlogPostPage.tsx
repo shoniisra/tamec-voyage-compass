@@ -74,6 +74,7 @@ const EditBlogPostPage = () => {
                 initialTitle={blog.title} 
                 initialContent={blog.content} 
                 initialCoverImage={blog.cover_image}
+                initialSlug={blog.slug || ''}
                 blogId={blog.id} 
                 isEdit={true} 
               />

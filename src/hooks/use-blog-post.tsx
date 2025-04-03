@@ -43,7 +43,7 @@ export function useBlogPost(slug: string) {
               date: newPost.created_at,
               category_en: '',
               category_es: '',
-              slug: slug,
+              slug: newPost.slug || slug,
               isLegacy: false,
               newContent: newPost.content
             });
@@ -63,6 +63,34 @@ export function useBlogPost(slug: string) {
             setLoading(false);
             return;
           }
+        }
+        
+        // Try to find the post with exact slug in the new blogs table
+        const { data: newPostBySlug } = await supabaseExtended
+          .from('blogs')
+          .select('*')
+          .eq('slug', slug)
+          .maybeSingle();
+          
+        if (newPostBySlug) {
+          setPost({
+            id: newPostBySlug.id,
+            title_en: newPostBySlug.title,
+            title_es: newPostBySlug.title,
+            excerpt_en: '',
+            excerpt_es: '',
+            content_en: '',
+            content_es: '',
+            cover_image: newPostBySlug.cover_image || '',
+            date: newPostBySlug.created_at,
+            category_en: '',
+            category_es: '',
+            slug: newPostBySlug.slug || slug,
+            isLegacy: false,
+            newContent: newPostBySlug.content
+          });
+          setLoading(false);
+          return;
         }
         
         // Try the legacy approach with full slug match

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -34,7 +33,7 @@ const RecentPosts = ({ currentPostId, limit = 3 }: RecentPostsProps) => {
         // Fetch new blog posts
         const { data: newPosts } = await supabaseExtended
           .from('blogs')
-          .select('id, title, content, cover_image, created_at')
+          .select('id, title, content, cover_image, created_at, slug')
           .neq('id', currentPostId)
           .order('created_at', { ascending: false })
           .limit(limit);
@@ -56,7 +55,7 @@ const RecentPosts = ({ currentPostId, limit = 3 }: RecentPostsProps) => {
           excerpt: '',
           cover_image: post.cover_image || '',
           date: new Date(post.created_at || '').toLocaleDateString(),
-          slug: `${post.id}-${toKebabCase(post.title)}`,
+          slug: post.slug || `${post.id}`, // Use custom slug if available
           isLegacy: false
         }));
         

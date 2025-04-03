@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
@@ -10,11 +9,13 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Image as ImageIcon } from "lucide-react";
+import { toKebabCase } from "@/utils/stringUtils";
 
 interface BlogEditorProps {
   initialTitle?: string;
   initialContent?: any;
   initialCoverImage?: string;
+  initialSlug?: string;
   blogId?: string;
   isEdit?: boolean;
 }
@@ -23,6 +24,7 @@ const BlogEditor = ({
   initialTitle = "", 
   initialContent = {}, 
   initialCoverImage = "",
+  initialSlug = "",
   blogId, 
   isEdit = false 
 }: BlogEditorProps) => {
@@ -32,8 +34,15 @@ const BlogEditor = ({
   const editorInstanceRef = useRef<any>(null);
   const [title, setTitle] = useState(initialTitle);
   const [coverImage, setCoverImage] = useState(initialCoverImage);
+  const [slug, setSlug] = useState(initialSlug);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+
+  useEffect(() => {
+    if ((!slug || !isEdit) && title) {
+      setSlug(toKebabCase(title));
+    }
+  }, [title, slug, isEdit]);
 
   useEffect(() => {
     if (!editorRef.current) {
@@ -128,7 +137,6 @@ const BlogEditor = ({
     };
   }, [initialContent]);
 
-  // Update editor content when value prop changes
   useEffect(() => {
     if (editorRef.current && initialContent && Object.keys(initialContent).length > 0) {
       editorRef.current.render(initialContent);
@@ -186,6 +194,15 @@ const BlogEditor = ({
       return;
     }
 
+    if (!slug.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a URL slug for your blog post",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       setIsSaving(true);
       
@@ -203,6 +220,7 @@ const BlogEditor = ({
             title, 
             content: outputData as any,
             cover_image: coverImage,
+            slug: slug,
             updated_at: new Date().toISOString()
           })
           .eq('id', blogId);
@@ -221,6 +239,7 @@ const BlogEditor = ({
             title, 
             content: outputData as any,
             cover_image: coverImage,
+            slug: slug,
             created_at: new Date().toISOString()
           });
           
@@ -272,6 +291,25 @@ const BlogEditor = ({
             placeholder="Enter blog title"
             className="w-full"
           />
+        </div>
+        
+        <div>
+          <label htmlFor="blog-slug" className="block text-sm font-medium mb-1">
+            URL Slug
+          </label>
+          <div className="flex items-center gap-2">
+            <span className="text-gray-500">/blog/</span>
+            <Input
+              id="blog-slug"
+              value={slug}
+              onChange={(e) => setSlug(toKebabCase(e.target.value))}
+              placeholder="url-friendly-slug"
+              className="flex-1"
+            />
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            This will be used in the URL. Use only lowercase letters, numbers, and hyphens.
+          </p>
         </div>
         
         <div>

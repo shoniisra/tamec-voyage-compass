@@ -8,7 +8,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { PlusCircle } from 'lucide-react';
-import { toKebabCase } from '@/utils/stringUtils';
 
 const BlogList = () => {
   const { posts, loading } = useBlogPosts();
@@ -57,11 +56,6 @@ const BlogList = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {posts.map((post) => {
-            // Generate proper slug based on post type
-            const slug = post.isLegacy 
-              ? post.slug 
-              : `${post.id}-${toKebabCase(post.title_en || post.title_es)}`;
-            
             return (
               <BlogCard
                 key={post.id}
@@ -75,7 +69,7 @@ const BlogList = () => {
                   day: 'numeric'
                 })}
                 category={language === 'en' ? post.category_en : post.category_es}
-                slug={slug}
+                slug={post.slug}
               />
             );
           })}
