@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
-import { supabaseExtended } from '@/integrations/supabase/client-extended';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toKebabCase } from '@/utils/stringUtils';
@@ -23,49 +22,30 @@ const RecentPosts = ({ currentPostId, limit = 3 }: RecentPostsProps) => {
       try {
         setLoading(true);
         
-        // Fetch legacy blog posts
-        const { data: legacyPosts } = await supabaseExtended
+        // Fetch blog posts from the blogs table
+        const { data, error } = await supabase
           .from('blogs')
-          .select('id, title_en, title_es, content, cover_image, created_at, slug')
-          .neq('id', currentPostId)
-          .order('created_at', { ascending: false })
-          .limit(limit);
-        
-        // Fetch new blog posts
-        const { data: newPosts, error } = await supabaseExtended
-          .from('blogs')
-          .select('id, title, content, cover_image, created_at, slug')
+          .select('id, title, title_en, content, cover_image, created_at, slug')
           .neq('id', currentPostId)
           .order('created_at', { ascending: false })
           .limit(limit);
         
         if (error) {
-          console.error('Error fetching new posts:', error);
-          // Continue with any available data
+          console.error('Error fetching posts:', error);
+          throw error;
         }
         
-        // Process and combine posts
-        const formattedLegacyPosts = (legacyPosts || []).map((post) => ({
+        // Process posts
+        const formattedPosts = (data || []).map((post) => ({
           id: post.id,
-          title: language === 'en' ? post.title_en : post.title_es,
+          title: language === 'en' ? (post.title_en || post.title) : post.title,
           cover_image: post.cover_image,
-          date: new Date(post.created_at).toLocaleDateString(),
-          slug: post.slug || `${post.id}-${toKebabCase(post.title_en || post.title_es)}`,
-          isLegacy: true
-        }));
-        
-        const formattedNewPosts = (newPosts || []).map((post) => ({
-          id: post.id,
-          title: post.title,
-          cover_image: post.cover_image || '',
           date: new Date(post.created_at || '').toLocaleDateString(),
           slug: post.slug || `${post.id}-${toKebabCase(post.title)}`,
           isLegacy: false
         }));
         
-        // Combine and limit to requested number
-        const combinedPosts = [...formattedNewPosts, ...formattedLegacyPosts].slice(0, limit);
-        setPosts(combinedPosts);
+        setPosts(formattedPosts);
       } catch (error) {
         console.error('Error fetching recent posts:', error);
       } finally {

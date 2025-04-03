@@ -28,7 +28,9 @@ export function useRecentPosts(currentPostId: string, limit: number = 3) {
         // Map the data to include the required fields
         const mappedPosts = (data || []).map(post => ({
           ...post,
-          title: post.title_en || post.title || '',
+          title: post.title || '',
+          title_en: post.title_en || post.title || '',
+          title_es: post.title || '',
           slug: post.slug || `${post.id}-${toKebabCase(post.title)}`,
           isLegacy: false
         }));

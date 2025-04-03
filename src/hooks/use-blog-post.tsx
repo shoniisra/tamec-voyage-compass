@@ -23,7 +23,7 @@ export function useBlogPost(slug: string) {
           // This is likely a new format post with ID-kebab-title
           const postId = idMatch[1];
           
-          // Try to fetch from the new blogs table first
+          // Try to fetch from the blogs table
           const { data: newPost, error: newPostError } = await supabaseExtended
             .from('blogs')
             .select('*')
@@ -31,7 +31,7 @@ export function useBlogPost(slug: string) {
             .maybeSingle();
           
           if (newPost) {
-            // Found in the new table
+            // Found in the blogs table
             setPost({
               id: newPost.id,
               title: newPost.title,
@@ -46,59 +46,25 @@ export function useBlogPost(slug: string) {
             setLoading(false);
             return;
           }
-          
-          // If not found in new table, try legacy with the ID
-          const { data: legacyById } = await supabase
-            .from('blog_posts')
-            .select('*')
-            .eq('id', postId)
-            .maybeSingle();
-          
-          if (legacyById) {
-            setPost({
-              ...legacyById,
-              title: legacyById.title_en || legacyById.title_es || '',
-              isLegacy: true
-            });
-            setLoading(false);
-            return;
-          }
         }
         
-        // Try to find the post with exact slug in the new blogs table
-        const { data: newPostBySlug } = await supabaseExtended
+        // Try to find the post with exact slug in the blogs table
+        const { data: postBySlug } = await supabaseExtended
           .from('blogs')
           .select('*')
           .eq('slug', slug)
           .maybeSingle();
           
-        if (newPostBySlug) {
+        if (postBySlug) {
           setPost({
-            id: newPostBySlug.id,
-            title: newPostBySlug.title,
-            title_en: newPostBySlug.title_en || newPostBySlug.title,
-            cover_image: newPostBySlug.cover_image || '',
-            date: newPostBySlug.created_at || '',
-            slug: newPostBySlug.slug || `${newPostBySlug.id}-${toKebabCase(newPostBySlug.title)}`,
+            id: postBySlug.id,
+            title: postBySlug.title,
+            title_en: postBySlug.title_en || postBySlug.title,
+            cover_image: postBySlug.cover_image || '',
+            date: postBySlug.created_at || '',
+            slug: postBySlug.slug || `${postBySlug.id}-${toKebabCase(postBySlug.title)}`,
             isLegacy: false,
-            newContent: newPostBySlug.content
-          });
-          setLoading(false);
-          return;
-        }
-        
-        // Try the legacy approach with full slug match
-        const { data: legacyBySlug } = await supabase
-          .from('blog_posts')
-          .select('*')
-          .eq('slug', slug)
-          .maybeSingle();
-        
-        if (legacyBySlug) {
-          setPost({
-            ...legacyBySlug,
-            title: legacyBySlug.title_en || legacyBySlug.title_es || '',
-            isLegacy: true
+            newContent: postBySlug.content
           });
         } else {
           // Post not found in either table
