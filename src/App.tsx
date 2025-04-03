@@ -8,6 +8,7 @@ import HomePage from "./pages/HomePage";
 import BlogPage from "./pages/BlogPage";
 import ContactPage from "./pages/ContactPage";
 import NotFound from "./pages/NotFound";
+import Layout from "./components/layout/Layout"; 
 
 const queryClient = new QueryClient();
 
