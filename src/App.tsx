@@ -22,31 +22,25 @@ const App = () => {
   
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <LanguageProvider>
-          <AuthProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/blog" element={<BlogPage />} />
-                <Route path="/blog/:slug" element={<BlogDetailPage />} />
-                <Route path="/contact" element={<ContactPage />} />
-                <Route path="/auth" element={<AuthPage />} />
-                
-                {/* Protected Admin Routes */}
-                <Route path="/admin" element={<ProtectedRoute requireAdmin={true} />}>
-                  <Route index element={<AdminDashboardPage />} />
-                  {/* Add more admin routes here */}
-                </Route>
-                
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </TooltipProvider>
-          </AuthProvider>
-        </LanguageProvider>
-      </BrowserRouter>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog/:slug" element={<BlogDetailPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/auth" element={<AuthPage />} />
+          
+          {/* Protected Admin Routes */}
+          <Route path="/admin" element={<ProtectedRoute requireAdmin={true} />}>
+            <Route index element={<AdminDashboardPage />} />
+            {/* Add more admin routes here */}
+          </Route>
+          
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </TooltipProvider>
     </QueryClientProvider>
   );
 };
