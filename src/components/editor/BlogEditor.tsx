@@ -21,6 +21,7 @@ const BlogEditor = ({ initialTitle = "", initialContent = {}, blogId, isEdit = f
   const { toast } = useToast();
   const navigate = useNavigate();
   const editorRef = useRef<EditorJS | null>(null);
+  const editorInstanceRef = useRef<any>(null);
   const [title, setTitle] = useState(initialTitle);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -94,14 +95,26 @@ const BlogEditor = ({ initialTitle = "", initialContent = {}, blogId, isEdit = f
         },
         data: initialContent
       });
+      
       editorRef.current = editor;
+      editorInstanceRef.current = editor;
     }
 
     // Cleanup
     return () => {
-      if (editorRef.current) {
-        editorRef.current.destroy();
-        editorRef.current = null;
+      if (editorInstanceRef.current) {
+        // Use the correct way to destroy an EditorJS instance
+        try {
+          editorInstanceRef.current.isReady.then(() => {
+            editorInstanceRef.current.destroy();
+            editorInstanceRef.current = null;
+            editorRef.current = null;
+          }).catch((e: any) => {
+            console.error("Error destroying editor", e);
+          });
+        } catch (err) {
+          console.error("Failed to cleanup editor instance", err);
+        }
       }
     };
   }, [initialContent]);
