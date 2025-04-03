@@ -15,29 +15,61 @@ export type ExtendedDatabase = Database & {
           title: string;
           content: any;
           cover_image?: string;
-          created_at: string;
-          updated_at?: string;
-          slug?: string;
+          created_at: string | null;
+          updated_at?: string | null;
+          slug?: string | null;
+          title_en?: string | null;
+          content_en?: any;
         };
         Insert: {
           id?: string;
           title: string;
           content: any;
-          cover_image?: string;
-          created_at?: string;
-          updated_at?: string;
-          slug?: string;
+          cover_image?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+          slug?: string | null;
+          title_en?: string | null;
+          content_en?: any;
         };
         Update: {
           id?: string;
           title?: string;
           content?: any;
-          cover_image?: string;
-          created_at?: string;
-          updated_at?: string;
-          slug?: string;
+          cover_image?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+          slug?: string | null;
+          title_en?: string | null;
+          content_en?: any;
         };
       };
+      blog_comments: {
+        Row: {
+          id: string;
+          blog_id: string;
+          name: string;
+          email: string;
+          content: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          blog_id: string;
+          name: string;
+          email: string;
+          content: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          blog_id?: string;
+          name?: string;
+          email?: string;
+          content?: string;
+          created_at?: string;
+        };
+      } & Database['public']['Tables']['blog_comments'];
     } & Database['public']['Tables'];
   };
 };

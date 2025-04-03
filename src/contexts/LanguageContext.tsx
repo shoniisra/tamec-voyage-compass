@@ -1,6 +1,5 @@
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { TranslationType } from '@/types/language';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { Language, Translations } from '@/types/language';
 
 type LanguageType = 'en' | 'es';
 
@@ -10,7 +9,7 @@ interface LanguageContextType {
   t: (key: string) => string;
 }
 
-const translations: Record<LanguageType, TranslationType> = {
+const translations: Translations = {
   en: {
     nav: {
       home: 'Home',
@@ -40,16 +39,51 @@ const translations: Record<LanguageType, TranslationType> = {
       title: 'Our Travel Blog',
       subtitle: 'Stories, tips, and inspiration for your next journey',
       readMore: 'Read More',
-      comments: 'Comments',
+      comments: {
+        en: 'Comments',
+        es: 'Comentarios'
+      },
       commentsSectionTitle: 'Comments',
-      leaveComment: 'Leave a Comment',
-      yourName: 'Your Name',
-      yourEmail: 'Your Email',
-      yourComment: 'Your Comment',
-      submitComment: 'Post Comment',
-      loadingComments: 'Loading comments...',
-      noComments: 'No comments yet. Be the first to comment!',
-      commentSubmitted: 'Your comment was submitted successfully!',
+      leaveComment: {
+        en: 'Leave a Comment',
+        es: 'Deja un Comentario'
+      },
+      name: {
+        en: 'Name',
+        es: 'Nombre'
+      },
+      namePlaceholder: {
+        en: 'Enter your name',
+        es: 'Ingresa tu nombre'
+      },
+      email: {
+        en: 'Email',
+        es: 'Correo electrónico'
+      },
+      emailPlaceholder: {
+        en: 'Enter your email',
+        es: 'Ingresa tu correo electrónico'
+      },
+      comment: {
+        en: 'Comment',
+        es: 'Comentario'
+      },
+      commentPlaceholder: {
+        en: 'Write your comment here...',
+        es: 'Escribe tu comentario aquí...'
+      },
+      postComment: {
+        en: 'Post Comment',
+        es: 'Publicar Comentario'
+      },
+      posting: {
+        en: 'Posting...',
+        es: 'Publicando...'
+      },
+      noComments: {
+        en: 'No comments yet. Be the first to comment!',
+        es: '¡No hay comentarios aún. Sé el primero en comentar!'
+      },
     },
     contact: {
       title: 'Contact Us',
@@ -126,16 +160,51 @@ const translations: Record<LanguageType, TranslationType> = {
       title: 'Nuestro Blog de Viajes',
       subtitle: 'Historias, consejos e inspiración para tu próximo viaje',
       readMore: 'Leer Más',
-      comments: 'Comentarios',
+      comments: {
+        en: 'Comments',
+        es: 'Comentarios'
+      },
       commentsSectionTitle: 'Comentarios',
-      leaveComment: 'Dejar un Comentario',
-      yourName: 'Tu Nombre',
-      yourEmail: 'Tu Email',
-      yourComment: 'Tu Comentario',
-      submitComment: 'Publicar Comentario',
-      loadingComments: 'Cargando comentarios...',
-      noComments: '¡No hay comentarios todavía. Sé el primero en comentar!',
-      commentSubmitted: '¡Tu comentario fue enviado con éxito!',
+      leaveComment: {
+        en: 'Leave a Comment',
+        es: 'Deja un Comentario'
+      },
+      name: {
+        en: 'Name',
+        es: 'Nombre'
+      },
+      namePlaceholder: {
+        en: 'Enter your name',
+        es: 'Ingresa tu nombre'
+      },
+      email: {
+        en: 'Email',
+        es: 'Correo electrónico'
+      },
+      emailPlaceholder: {
+        en: 'Enter your email',
+        es: 'Ingresa tu correo electrónico'
+      },
+      comment: {
+        en: 'Comment',
+        es: 'Comentario'
+      },
+      commentPlaceholder: {
+        en: 'Write your comment here...',
+        es: 'Escribe tu comentario aquí...'
+      },
+      postComment: {
+        en: 'Post Comment',
+        es: 'Publicar Comentario'
+      },
+      posting: {
+        en: 'Posting...',
+        es: 'Publicando...'
+      },
+      noComments: {
+        en: 'No comments yet. Be the first to comment!',
+        es: '¡No hay comentarios aún. Sé el primero en comentar!'
+      },
     },
     contact: {
       title: 'Contáctanos',

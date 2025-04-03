@@ -4,6 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import BlogRenderer from '@/components/editor/BlogRenderer';
 import RecentPosts from './RecentPosts';
+import BlogComments from './BlogComments';
 import { useBlogPost } from '@/hooks/use-blog-post';
 
 interface BlogDetailProps {
@@ -38,11 +39,15 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
     );
   }
 
-  const title = language === 'en' ? post.title_en : post.title_es;
+  const title = post.title_en || post.title;
   const content = post.isLegacy 
-    ? (language === 'en' ? post.content_en : post.content_es)
-    : post.newContent;
-  const formattedDate = new Date(post.date).toLocaleDateString();
+    ? (language === 'en' ? post.content_en : post.content)
+    : post.content || post.newContent;
+  const formattedDate = post.date 
+    ? new Date(post.date).toLocaleDateString() 
+    : post.created_at 
+      ? new Date(post.created_at).toLocaleDateString()
+      : '';
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -64,6 +69,9 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
         // Render new content with EditorJS renderer
         <BlogRenderer content={content} />
       )}
+
+      {/* Comments Section */}
+      <BlogComments postId={post.id} />
 
       {/* Recent Posts Section */}
       <div className="mt-12 border-t pt-8">

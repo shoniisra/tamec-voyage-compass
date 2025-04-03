@@ -16,7 +16,7 @@ export function useComments(postId: string) {
         const { data, error } = await supabase
           .from('blog_comments')
           .select('*')
-          .eq('blog_post_id', postId)
+          .eq('blog_id', postId)
           .order('created_at', { ascending: false });
 
         if (error) {
@@ -46,7 +46,7 @@ export function useComments(postId: string) {
       const { data, error } = await supabase
         .from('blog_comments')
         .insert([
-          { blog_post_id: postId, name, email, content }
+          { blog_id: postId, name, email, content }
         ])
         .select();
 

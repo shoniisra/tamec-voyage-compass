@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
-import EditorJS from "@editorjs/editorjs";
+import EditorJS, { OutputData } from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 import List from "@editorjs/list";
 import Image from "@editorjs/image";
@@ -207,13 +207,16 @@ const BlogEditor = ({
       
       const outputData = await editorRef.current.save();
       
+      // Fix type casting for content
+      const contentData = outputData as any;
+      
       if (isEdit && blogId) {
         // Update existing blog
         const { error } = await supabaseExtended
           .from('blogs')
           .update({ 
             title, 
-            content: outputData as unknown as Json,
+            content: contentData,
             cover_image: coverImage,
             slug: slug,
             updated_at: new Date().toISOString()
@@ -232,7 +235,7 @@ const BlogEditor = ({
           .from('blogs')
           .insert({ 
             title, 
-            content: outputData as unknown as Json,
+            content: contentData,
             cover_image: coverImage,
             slug: slug,
             created_at: new Date().toISOString()
