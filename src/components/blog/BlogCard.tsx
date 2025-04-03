@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface BlogCardProps {
-  id: number;
+  id: string;
   title: string;
   excerpt: string;
   coverImage: string;

@@ -1,11 +1,18 @@
 
-import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { Language } from '@/types/language';
+import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
+import { Language, TranslationDictionary } from '@/types/language';
+import { BlogPost } from '@/types/blog';
 
 interface LanguageContextType {
   language: Language;
   setLanguage: (language: Language) => void;
   t: (key: string) => string;
+  formatBlogPost: (post: BlogPost) => {
+    title: string;
+    excerpt: string;
+    content: string;
+    category: string;
+  };
 }
 
 const translations = {
@@ -182,21 +189,40 @@ export const LanguageContext = createContext<LanguageContextType>({
   language: 'en',
   setLanguage: () => {},
   t: (key: string) => key,
+  formatBlogPost: () => ({ title: '', excerpt: '', content: '', category: '' }),
 });
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<Language>('en');
 
-  const t = (key: string): string => {
+  const t = useCallback((key: string): string => {
     if (!translations[key]) {
       console.warn(`Translation key not found: ${key}`);
       return key;
     }
     return translations[key][language];
-  };
+  }, [language]);
+
+  const formatBlogPost = useCallback((post: BlogPost) => {
+    if (language === 'en') {
+      return {
+        title: post.title_en,
+        excerpt: post.excerpt_en,
+        content: post.content_en,
+        category: post.category_en
+      };
+    } else {
+      return {
+        title: post.title_es,
+        excerpt: post.excerpt_es,
+        content: post.content_es,
+        category: post.category_es
+      };
+    }
+  }, [language]);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, formatBlogPost }}>
       {children}
     </LanguageContext.Provider>
   );
