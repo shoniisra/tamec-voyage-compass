@@ -41,7 +41,14 @@ export function useBlogPostById(id: string | undefined) {
           return;
         }
 
-        setPost(data as BlogPost);
+        // Convert to BlogPost type with title field
+        const blogPost: BlogPost = {
+          ...data,
+          title: data.title_en || data.title_es || '',
+          isLegacy: true
+        };
+
+        setPost(blogPost);
       } catch (error) {
         console.error('Error fetching blog post:', error);
         toast({

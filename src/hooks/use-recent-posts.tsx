@@ -24,7 +24,14 @@ export function useRecentPosts(currentPostId: string, limit: number = 3) {
           throw error;
         }
 
-        setPosts(data as BlogPost[]);
+        // Map the data to include the required title field
+        const mappedPosts = (data || []).map(post => ({
+          ...post,
+          title: post.title_en || post.title_es || '',
+          isLegacy: true
+        }));
+
+        setPosts(mappedPosts as BlogPost[]);
       } catch (error) {
         console.error('Error fetching recent posts:', error);
         toast({

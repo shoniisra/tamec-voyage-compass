@@ -28,7 +28,6 @@ export interface TranslationType {
     title: string;
     subtitle: string;
     readMore: string;
-    comments: string;
     commentsSectionTitle: string;
     leaveComment: string;
     yourName: string;
@@ -84,4 +83,10 @@ export interface TranslationType {
     english: string;
     spanish: string;
   };
+}
+
+export type Language = 'en' | 'es';
+
+export interface Translations {
+  [key: string]: any;
 }

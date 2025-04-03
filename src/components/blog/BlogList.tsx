@@ -1,3 +1,4 @@
+
 import React from 'react';
 import BlogCard from './BlogCard';
 import { useBlogPosts } from '@/hooks/use-blog-posts';
@@ -56,20 +57,32 @@ const BlogList = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {posts.map((post) => {
+            const title = language === 'en' 
+              ? post.title_en || post.title 
+              : post.title_es || post.title;
+            
+            const excerpt = language === 'en' 
+              ? post.excerpt_en || '' 
+              : post.excerpt_es || '';
+              
+            const category = language === 'en' 
+              ? post.category_en || '' 
+              : post.category_es || '';
+              
             return (
               <BlogCard
                 key={post.id}
                 id={post.id}
-                title={language === 'en' ? post.title_en : post.title_es}
-                excerpt={language === 'en' ? post.excerpt_en : post.excerpt_es}
+                title={title}
+                excerpt={excerpt}
                 coverImage={post.cover_image}
-                date={new Date(post.date).toLocaleDateString('en-US', { 
+                date={new Date(post.date || post.created_at || '').toLocaleDateString('en-US', { 
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric'
                 })}
-                category={language === 'en' ? post.category_en : post.category_es}
-                slug={post.slug}
+                category={category}
+                slug={post.slug || post.id}
               />
             );
           })}

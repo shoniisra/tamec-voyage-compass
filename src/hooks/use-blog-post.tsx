@@ -34,16 +34,11 @@ export function useBlogPost(slug: string) {
             // Found in the new table
             setPost({
               id: newPost.id,
-              title_en: newPost.title,
-              title_es: newPost.title,
-              excerpt_en: '',
-              excerpt_es: '',
+              title: newPost.title,
+              title_en: newPost.title_en || newPost.title,
               content_en: '',
-              content_es: '',
               cover_image: newPost.cover_image || '',
               date: newPost.created_at || '',
-              category_en: '',
-              category_es: '',
               slug: newPost.slug || `${newPost.id}-${toKebabCase(newPost.title)}`,
               isLegacy: false,
               newContent: newPost.content
@@ -60,7 +55,11 @@ export function useBlogPost(slug: string) {
             .maybeSingle();
           
           if (legacyById) {
-            setPost({...legacyById, isLegacy: true} as BlogPost);
+            setPost({
+              ...legacyById,
+              title: legacyById.title_en || legacyById.title_es || '',
+              isLegacy: true
+            });
             setLoading(false);
             return;
           }
@@ -76,16 +75,10 @@ export function useBlogPost(slug: string) {
         if (newPostBySlug) {
           setPost({
             id: newPostBySlug.id,
-            title_en: newPostBySlug.title,
-            title_es: newPostBySlug.title,
-            excerpt_en: '',
-            excerpt_es: '',
-            content_en: '',
-            content_es: '',
+            title: newPostBySlug.title,
+            title_en: newPostBySlug.title_en || newPostBySlug.title,
             cover_image: newPostBySlug.cover_image || '',
             date: newPostBySlug.created_at || '',
-            category_en: '',
-            category_es: '',
             slug: newPostBySlug.slug || `${newPostBySlug.id}-${toKebabCase(newPostBySlug.title)}`,
             isLegacy: false,
             newContent: newPostBySlug.content
@@ -102,7 +95,11 @@ export function useBlogPost(slug: string) {
           .maybeSingle();
         
         if (legacyBySlug) {
-          setPost({...legacyBySlug, isLegacy: true} as BlogPost);
+          setPost({
+            ...legacyBySlug,
+            title: legacyBySlug.title_en || legacyBySlug.title_es || '',
+            isLegacy: true
+          });
         } else {
           // Post not found in either table
           setPost(null);

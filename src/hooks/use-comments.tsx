@@ -23,7 +23,17 @@ export function useComments(postId: string) {
           throw error;
         }
 
-        setComments(data as Comment[]);
+        // Map the database fields to our Comment type
+        const mappedComments = data.map((comment: any) => ({
+          id: comment.id,
+          blog_id: comment.blog_id,
+          name: comment.name,
+          email: comment.email,
+          content: comment.content,
+          created_at: comment.created_at
+        }));
+
+        setComments(mappedComments as Comment[]);
       } catch (error) {
         console.error('Error fetching comments:', error);
         toast({
@@ -54,7 +64,17 @@ export function useComments(postId: string) {
         throw error;
       }
 
-      setComments(prev => [data![0] as Comment, ...prev]);
+      // Map the returned comment to our Comment type
+      const newComment: Comment = {
+        id: data![0].id,
+        blog_id: data![0].blog_id,
+        name: data![0].name,
+        email: data![0].email,
+        content: data![0].content,
+        created_at: data![0].created_at
+      };
+
+      setComments(prev => [newComment, ...prev]);
       
       return { success: true };
     } catch (error) {

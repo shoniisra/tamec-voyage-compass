@@ -49,15 +49,17 @@ export function useBlogPosts() {
         // Process legacy posts
         const legacyPosts = legacyData.map((post: any) => ({
           ...post,
+          title: post.title_en || post.title_es || '',
           isLegacy: true
         }));
         
         // Process new posts
         const newPosts = (newData || []).map((post: BlogPostNew) => ({
           id: post.id,
-          title_en: post.title, // Map to existing schema for compatibility
+          title: post.title,
+          title_en: post.title,
           title_es: post.title,
-          slug: post.slug || `${post.id}-${toKebabCase(post.title)}`, // Use custom slug if available
+          slug: post.slug || `${post.id}-${toKebabCase(post.title)}`,
           excerpt_en: '',
           excerpt_es: '',
           content_en: '',
@@ -66,7 +68,7 @@ export function useBlogPosts() {
           category_es: '',
           cover_image: post.cover_image || '',
           date: post.created_at,
-          newContent: post.content, // Store the new content format
+          newContent: post.content,
           isLegacy: false
         }));
         
