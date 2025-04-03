@@ -12,6 +12,8 @@ export interface BlogPost {
   category_en: string;
   category_es: string;
   slug: string;
+  isLegacy?: boolean;
+  newContent?: any;
 }
 
 export interface Comment {
