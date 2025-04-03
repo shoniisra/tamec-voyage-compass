@@ -1,64 +1,72 @@
-import { useCallback, useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
 
-export interface Comment {
-  id: string;
-  blog_post_id: string;
-  name: string;
-  email: string;
-  content: string;
-  created_at: string;
-}
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Comment } from '@/types/blog';
+import { useToast } from '@/components/ui/use-toast';
 
-export const useComments = (postId: string) => {
+export function useComments(postId: string) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const fetchComments = useCallback(async () => {
-    try {
-      const { data, error } = await supabase
-        .from('blog_comments')
-        .select('*')
-        .eq('blog_post_id', postId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setComments(data as Comment[]);
-    } catch (error) {
-      console.error('Error fetching comments:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [postId]);
+  const { toast } = useToast();
 
   useEffect(() => {
-    fetchComments();
-  }, [fetchComments]);
+    async function fetchComments() {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('blog_comments')
+          .select('*')
+          .eq('blog_post_id', postId)
+          .order('created_at', { ascending: false });
 
-  const addComment = async (newComment: Omit<Comment, 'id' | 'created_at'>) => {
+        if (error) {
+          throw error;
+        }
+
+        setComments(data as Comment[]);
+      } catch (error) {
+        console.error('Error fetching comments:', error);
+        toast({
+          variant: "destructive",
+          title: "Error loading comments",
+          description: "Please try again later.",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (postId) {
+      fetchComments();
+    }
+  }, [postId, toast]);
+
+  const addComment = async (name: string, email: string, content: string) => {
     try {
       const { data, error } = await supabase
         .from('blog_comments')
-        .insert([{
-          ...newComment,
-          created_at: new Date().toISOString(),
-        }])
-        .select()
-        .single();
+        .insert([
+          { blog_post_id: postId, name, email, content }
+        ])
+        .select();
 
-      if (error) throw error;
-      setComments(prev => [data as Comment, ...prev]);
-      return { success: true, data };
+      if (error) {
+        throw error;
+      }
+
+      setComments(prev => [data![0] as Comment, ...prev]);
+      
+      return { success: true };
     } catch (error) {
       console.error('Error adding comment:', error);
-      return { success: false, error };
+      toast({
+        variant: "destructive",
+        title: "Error posting comment",
+        description: "Please try again later.",
+      });
+      return { success: false };
     }
   };
 
-  return {
-    comments,
-    loading,
-    addComment,
-    refreshComments: fetchComments,
-  };
-};
+  return { comments, loading, addComment };
+}
