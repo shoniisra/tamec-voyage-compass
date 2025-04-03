@@ -1,21 +1,46 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useBlogPostManagement } from '@/hooks/use-blog-post-management';
-import { useBlogPostById } from '@/hooks/use-blog-post-by-id';
-import BlogPostForm from '@/components/admin/blog/BlogPostForm';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import AdminSidebar from '@/components/admin/AdminSidebar';
+import BlogEditor from '@/components/editor/BlogEditor';
+import { supabase } from '@/integrations/supabase/client';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const EditBlogPostPage = () => {
   const { id } = useParams<{ id: string }>();
   const { isAdmin } = useAuth();
   const { t } = useLanguage();
-  const { post, loading: loadingPost } = useBlogPostById(id);
-  const { isLoading: savingPost, updateBlogPost } = useBlogPostManagement();
+  const [blog, setBlog] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchBlog = async () => {
+      try {
+        if (!id) return;
+        
+        const { data, error } = await supabase
+          .from('blogs')
+          .select('*')
+          .eq('id', id)
+          .single();
+          
+        if (error) throw error;
+        setBlog(data);
+      } catch (err: any) {
+        console.error('Error fetching blog:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlog();
+  }, [id]);
 
   if (!isAdmin) {
     return (
@@ -27,28 +52,31 @@ const EditBlogPostPage = () => {
     );
   }
 
-  const handleUpdatePost = async (data: any) => {
-    if (id) {
-      await updateBlogPost(id, data);
-    }
-  };
-
   return (
     <Layout fullWidth className="bg-gray-50 dark:bg-gray-900 min-h-screen p-0">
       <SidebarProvider>
         <div className="flex min-h-screen w-full">
           <AdminSidebar />
           <div className="flex-1 p-8">
-            {loadingPost ? (
-              <div className="flex items-center justify-center h-full">
-                <p>Loading post...</p>
+            {loading ? (
+              <div className="space-y-4">
+                <Skeleton className="h-10 w-3/4" />
+                <Skeleton className="h-8 w-1/2" />
+                <Skeleton className="h-80 w-full" />
               </div>
-            ) : (
-              <BlogPostForm 
-                post={post} 
-                isLoading={savingPost} 
-                onSave={handleUpdatePost} 
+            ) : error ? (
+              <div className="text-red-500">
+                Error: {error}
+              </div>
+            ) : blog ? (
+              <BlogEditor 
+                initialTitle={blog.title} 
+                initialContent={blog.content} 
+                blogId={blog.id} 
+                isEdit={true} 
               />
+            ) : (
+              <div>Blog post not found</div>
             )}
           </div>
         </div>

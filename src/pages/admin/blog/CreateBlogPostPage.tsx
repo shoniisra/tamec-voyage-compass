@@ -3,15 +3,13 @@ import React from 'react';
 import Layout from '@/components/layout/Layout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useBlogPostManagement } from '@/hooks/use-blog-post-management';
-import BlogPostForm from '@/components/admin/blog/BlogPostForm';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import AdminSidebar from '@/components/admin/AdminSidebar';
+import BlogEditor from '@/components/editor/BlogEditor';
 
 const CreateBlogPostPage = () => {
   const { isAdmin } = useAuth();
   const { t } = useLanguage();
-  const { isLoading, createBlogPost } = useBlogPostManagement();
 
   if (!isAdmin) {
     return (
@@ -29,10 +27,7 @@ const CreateBlogPostPage = () => {
         <div className="flex min-h-screen w-full">
           <AdminSidebar />
           <div className="flex-1 p-8">
-            <BlogPostForm 
-              isLoading={isLoading} 
-              onSave={createBlogPost} 
-            />
+            <BlogEditor />
           </div>
         </div>
       </SidebarProvider>

@@ -18,11 +18,17 @@ interface BlogPostFormData {
   cover_image: string;
 }
 
+// Interface for EditorJS blog post
+interface EditorJSBlogData {
+  title: string;
+  content: any;
+}
+
 export function useBlogPostManagement() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  // Create a new blog post
+  // Create a new legacy blog post
   const createBlogPost = async (data: BlogPostFormData) => {
     try {
       setIsLoading(true);
@@ -59,6 +65,11 @@ export function useBlogPostManagement() {
       
       if (error) throw error;
       
+      toast({
+        title: "Success",
+        description: "Blog post created successfully",
+      });
+      
     } catch (error: any) {
       console.error('Error creating blog post:', error);
       toast({
@@ -72,7 +83,41 @@ export function useBlogPostManagement() {
     }
   };
 
-  // Update an existing blog post
+  // Create a new EditorJS blog post
+  const createEditorJSBlogPost = async (data: EditorJSBlogData) => {
+    try {
+      setIsLoading(true);
+      
+      // Insert new post
+      const { error } = await supabase
+        .from('blogs')
+        .insert({
+          title: data.title,
+          content: data.content,
+          created_at: new Date().toISOString(),
+        });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Success",
+        description: "Blog post created successfully",
+      });
+      
+    } catch (error: any) {
+      console.error('Error creating EditorJS blog post:', error);
+      toast({
+        variant: "destructive",
+        title: "Error creating blog post",
+        description: error.message || "An unexpected error occurred",
+      });
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Update an existing legacy blog post
   const updateBlogPost = async (id: string, data: BlogPostFormData) => {
     try {
       setIsLoading(true);
@@ -110,6 +155,11 @@ export function useBlogPostManagement() {
       
       if (error) throw error;
       
+      toast({
+        title: "Success",
+        description: "Blog post updated successfully",
+      });
+      
     } catch (error: any) {
       console.error('Error updating blog post:', error);
       toast({
@@ -123,36 +173,73 @@ export function useBlogPostManagement() {
     }
   };
 
-  // Delete a blog post
+  // Update an EditorJS blog post
+  const updateEditorJSBlogPost = async (id: string, data: EditorJSBlogData) => {
+    try {
+      setIsLoading(true);
+      
+      // Update post
+      const { error } = await supabase
+        .from('blogs')
+        .update({
+          title: data.title,
+          content: data.content,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Success",
+        description: "Blog post updated successfully",
+      });
+      
+    } catch (error: any) {
+      console.error('Error updating EditorJS blog post:', error);
+      toast({
+        variant: "destructive",
+        title: "Error updating blog post",
+        description: error.message || "An unexpected error occurred",
+      });
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Delete a blog post (works for both types)
   const deleteBlogPost = async (id: string) => {
     try {
       setIsLoading(true);
       
-      // First, check if there are comments associated with this post
-      const { data: comments, error: commentsError } = await supabase
-        .from('blog_comments')
-        .select('id')
-        .eq('blog_post_id', id);
-      
-      if (commentsError) throw commentsError;
-      
-      // If there are comments, delete them first
-      if (comments && comments.length > 0) {
-        const { error: deleteCommentsError } = await supabase
-          .from('blog_comments')
-          .delete()
-          .eq('blog_post_id', id);
-        
-        if (deleteCommentsError) throw deleteCommentsError;
-      }
-      
-      // Then delete the post
-      const { error } = await supabase
+      // First try to delete from legacy blog_posts table
+      let { error: blogPostsError } = await supabase
         .from('blog_posts')
         .delete()
         .eq('id', id);
       
-      if (error) throw error;
+      // If there's no error, it was successfully deleted
+      if (!blogPostsError) {
+        toast({
+          title: "Success",
+          description: "Blog post deleted successfully",
+        });
+        return;
+      }
+      
+      // If it wasn't in the legacy table, try the new blogs table
+      let { error: blogsError } = await supabase
+        .from('blogs')
+        .delete()
+        .eq('id', id);
+      
+      if (blogsError) throw blogsError;
+      
+      toast({
+        title: "Success",
+        description: "Blog post deleted successfully",
+      });
       
     } catch (error: any) {
       console.error('Error deleting blog post:', error);
@@ -170,7 +257,9 @@ export function useBlogPostManagement() {
   return {
     isLoading,
     createBlogPost,
+    createEditorJSBlogPost,
     updateBlogPost,
+    updateEditorJSBlogPost,
     deleteBlogPost,
   };
 }
