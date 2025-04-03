@@ -10,6 +10,7 @@ import BlogEditor from '@/components/editor/BlogEditor';
 import { supabase } from '@/integrations/supabase/client';
 import { supabaseExtended } from '@/integrations/supabase/client-extended';
 import { Skeleton } from '@/components/ui/skeleton';
+import { toKebabCase } from '@/utils/stringUtils';
 
 const EditBlogPostPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -31,6 +32,12 @@ const EditBlogPostPage = () => {
           .single();
           
         if (error) throw error;
+        
+        // If slug is not present, generate one from the title
+        if (!data.slug && data.title) {
+          data.slug = `${data.id}-${toKebabCase(data.title)}`;
+        }
+        
         setBlog(data);
       } catch (err: any) {
         console.error('Error fetching blog:', err);

@@ -42,7 +42,8 @@ export function useBlogPosts() {
           .order('created_at', { ascending: false });
 
         if (newError) {
-          throw newError;
+          console.error('Error fetching new blog posts:', newError);
+          // Continue with legacy posts if available
         }
 
         // Process legacy posts

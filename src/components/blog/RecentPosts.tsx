@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -31,12 +32,17 @@ const RecentPosts = ({ currentPostId, limit = 3 }: RecentPostsProps) => {
           .limit(limit);
         
         // Fetch new blog posts
-        const { data: newPosts } = await supabaseExtended
+        const { data: newPosts, error } = await supabaseExtended
           .from('blogs')
           .select('id, title, content, cover_image, created_at, slug')
           .neq('id', currentPostId)
           .order('created_at', { ascending: false })
           .limit(limit);
+        
+        if (error) {
+          console.error('Error fetching new posts:', error);
+          // Continue with any available data
+        }
         
         // Process and combine posts
         const formattedLegacyPosts = (legacyPosts || []).map((post) => ({
@@ -55,7 +61,7 @@ const RecentPosts = ({ currentPostId, limit = 3 }: RecentPostsProps) => {
           excerpt: '',
           cover_image: post.cover_image || '',
           date: new Date(post.created_at || '').toLocaleDateString(),
-          slug: post.slug || `${post.id}`, // Use custom slug if available
+          slug: post.slug || `${post.id}-${toKebabCase(post.title)}`, // Generate slug if not available
           isLegacy: false
         }));
         

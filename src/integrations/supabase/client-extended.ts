@@ -17,6 +17,7 @@ export type ExtendedDatabase = Database & {
           cover_image?: string;
           created_at: string;
           updated_at?: string;
+          slug?: string;
         };
         Insert: {
           id?: string;
@@ -25,6 +26,7 @@ export type ExtendedDatabase = Database & {
           cover_image?: string;
           created_at?: string;
           updated_at?: string;
+          slug?: string;
         };
         Update: {
           id?: string;
@@ -33,6 +35,7 @@ export type ExtendedDatabase = Database & {
           cover_image?: string;
           created_at?: string;
           updated_at?: string;
+          slug?: string;
         };
       };
     } & Database['public']['Tables'];

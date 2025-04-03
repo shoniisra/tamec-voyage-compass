@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { supabaseExtended } from '@/integrations/supabase/client-extended';
 import { BlogPost } from '@/types/blog';
 import { useToast } from '@/components/ui/use-toast';
+import { toKebabCase } from '@/utils/stringUtils';
 
 export function useBlogPost(slug: string) {
   const [post, setPost] = useState<BlogPost | null>(null);
@@ -40,10 +41,10 @@ export function useBlogPost(slug: string) {
               content_en: '',
               content_es: '',
               cover_image: newPost.cover_image || '',
-              date: newPost.created_at,
+              date: newPost.created_at || '',
               category_en: '',
               category_es: '',
-              slug: newPost.slug || slug,
+              slug: newPost.slug || `${newPost.id}-${toKebabCase(newPost.title)}`,
               isLegacy: false,
               newContent: newPost.content
             });
@@ -82,10 +83,10 @@ export function useBlogPost(slug: string) {
             content_en: '',
             content_es: '',
             cover_image: newPostBySlug.cover_image || '',
-            date: newPostBySlug.created_at,
+            date: newPostBySlug.created_at || '',
             category_en: '',
             category_es: '',
-            slug: newPostBySlug.slug || slug,
+            slug: newPostBySlug.slug || `${newPostBySlug.id}-${toKebabCase(newPostBySlug.title)}`,
             isLegacy: false,
             newContent: newPostBySlug.content
           });
