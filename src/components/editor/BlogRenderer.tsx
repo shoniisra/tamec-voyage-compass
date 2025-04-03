@@ -13,7 +13,7 @@ const renderers = {
     return <Tag className="mt-6 mb-3 font-bold">{data.text}</Tag>;
   },
   paragraph: ({ data }: any) => {
-    return <p className="my-4">{data.text}</p>;
+    return <p className="my-4" dangerouslySetInnerHTML={{ __html: data.text }} />;
   },
   list: ({ data }: any) => {
     const ListTag = data.style === 'ordered' ? 'ol' : 'ul';
@@ -23,7 +23,7 @@ const renderers = {
     return (
       <ListTag className={listClasses}>
         {data.items.map((item: string, idx: number) => (
-          <li key={idx}>{item}</li>
+          <li key={idx} dangerouslySetInnerHTML={{ __html: item }} />
         ))}
       </ListTag>
     );

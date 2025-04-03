@@ -73,6 +73,7 @@ const EditBlogPostPage = () => {
               <BlogEditor 
                 initialTitle={blog.title} 
                 initialContent={blog.content} 
+                initialCoverImage={blog.cover_image}
                 blogId={blog.id} 
                 isEdit={true} 
               />

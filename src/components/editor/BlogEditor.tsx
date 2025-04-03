@@ -9,21 +9,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import { Image as ImageIcon } from "lucide-react";
 
 interface BlogEditorProps {
   initialTitle?: string;
   initialContent?: any;
+  initialCoverImage?: string;
   blogId?: string;
   isEdit?: boolean;
 }
 
-const BlogEditor = ({ initialTitle = "", initialContent = {}, blogId, isEdit = false }: BlogEditorProps) => {
+const BlogEditor = ({ 
+  initialTitle = "", 
+  initialContent = {}, 
+  initialCoverImage = "",
+  blogId, 
+  isEdit = false 
+}: BlogEditorProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const editorRef = useRef<EditorJS | null>(null);
   const editorInstanceRef = useRef<any>(null);
   const [title, setTitle] = useState(initialTitle);
+  const [coverImage, setCoverImage] = useState(initialCoverImage);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     if (!editorRef.current) {
@@ -103,7 +113,6 @@ const BlogEditor = ({ initialTitle = "", initialContent = {}, blogId, isEdit = f
     // Cleanup
     return () => {
       if (editorInstanceRef.current) {
-        // Use the correct way to destroy an EditorJS instance
         try {
           editorInstanceRef.current.isReady.then(() => {
             editorInstanceRef.current.destroy();
@@ -125,6 +134,47 @@ const BlogEditor = ({ initialTitle = "", initialContent = {}, blogId, isEdit = f
       editorRef.current.render(initialContent);
     }
   }, [initialContent]);
+
+  const handleCoverImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    try {
+      setIsUploading(true);
+      
+      const fileExt = file.name.split('.').pop();
+      const fileName = `cover-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+      const filePath = `blog-covers/${fileName}`;
+      
+      const { error: uploadError } = await supabaseExtended.storage
+        .from('blog-content')
+        .upload(filePath, file);
+        
+      if (uploadError) {
+        throw uploadError;
+      }
+      
+      const { data } = supabaseExtended.storage
+        .from('blog-content')
+        .getPublicUrl(filePath);
+        
+      setCoverImage(data.publicUrl);
+      
+      toast({
+        title: "Success",
+        description: "Cover image uploaded successfully",
+      });
+    } catch (error: any) {
+      console.error('Error uploading cover image:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to upload cover image",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -152,6 +202,7 @@ const BlogEditor = ({ initialTitle = "", initialContent = {}, blogId, isEdit = f
           .update({ 
             title, 
             content: outputData as any,
+            cover_image: coverImage,
             updated_at: new Date().toISOString()
           })
           .eq('id', blogId);
@@ -169,6 +220,7 @@ const BlogEditor = ({ initialTitle = "", initialContent = {}, blogId, isEdit = f
           .insert({ 
             title, 
             content: outputData as any,
+            cover_image: coverImage,
             created_at: new Date().toISOString()
           });
           
@@ -220,6 +272,50 @@ const BlogEditor = ({ initialTitle = "", initialContent = {}, blogId, isEdit = f
             placeholder="Enter blog title"
             className="w-full"
           />
+        </div>
+        
+        <div>
+          <label htmlFor="cover-image" className="block text-sm font-medium mb-1">
+            Cover Image
+          </label>
+          <div className="space-y-3">
+            {coverImage && (
+              <div className="relative rounded-md overflow-hidden border h-60 w-full bg-gray-100">
+                <img 
+                  src={coverImage} 
+                  alt="Cover" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+            
+            <div className="flex gap-2">
+              <label htmlFor="cover-image-upload" className="cursor-pointer">
+                <div className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md inline-flex items-center transition-colors">
+                  <ImageIcon className="h-4 w-4 mr-2" />
+                  {coverImage ? "Change Cover Image" : "Upload Cover Image"}
+                </div>
+                <input
+                  id="cover-image-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleCoverImageUpload}
+                  className="hidden"
+                  disabled={isUploading}
+                />
+              </label>
+              
+              {coverImage && (
+                <Button 
+                  variant="outline" 
+                  onClick={() => setCoverImage("")}
+                  disabled={isUploading}
+                >
+                  Remove
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
         
         <div>

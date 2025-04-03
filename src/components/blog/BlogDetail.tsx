@@ -55,6 +55,7 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
             title: newPostData.title,
             content: newPostData.content,
             date: new Date(newPostData.created_at).toLocaleDateString(),
+            coverImage: newPostData.cover_image,
             isLegacy: false
           });
         } else if (!oldPostData) {
