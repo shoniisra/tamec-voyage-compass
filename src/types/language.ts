@@ -66,4 +66,22 @@ export interface TranslationType {
     loggingIn: string;
     registering: string;
   };
+  theme: {
+    light: string;
+    dark: string;
+    toggle: string;
+  };
+  footer: {
+    description: string;
+    quickLinks: string;
+    popularDestinations: string;
+    contactUs: string;
+    rights: string;
+    terms: string;
+    privacy: string;
+  };
+  language: {
+    english: string;
+    spanish: string;
+  };
 }

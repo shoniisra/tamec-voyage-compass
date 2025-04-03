@@ -78,6 +78,24 @@ const translations: Record<LanguageType, TranslationType> = {
       loggingIn: 'Logging in...',
       registering: 'Creating account...',
     },
+    theme: {
+      light: 'Light Mode',
+      dark: 'Dark Mode',
+      toggle: 'Toggle theme',
+    },
+    footer: {
+      description: 'Your trusted travel agency for unforgettable experiences and adventures around the world.',
+      quickLinks: 'Quick Links',
+      popularDestinations: 'Popular Destinations',
+      contactUs: 'Contact Us',
+      rights: 'All rights reserved.',
+      terms: 'Terms of Service',
+      privacy: 'Privacy Policy',
+    },
+    language: {
+      english: 'English',
+      spanish: 'Spanish',
+    },
   },
   es: {
     nav: {
@@ -145,6 +163,24 @@ const translations: Record<LanguageType, TranslationType> = {
       registerDescription: 'Regístrate para unirte a nuestra comunidad',
       loggingIn: 'Iniciando sesión...',
       registering: 'Creando cuenta...',
+    },
+    theme: {
+      light: 'Modo Claro',
+      dark: 'Modo Oscuro',
+      toggle: 'Cambiar tema',
+    },
+    footer: {
+      description: 'Tu agencia de viajes de confianza para experiencias inolvidables y aventuras alrededor del mundo.',
+      quickLinks: 'Enlaces Rápidos',
+      popularDestinations: 'Destinos Populares',
+      contactUs: 'Contáctanos',
+      rights: 'Todos los derechos reservados.',
+      terms: 'Términos de Servicio',
+      privacy: 'Política de Privacidad',
+    },
+    language: {
+      english: 'Inglés',
+      spanish: 'Español',
     },
   },
 };

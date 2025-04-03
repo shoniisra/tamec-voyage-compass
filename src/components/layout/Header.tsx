@@ -6,6 +6,7 @@ import { Menu, X, LogOut, User, Settings } from "lucide-react";
 import LanguageSwitch from '../language/LanguageSwitch';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { ThemeToggle } from '../theme/ThemeToggle';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,59 +42,63 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/80 backdrop-blur-md border-b">
+    <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-md border-b">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <Link to="/" className="flex items-center">
           <span className="text-2xl font-bold text-tamec-600">TAMEC</span>
-          <span className="ml-2 text-sm text-gray-500">Travel Agency</span>
+          <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">Travel Agency</span>
         </Link>
         
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
-          <Link to="/" className="text-gray-700 hover:text-tamec-600 transition-colors">
+        <nav className="hidden md:flex items-center space-x-4">
+          <Link to="/" className="text-foreground hover:text-tamec-600 transition-colors">
             {t('nav.home')}
           </Link>
-          <Link to="/destinations" className="text-gray-700 hover:text-tamec-600 transition-colors">
+          <Link to="/destinations" className="text-foreground hover:text-tamec-600 transition-colors">
             {t('nav.destinations')}
           </Link>
-          <Link to="/blog" className="text-gray-700 hover:text-tamec-600 transition-colors">
+          <Link to="/blog" className="text-foreground hover:text-tamec-600 transition-colors">
             {t('nav.blog')}
           </Link>
-          <Link to="/contact" className="text-gray-700 hover:text-tamec-600 transition-colors">
+          <Link to="/contact" className="text-foreground hover:text-tamec-600 transition-colors">
             {t('nav.contact')}
           </Link>
           
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="rounded-full">
-                  <User size={18} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {isAdmin && (
-                  <DropdownMenuItem onClick={handleAdminDashboard} className="cursor-pointer">
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Admin Dashboard</span>
+          <div className="flex items-center space-x-2">
+            <ThemeToggle />
+            <LanguageSwitch />
+            
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon" className="rounded-full">
+                    <User size={18} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {isAdmin && (
+                    <DropdownMenuItem onClick={handleAdminDashboard} className="cursor-pointer">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Admin Dashboard</span>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>{t('nav.logout')}</span>
                   </DropdownMenuItem>
-                )}
-                <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>{t('nav.logout')}</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Button onClick={handleLogin}>{t('nav.login')}</Button>
-          )}
-          
-          <LanguageSwitch />
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button onClick={handleLogin}>{t('nav.login')}</Button>
+            )}
+          </div>
         </nav>
         
         {/* Mobile menu button */}
         <div className="md:hidden flex items-center gap-4">
+          <ThemeToggle />
           <LanguageSwitch />
           <Button 
             variant="ghost" 
@@ -108,32 +113,32 @@ const Header = () => {
       
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white border-b animate-fade-in">
+        <div className="md:hidden bg-background border-b animate-fade-in">
           <div className="flex flex-col space-y-4 px-4 py-6">
             <Link 
               to="/" 
-              className="text-gray-700 hover:text-tamec-600 transition-colors py-2"
+              className="text-foreground hover:text-tamec-600 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               {t('nav.home')}
             </Link>
             <Link 
               to="/destinations" 
-              className="text-gray-700 hover:text-tamec-600 transition-colors py-2"
+              className="text-foreground hover:text-tamec-600 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               {t('nav.destinations')}
             </Link>
             <Link 
               to="/blog" 
-              className="text-gray-700 hover:text-tamec-600 transition-colors py-2"
+              className="text-foreground hover:text-tamec-600 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               {t('nav.blog')}
             </Link>
             <Link 
               to="/contact" 
-              className="text-gray-700 hover:text-tamec-600 transition-colors py-2"
+              className="text-foreground hover:text-tamec-600 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               {t('nav.contact')}

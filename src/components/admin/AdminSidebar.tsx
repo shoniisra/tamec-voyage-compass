@@ -83,7 +83,7 @@ const AdminSidebar = () => {
           <div className="size-8 rounded-full bg-tamec-600 flex items-center justify-center text-white font-semibold">
             T
           </div>
-          <span className="text-xl font-bold">TAMEC Admin</span>
+          <span className="text-xl font-bold text-foreground">TAMEC Admin</span>
         </div>
       </SidebarHeader>
       
@@ -111,8 +111,9 @@ const AdminSidebar = () => {
             size="icon"
             onClick={toggleTheme}
             className="mb-4 w-full flex justify-center"
+            title={theme === 'dark' ? t('theme.light') : t('theme.dark')}
           >
-            {theme === 'dark' ? <Sun /> : <MoonStar />}
+            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <MoonStar className="h-5 w-5" />}
           </Button>
           <Button 
             variant="destructive"
@@ -120,7 +121,7 @@ const AdminSidebar = () => {
             onClick={handleLogout}
           >
             <LogOut className="mr-2 size-4" />
-            Cerrar Sesión
+            {t('nav.logout')}
           </Button>
         </div>
       </SidebarFooter>
