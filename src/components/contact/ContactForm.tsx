@@ -7,11 +7,12 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface FormValues {
   name: string;
   email: string;
-  subject: string;
+  phone: string;
   message: string;
 }
 
@@ -19,11 +20,37 @@ const ContactForm = () => {
   const { t } = useLanguage();
   const { register, handleSubmit, formState: { errors }, reset } = useForm<FormValues>();
   
-  const onSubmit = (data: FormValues) => {
-    console.log('Form submitted:', data);
-    // Here you would normally handle the form submission to your backend
-    toast.success('Thank you for your message! We\'ll get back to you soon.');
-    reset();
+  const onSubmit = async (data: FormValues) => {
+    try {
+      // Insert data into the leads table
+      const { error } = await supabase
+        .from('leads')
+        .insert({
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          message: data.message,
+          status: 'New', // Default status for new leads
+          source: 'Website Contact Form'
+        });
+
+      if (error) {
+        console.error('Error submitting form:', error);
+        if (error.code === '23505') { // Unique constraint violation
+          toast.error(t('contact.form.emailExists') || 'This email is already registered.');
+        } else {
+          toast.error(t('contact.form.submitError') || 'Something went wrong. Please try again.');
+        }
+        return;
+      }
+
+      // On success
+      toast.success(t('contact.form.success') || 'Thank you for your message! We\'ll get back to you soon.');
+      reset();
+    } catch (err) {
+      console.error('Error submitting form:', err);
+      toast.error(t('contact.form.submitError') || 'Something went wrong. Please try again.');
+    }
   };
   
   return (
@@ -48,7 +75,6 @@ const ContactForm = () => {
             type="email" 
             placeholder={t('contact.form.emailPlaceholder')}
             {...register('email', { 
-              required: 'Email is required',
               pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                 message: 'Invalid email address'
@@ -62,14 +88,14 @@ const ContactForm = () => {
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="subject">{t('contact.form.subject')}</Label>
+        <Label htmlFor="phone">{t('contact.form.phone')}</Label>
         <Input 
-          id="subject" 
-          placeholder={t('contact.form.subjectPlaceholder')}
-          {...register('subject', { required: 'Subject is required' })}
+          id="phone" 
+          placeholder={t('contact.form.phonePlaceholder')}
+          {...register('phone')}
         />
-        {errors.subject && (
-          <p className="text-red-500 text-sm mt-1">{errors.subject.message}</p>
+        {errors.phone && (
+          <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
         )}
       </div>
       

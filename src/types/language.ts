@@ -41,11 +41,25 @@ export interface TranslationType {
   contact: {
     title: string;
     subtitle: string;
-    formName: string;
-    formEmail: string;
-    formSubject: string;
-    formMessage: string;
-    formSubmit: string;
+    findUs: string;
+    form: {
+      title: string;
+      description: string;
+      fullName: string;
+      namePlaceholder: string;
+      email: string;
+      emailPlaceholder: string;
+      phone: string;
+      phonePlaceholder: string;
+      subject: string;
+      subjectPlaceholder: string;
+      message: string;
+      messagePlaceholder: string;
+      submit: string;
+      success: string;
+      submitError: string;
+      emailExists: string;
+    };
     infoTitle: string;
     infoAddressLabel: string;
     infoEmailLabel: string;
