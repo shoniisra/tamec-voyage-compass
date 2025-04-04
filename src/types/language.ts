@@ -1,4 +1,3 @@
-
 export interface TranslationType {
   nav: {
     home: string;
@@ -37,6 +36,12 @@ export interface TranslationType {
     loadingComments: string;
     noComments: string;
     commentSubmitted: string;
+    posting: string;
+    searchPlaceholder: string;
+    latestStories: string;
+    latestStoriesSubtitle: string;
+    noResults: string;
+    discoverMore: string;
   };
   contact: {
     title: string;
