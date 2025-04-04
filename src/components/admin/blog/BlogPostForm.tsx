@@ -191,7 +191,6 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ post, isLoading, onSave }) 
                               <Input
                                 placeholder="Enter post title"
                                 {...field}
-                                onValueChange={(value) => field.onChange(value)}
                               />
                             </FormControl>
                             <FormMessage />
@@ -265,7 +264,6 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ post, isLoading, onSave }) 
                               <Input
                                 placeholder="Enter post title"
                                 {...field}
-                                onValueChange={(value) => field.onChange(value)}
                               />
                             </FormControl>
                             <FormMessage />
