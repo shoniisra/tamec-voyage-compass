@@ -188,7 +188,11 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ post, isLoading, onSave }) 
                           <FormItem>
                             <FormLabel>Title (English)</FormLabel>
                             <FormControl>
-                              <Input placeholder="Enter post title" {...field} />
+                              <Input
+                                placeholder="Enter post title"
+                                {...field}
+                                onValueChange={(value) => field.onChange(value)}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -258,7 +262,11 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ post, isLoading, onSave }) 
                           <FormItem>
                             <FormLabel>Title (Spanish)</FormLabel>
                             <FormControl>
-                              <Input placeholder="Enter post title" {...field} />
+                              <Input
+                                placeholder="Enter post title"
+                                {...field}
+                                onValueChange={(value) => field.onChange(value)}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
