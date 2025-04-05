@@ -69,19 +69,7 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ post, isLoading, onSave }) 
     },
   });
 
-  // Generate slug from English title
-  useEffect(() => {
-    const subscription = form.watch((value, { name }) => {
-      if (name === 'title_en' && !isEditing) {
-        const slugValue = value.title_en?.toLowerCase()
-          .replace(/[^\w\s]/gi, '')
-          .replace(/\s+/g, '-') || '';
-        form.setValue('slug', slugValue);
-      }
-    });
-    
-    return () => subscription.unsubscribe();
-  }, [form, isEditing]);
+
 
   // Handle form submission
   const onSubmit = async (data: BlogFormValues) => {

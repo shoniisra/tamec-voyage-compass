@@ -3,7 +3,16 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input"> & { onValueChange?: (value: string) => void }>(
-  ({ className, type, onChange, onValueChange, ...props }, ref) => {
+  ({ className, type, onChange, onValueChange, value, ...props }, ref) => {
+    const handleChange = React.useCallback(
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+        onChange?.(e);
+        onValueChange?.(newValue);
+      },
+      [onChange, onValueChange]
+    );
+
     return (
       <input
         type={type}
@@ -12,10 +21,8 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input"> &
           className
         )}
         ref={ref}
-        onChange={(e) => {
-          onChange?.(e);
-          onValueChange?.(e.target.value);
-        }}
+        value={value}
+        onChange={handleChange}
         {...props}
       />
     )
