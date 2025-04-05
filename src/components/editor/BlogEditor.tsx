@@ -138,6 +138,14 @@ const BlogEditor = ({
     };
   }, [initialContent]);
 
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTitle(e.target.value);
+  };
+
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSlug(toKebabCase(e.target.value));
+  };
+
   const handleCoverImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -286,7 +294,7 @@ const BlogEditor = ({
           <Input
             id="blog-title"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={handleTitleChange}
             placeholder="Enter blog title"
             className="w-full"
           />
@@ -301,7 +309,7 @@ const BlogEditor = ({
             <Input
               id="blog-slug"
               value={slug}
-              onChange={(e) => setSlug(toKebabCase(e.target.value))}
+              onChange={handleSlugChange}
               placeholder="url-friendly-slug"
               className="flex-1"
             />
