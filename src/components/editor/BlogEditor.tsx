@@ -53,7 +53,6 @@ const BlogEditor = ({
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const title = watch('title');
   const coverImage = watch('coverImage');
 
   useEffect(() => {
@@ -174,7 +173,8 @@ const BlogEditor = ({
   }, [initialContent]);
 
   const handleGenerateSlug = () => {
-    setValue('slug', toKebabCase(title));
+    const currentTitle = watch('title');
+    setValue('slug', toKebabCase(currentTitle));
   };
 
   const handleCoverImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -301,12 +301,12 @@ const BlogEditor = ({
             <label htmlFor="blog-title" className="block text-sm font-medium mb-1">
               Blog Title
             </label>
-            <Input
+             <Input
               id="blog-title"
               placeholder="Enter blog title"
               className="w-full"
               {...register('title', { required: 'Title is required' })}
-            />
+            /> 
             {errors.title && (
               <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
             )}
