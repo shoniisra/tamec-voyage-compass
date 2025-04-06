@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import Layout from '@/components/layout/Layout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -23,7 +23,7 @@ const AdminDashboardPage = () => {
   }
 
   return (
-    <Layout fullWidth className="bg-gray-50 dark:bg-gray-900 min-h-screen p-0">
+    <Layout fullWidth hideHeader hideFooter className="bg-gray-50 dark:bg-gray-900 min-h-screen p-0">
       <SidebarProvider>
         <div className="flex min-h-screen w-full">
           <AdminSidebar />

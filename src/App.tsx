@@ -1,6 +1,6 @@
 
 import { Suspense, lazy } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 import AuthPage from '@/pages/AuthPage';
 import HomePage from '@/pages/HomePage';
@@ -31,6 +31,7 @@ function App() {
             <Route path="/contact" element={<ContactPage />} />
 
             {/* Admin Routes */}
+            <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="/admin/dashboard" element={
               <ProtectedRoute>
                 <AdminDashboardPage />
