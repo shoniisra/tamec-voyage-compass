@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import AdminSidebar from '@/components/admin/AdminSidebar';
-import BlogEditor from '@/components/editor/BlogEditor';
+import BlogEditor from '@/components/admin/blog/editor/BlogEditor';
 import { supabaseExtended } from '@/integrations/supabase/client-extended';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toKebabCase } from '@/utils/stringUtils';

@@ -2,7 +2,7 @@
 import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Skeleton } from '@/components/ui/skeleton';
-import BlogRenderer from '@/components/editor/BlogRenderer';
+import BlogRenderer from '@/components/admin/blog/editor/BlogRenderer';
 import RecentPosts from './RecentPosts';
 import BlogComments from './BlogComments';
 import { useBlogPost } from '@/hooks/use-blog-post';

@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import AdminSidebar from '@/components/admin/AdminSidebar';
-import BlogEditor from '@/components/editor/BlogEditor';
+import BlogEditor from '@/components/admin/blog/editor/BlogEditor';
 
 const CreateBlogPostPage = () => {
   const { isAdmin } = useAuth();
