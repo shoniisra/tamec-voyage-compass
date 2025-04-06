@@ -44,6 +44,36 @@ export type Database = {
           },
         ]
       }
+      blog_tags: {
+        Row: {
+          blog_id: string
+          tag_id: string
+        }
+        Insert: {
+          blog_id: string
+          tag_id: string
+        }
+        Update: {
+          blog_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_tags_blog_id_fkey"
+            columns: ["blog_id"]
+            isOneToOne: false
+            referencedRelation: "blogs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blog_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blogs: {
         Row: {
           content: Json
@@ -133,6 +163,56 @@ export type Database = {
           id?: string
         }
         Relationships: []
+      }
+      tag_categories: {
+        Row: {
+          description: string | null
+          id: string
+          name: string
+          sort_order: number | null
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          name: string
+          sort_order?: number | null
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          name?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      tags: {
+        Row: {
+          category_id: string | null
+          color: string
+          id: string
+          name: string
+        }
+        Insert: {
+          category_id?: string | null
+          color: string
+          id?: string
+          name: string
+        }
+        Update: {
+          category_id?: string | null
+          color?: string
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tags_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "tag_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

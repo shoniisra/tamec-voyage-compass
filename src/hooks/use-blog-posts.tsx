@@ -28,6 +28,39 @@ export function useBlogPosts() {
           throw error;
         }
         
+        // Get post IDs for tag fetching
+        const postIds = data?.map(post => post.id) || [];
+        
+        // Fetch tags for all posts
+        const { data: tagData, error: tagError } = await supabase
+          .from('blog_tags')
+          .select(`
+            blog_id,
+            tags:tag_id(
+              id,
+              name,
+              color,
+              category_id
+            )
+          `)
+          .in('blog_id', postIds);
+          
+        if (tagError) {
+          console.error('Error fetching tags:', tagError);
+        }
+        
+        // Create a map of blog IDs to their tags
+        const tagsByBlogId: Record<string, any[]> = {};
+        
+        tagData?.forEach(item => {
+          if (!tagsByBlogId[item.blog_id]) {
+            tagsByBlogId[item.blog_id] = [];
+          }
+          if (item.tags) {
+            tagsByBlogId[item.blog_id].push(item.tags);
+          }
+        });
+        
         // Process posts
         const formattedPosts = (data || []).map((post) => ({
           id: post.id,
@@ -42,7 +75,8 @@ export function useBlogPosts() {
           cover_image: post.cover_image || '',
           date: post.created_at,
           newContent: post.content,
-          isLegacy: false
+          isLegacy: false,
+          tags: tagsByBlogId[post.id] || []
         }));
         
         setPosts(formattedPosts as BlogPost[]);

@@ -1,130 +1,82 @@
 
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { 
-  LayoutDashboard, 
-  FileText, 
-  Map, 
-  CreditCard, 
-  Tag, 
-  Users, 
-  LogOut,
-  MoonStar,
-  Sun
-} from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { 
-  Sidebar, 
-  SidebarContent, 
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarSeparator
-} from '@/components/ui/sidebar';
-import { Button } from '@/components/ui/button';
-import { useTheme } from 'next-themes';
+import { Sidebar, SidebarContent, SidebarHeader, SidebarTrigger } from '@/components/ui/sidebar';
+import { ChevronRight, PieChart, FileText, Users, MessageSquare, Settings, Tags } from 'lucide-react';
 
 const AdminSidebar = () => {
   const { t } = useLanguage();
   const location = useLocation();
-  const navigate = useNavigate();
-  const { signOut } = useAuth();
-  const { theme, setTheme } = useTheme();
 
-  const menuItems = [
-    { 
-      icon: LayoutDashboard, 
-      title: 'Dashboard de Métricas', 
-      path: '/admin' 
-    },
-    { 
-      icon: Users, 
-      title: 'Clientes', 
-      path: '/admin/customers' 
-    },
-    { 
-      icon: FileText, 
-      title: 'Blogs', 
-      path: '/admin/blog/posts' 
-    },
-    { 
-      icon: Map, 
-      title: 'Tours',
-      path: '/admin/tours' 
-    },
-    { 
-      icon: CreditCard, 
-      title: 'Precios de Visa', 
-      path: '/admin/visas' 
-    },
-    { 
-      icon: Tag, 
-      title: 'Etiquetas', 
-      path: '/admin/tags' 
-    }
-  ];
-
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+  const isLinkActive = (path: string) => {
+    return location.pathname.startsWith(path);
   };
 
-  const handleLogout = async () => {
-    await signOut();
-    navigate('/');
+  const navLinkClasses = (path: string) => {
+    const baseClasses = "flex items-center gap-3 py-3 px-4 rounded-md text-sm font-medium transition-colors";
+    const activeClasses = "bg-tamec-100 text-tamec-900 dark:bg-tamec-900/20 dark:text-tamec-200";
+    const inactiveClasses = "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800";
+    
+    return `${baseClasses} ${isLinkActive(path) ? activeClasses : inactiveClasses}`;
   };
 
   return (
-    <Sidebar className="border-r border-border bg-background">
-      <SidebarHeader className="py-6 px-2">
-        <div className="flex items-center gap-2 px-2">
-          <div className="size-8 rounded-full bg-tamec-600 flex items-center justify-center text-white font-semibold">
-            T
-          </div>
-          <span className="text-xl font-bold text-foreground">TAMEC Admin</span>
-        </div>
+    <Sidebar>
+      <SidebarHeader className="flex h-16 items-center border-b px-6">
+        <h2 className="text-lg font-semibold">Admin</h2>
+        <SidebarTrigger className="ml-auto h-8 w-8">
+          <ChevronRight className="h-4 w-4" />
+        </SidebarTrigger>
       </SidebarHeader>
-      
-      <SidebarContent>
-        <SidebarMenu>
-          {menuItems.map((item) => (
-            <SidebarMenuItem key={item.path}>
-              <SidebarMenuButton 
-                isActive={location.pathname === item.path}
-                onClick={() => navigate(item.path)}
-              >
-                <item.icon className="mr-2" />
-                <span>{item.title}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarContent>
-      
-      <SidebarFooter className="mt-auto">
-        <SidebarSeparator />
-        <div className="p-4">
-          <Button 
-            variant="outline"
-            size="icon"
-            onClick={toggleTheme}
-            className="mb-4 w-full flex justify-center"
-            title={theme === 'dark' ? t('theme.light') : t('theme.dark')}
-          >
-            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <MoonStar className="h-5 w-5" />}
-          </Button>
-          <Button 
-            variant="destructive"
-            className="w-full"
-            onClick={handleLogout}
-          >
-            <LogOut className="mr-2 size-4" />
-            {t('nav.logout')}
-          </Button>
+      <SidebarContent className="p-4">
+        <div className="flex flex-col gap-1">
+          <NavLink to="/admin/dashboard" className={navLinkClasses('/admin/dashboard')}>
+            <PieChart className="h-5 w-5" />
+            Dashboard
+          </NavLink>
+          <div className="mt-3 mb-1 px-4">
+            <h3 className="text-xs uppercase text-gray-500 dark:text-gray-400 font-semibold">
+              Blog
+            </h3>
+          </div>
+          <NavLink to="/admin/blog/posts" className={navLinkClasses('/admin/blog/posts')}>
+            <FileText className="h-5 w-5" />
+            Posts
+          </NavLink>
+          <NavLink to="/admin/blog/tags" className={navLinkClasses('/admin/blog/tags')}>
+            <Tags className="h-5 w-5" />
+            Tags
+          </NavLink>
+          <div className="mt-3 mb-1 px-4">
+            <h3 className="text-xs uppercase text-gray-500 dark:text-gray-400 font-semibold">
+              Users
+            </h3>
+          </div>
+          <NavLink to="/admin/users" className={navLinkClasses('/admin/users')}>
+            <Users className="h-5 w-5" />
+            User Management
+          </NavLink>
+          <div className="mt-3 mb-1 px-4">
+            <h3 className="text-xs uppercase text-gray-500 dark:text-gray-400 font-semibold">
+              Communications
+            </h3>
+          </div>
+          <NavLink to="/admin/communications/messages" className={navLinkClasses('/admin/communications/messages')}>
+            <MessageSquare className="h-5 w-5" />
+            Messages
+          </NavLink>
+          <div className="mt-3 mb-1 px-4">
+            <h3 className="text-xs uppercase text-gray-500 dark:text-gray-400 font-semibold">
+              Configuration
+            </h3>
+          </div>
+          <NavLink to="/admin/settings" className={navLinkClasses('/admin/settings')}>
+            <Settings className="h-5 w-5" />
+            Settings
+          </NavLink>
         </div>
-      </SidebarFooter>
+      </SidebarContent>
     </Sidebar>
   );
 };

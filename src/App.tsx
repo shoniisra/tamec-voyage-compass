@@ -1,84 +1,70 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import HomePage from "./pages/HomePage";
-import BlogPage from "./pages/BlogPage";
-import BlogDetailPage from "./pages/BlogDetailPage";
-import ContactPage from "./pages/ContactPage";
-import NotFound from "./pages/NotFound";
-import AuthPage from "./pages/AuthPage";
-import AdminDashboardPage from "./pages/AdminDashboardPage";
-import BlogPostsPage from "./pages/admin/blog/BlogPostsPage";
-import CreateBlogPostPage from "./pages/admin/blog/CreateBlogPostPage";
-import EditBlogPostPage from "./pages/admin/blog/EditBlogPostPage";
-import { LanguageProvider } from "./contexts/LanguageContext";
-import { AuthProvider } from "./contexts/AuthContext";
-import { ProtectedRoute } from "./components/auth/ProtectedRoute";
-import { ThemeProvider } from "./providers/ThemeProvider";
-import { setupBlogStorage } from "./integrations/supabase/setupStorage";
-import React from 'react';
+import { Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Toaster } from '@/components/ui/sonner';
+import AuthPage from '@/pages/AuthPage';
+import HomePage from '@/pages/HomePage';
+import BlogPage from '@/pages/BlogPage';
+import BlogDetailPage from '@/pages/BlogDetailPage';
+import ContactPage from '@/pages/ContactPage';
+import AdminDashboardPage from '@/pages/AdminDashboardPage';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import NotFound from '@/pages/NotFound';
+import ThemeProvider from '@/providers/ThemeProvider';
+import BlogPostsPage from '@/pages/admin/blog/BlogPostsPage';
+import CreateBlogPostPage from '@/pages/admin/blog/CreateBlogPostPage';
+import EditBlogPostPage from '@/pages/admin/blog/EditBlogPostPage';
+import TagsPage from '@/pages/admin/blog/TagsPage';
 
-// Create query client
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+import './App.css';
 
-const AppContent = () => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    // Setup storage bucket for blog images
-    setupBlogStorage().catch(error => {
-      console.error("Failed to setup blog storage:", error);
-    });
-  }, []);
-  
+function App() {
   return (
     <ThemeProvider>
-      <TooltipProvider>
-        <AuthProvider>
-          <Toaster />
-          <Sonner />
+      <Router>
+        <Suspense fallback={<div>Loading...</div>}>
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/auth" element={<AuthPage />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogDetailPage />} />
             <Route path="/contact" element={<ContactPage />} />
-            <Route path="/auth" element={<AuthPage />} />
-            
-            {/* Protected Admin Routes */}
-            <Route path="/admin" element={<ProtectedRoute requireAdmin={true} />}>
-              <Route index element={<AdminDashboardPage />} />
-              <Route path="blog/posts" element={<BlogPostsPage />} />
-              <Route path="blog/posts/create" element={<CreateBlogPostPage />} />
-              <Route path="blog/posts/edit/:id" element={<EditBlogPostPage />} />
-              {/* Add more admin routes here */}
-            </Route>
-            
+
+            {/* Admin Routes */}
+            <Route path="/admin/dashboard" element={
+              <ProtectedRoute>
+                <AdminDashboardPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/blog/posts" element={
+              <ProtectedRoute>
+                <BlogPostsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/blog/posts/create" element={
+              <ProtectedRoute>
+                <CreateBlogPostPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/blog/posts/edit/:id" element={
+              <ProtectedRoute>
+                <EditBlogPostPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/blog/tags" element={
+              <ProtectedRoute>
+                <TagsPage />
+              </ProtectedRoute>
+            } />
+
+            {/* 404 Page */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </AuthProvider>
-      </TooltipProvider>
+        </Suspense>
+      </Router>
+      <Toaster />
     </ThemeProvider>
   );
-};
-
-const App = () => {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <AppContent />
-      </LanguageProvider>
-    </QueryClientProvider>
-  );
-};
+}
 
 export default App;

@@ -14,12 +14,16 @@ import { toKebabCase } from "@/utils/stringUtils";
 import { useForm } from "react-hook-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTags, Tag } from "@/hooks/use-tags";
+import { useBlogTags } from "@/hooks/use-blog-tags";
+import { MultiSelect } from "@/components/ui/multi-select";
 
 interface FormValues {
   title: string;
   title_en: string;
   slug: string;
   coverImage: string;
+  tags: string[];
 }
 
 interface BlogEditorProps {
@@ -29,6 +33,7 @@ interface BlogEditorProps {
   initialContent_en?: any;
   initialCoverImage?: string;
   initialSlug?: string;
+  initialTags?: string[];
   blogId?: string;
   isEdit?: boolean;
 }
@@ -40,12 +45,15 @@ const BlogEditor = ({
   initialContent_en = {},
   initialCoverImage = "",
   initialSlug = "",
+  initialTags = [],
   blogId,
   isEdit = false
 }: BlogEditorProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { t, language } = useLanguage();
+  const { tags, loading: tagsLoading } = useTags();
+  const { getBlogTags, updateBlogTags } = useBlogTags();
 
   // Create separate refs for Spanish and English editors
   const spanishEditorRef = useRef<EditorJS | null>(null);
@@ -56,7 +64,8 @@ const BlogEditor = ({
       title: initialTitle,
       title_en: initialTitle_en,
       slug: initialSlug,
-      coverImage: initialCoverImage
+      coverImage: initialCoverImage,
+      tags: initialTags
     }
   });
 
@@ -65,6 +74,23 @@ const BlogEditor = ({
   const [activeTab, setActiveTab] = useState<string>("spanish");
 
   const coverImage = watch('coverImage');
+
+  // Load blog tags if in edit mode
+  useEffect(() => {
+    if (isEdit && blogId) {
+      const loadBlogTags = async () => {
+        try {
+          const blogTags = await getBlogTags(blogId);
+          const tagIds = blogTags.map(tag => tag.id);
+          setValue('tags', tagIds);
+        } catch (error) {
+          console.error('Error loading blog tags:', error);
+        }
+      };
+      
+      loadBlogTags();
+    }
+  }, [blogId, isEdit, getBlogTags, setValue]);
 
   // Initialize Spanish editor
   useEffect(() => {
@@ -310,11 +336,23 @@ const BlogEditor = ({
     };
   }, [initialContent_en, activeTab]);
 
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue('title', e.target.value);
+  };
+
+  const handleTitle_enChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue('title_en', e.target.value);
+  };
+
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue('slug', e.target.value);
+  };
+
   const handleGenerateSlug = () => {
     // Generate slug from Spanish title if available, otherwise from English title
     const sourceTitle = watch('title') || watch('title_en');
     setValue('slug', toKebabCase(sourceTitle));
-    };
+  };
 
   const handleCoverImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -391,13 +429,17 @@ const BlogEditor = ({
           .eq('id', blogId);
 
         if (error) throw error;
+        
+        // Update blog tags
+        await updateBlogTags(blogId, formData.tags);
 
         toast({
           title: "Success",
           description: "Blog post updated successfully",
         });
       } else {
-        const { error } = await supabaseExtended
+        // Create new blog post
+        const { data, error } = await supabaseExtended
           .from('blogs')
           .insert({
             title: formData.title,
@@ -407,9 +449,16 @@ const BlogEditor = ({
             cover_image: formData.coverImage,
             slug: formData.slug,
             created_at: new Date().toISOString()
-          });
+          })
+          .select();
 
         if (error) throw error;
+        
+        // If tags are selected, add them to the blog post
+        if (data && data.length > 0 && formData.tags.length > 0) {
+          const newBlogId = data[0].id;
+          await updateBlogTags(newBlogId, formData.tags);
+        }
 
         toast({
           title: "Success",
@@ -456,11 +505,12 @@ const BlogEditor = ({
             <div className="flex items-center gap-2">
               <span className="text-gray-500">/blog/</span>
               <div className="flex-1 flex gap-2">
-        
                 <Input
                   id="blog-slug"
                   placeholder="url-friendly-slug"
                   className="flex-1"
+                  value={watch('slug')}
+                  onChange={handleSlugChange}
                   {...register('slug', { required: 'URL slug is required' })}
                 />
                 <Button
@@ -527,6 +577,31 @@ const BlogEditor = ({
             </div>
           </div>
 
+          {/* Tags - Common for both languages */}
+          <div>
+            <label htmlFor="blog-tags" className="block text-sm font-medium mb-1">
+              Tags
+            </label>
+            <MultiSelect
+              options={tags.map(tag => ({
+                value: tag.id,
+                label: tag.name,
+                color: tag.color
+              }))}
+              selected={watch('tags')}
+              onChange={(selectedValues) => setValue('tags', selectedValues)}
+              placeholder="Select tags for this post"
+              emptyIndicator={
+                <p className="text-center text-sm text-muted-foreground">
+                  No tags found.
+                </p>
+              }
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Add tags to categorize your content. You can create new tags in the Tags section of the admin.
+            </p>
+          </div>
+
           {/* Language Tabs */}
           <Tabs defaultValue="spanish" onValueChange={setActiveTab} value={activeTab}>
             <TabsList className="mb-4">
@@ -544,6 +619,8 @@ const BlogEditor = ({
                   id="blog-title"
                   placeholder="Ingresa el título del blog"
                   className="w-full"
+                  value={watch('title')}
+                  onChange={handleTitleChange}
                   {...register('title', { required: 'El título es requerido' })}
                 />
                 
@@ -573,6 +650,8 @@ const BlogEditor = ({
                   id="blog-title-en"
                   placeholder="Enter blog title"
                   className="w-full"
+                  value={watch('title_en')}
+                  onChange={handleTitle_enChange}
                   {...register('title_en')}
                 />
               </div>

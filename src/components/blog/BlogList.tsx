@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import BlogCard from './BlogCard';
 import { useBlogPosts } from '@/hooks/use-blog-posts';
@@ -7,8 +8,11 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { PlusCircle, Search } from 'lucide-react';
+import { PlusCircle, Search, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { supabase } from '@/integrations/supabase/client';
+import TagsFilter from './TagsFilter';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 const BlogList = () => {
   const { posts, loading } = useBlogPosts();
@@ -16,9 +20,23 @@ const BlogList = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
-  // Filter posts based on search query
+  // Filter posts based on search query and tags
   const filteredPosts = posts.filter(post => {
+    // First, check if there are any selected tags
+    if (selectedTags.length > 0) {
+      // Check if this post has any of the selected tags
+      // We'll need to fetch tags for each post - in a real app,
+      // you might want to optimize this by fetching tags with posts
+      const postHasSelectedTag = post.tags?.some(tag => 
+        selectedTags.includes(tag.id)
+      );
+      
+      if (!postHasSelectedTag) return false;
+    }
+    
+    // Then check search query
     const title = typeof post.title === 'string' ? post.title.toLowerCase() : 
       (language === 'en' && post.title_en ? post.title_en.toLowerCase() : 'untitled').toLowerCase();
       
@@ -79,15 +97,58 @@ const BlogList = () => {
             />
           </div>
           
-          {isAdmin && (
-            <Button 
-              onClick={() => navigate('/admin/blog/posts/create')}
-              className="bg-tamec-600 hover:bg-tamec-700 whitespace-nowrap"
-            >
-              <PlusCircle className="mr-2 h-4 w-4" />
-              {language === 'en' ? 'New Article' : 'Nuevo Artículo'}
-            </Button>
-          )}
+          <div className="flex gap-2">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" className="flex items-center gap-2">
+                  <Filter className="h-4 w-4" />
+                  {language === 'en' ? 'Filter' : 'Filtrar'}
+                  {selectedTags.length > 0 && (
+                    <span className="ml-1 inline-flex items-center justify-center w-5 h-5 text-xs font-semibold rounded-full bg-primary text-primary-foreground">
+                      {selectedTags.length}
+                    </span>
+                  )}
+                </Button>
+              </SheetTrigger>
+              <SheetContent>
+                <SheetHeader>
+                  <SheetTitle>{language === 'en' ? 'Filter Blog Posts' : 'Filtrar Artículos'}</SheetTitle>
+                  <SheetDescription>
+                    {language === 'en' 
+                      ? 'Select tags to filter the blog posts'
+                      : 'Selecciona etiquetas para filtrar los artículos'}
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="py-6">
+                  <TagsFilter 
+                    selectedTags={selectedTags} 
+                    onTagsChange={setSelectedTags} 
+                  />
+                </div>
+                {selectedTags.length > 0 && (
+                  <div className="pt-2">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setSelectedTags([])}
+                      className="w-full"
+                    >
+                      {language === 'en' ? 'Clear Filters' : 'Borrar Filtros'}
+                    </Button>
+                  </div>
+                )}
+              </SheetContent>
+            </Sheet>
+            
+            {isAdmin && (
+              <Button 
+                onClick={() => navigate('/admin/blog/posts/create')}
+                className="bg-tamec-600 hover:bg-tamec-700 whitespace-nowrap"
+              >
+                <PlusCircle className="mr-2 h-4 w-4" />
+                {language === 'en' ? 'New Article' : 'Nuevo Artículo'}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
       
@@ -124,6 +185,7 @@ const BlogList = () => {
                 })}
                 category={category}
                 slug={postSlug}
+                tags={post.tags}
               />
             );
           })}
@@ -133,6 +195,15 @@ const BlogList = () => {
           <p className="text-muted-foreground text-lg">
             {language === 'en' ? 'No articles found matching your search.' : 'No se encontraron artículos que coincidan con tu búsqueda.'}
           </p>
+          {selectedTags.length > 0 && (
+            <Button 
+              variant="outline" 
+              onClick={() => setSelectedTags([])}
+              className="mt-4"
+            >
+              {language === 'en' ? 'Clear Tag Filters' : 'Borrar Filtros de Etiquetas'}
+            </Button>
+          )}
         </div>
       )}
       

@@ -1,65 +1,100 @@
+
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Calendar, Clock, ArrowRight } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface BlogCardProps {
   id: string;
   title: string;
-  excerpt: string;
-  coverImage: string;
+  excerpt?: string;
   date: string;
-  category: string;
+  category?: string;
+  coverImage?: string;
+  tags?: any[];
   slug: string;
 }
 
-const BlogCard = ({ id, title, excerpt, coverImage, date, category, slug }: BlogCardProps) => {
-  const { t, language } = useLanguage();
-  
-  const defaultImage = "https://images.unsplash.com/photo-1482938289607-e9573fc25ebb?auto=format&fit=crop&w=800&q=80";
+const BlogCard = ({ id, title, excerpt, date, category, coverImage, tags, slug }: BlogCardProps) => {
+  // Get 5 minutes read time for every 500 characters in excerpt
+  const readTime = excerpt ? Math.max(1, Math.ceil(excerpt.length / 500) * 5) : 5;
   
   return (
-    <Card className="overflow-hidden h-full rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg border dark:border-gray-700">
-      <Link to={`/blog/${slug}`} className="block h-52 overflow-hidden relative">
-        <img 
-          src={coverImage || defaultImage} 
-          alt={title} 
-          className="w-full h-full object-cover transition-transform hover:scale-105 duration-500"
-        />
-        {category && (
-          <span className="absolute top-4 left-4 bg-tamec-600 text-white text-xs font-medium px-2 py-1 rounded-full">
-            {category}
-          </span>
-        )}
+    <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md border border-gray-100 dark:border-gray-700 transition-transform hover:shadow-lg hover:-translate-y-1">
+      <Link to={`/blog/${slug}`} className="block">
+        <div className="relative h-48 overflow-hidden bg-gray-100 dark:bg-gray-700">
+          {coverImage ? (
+            <img
+              src={coverImage}
+              alt={title}
+              className="w-full h-full object-cover object-center"
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <span className="text-gray-400">No image</span>
+            </div>
+          )}
+        </div>
       </Link>
       
-      <CardContent className="p-6">
-        <div className="flex items-center text-muted-foreground mb-3 text-sm">
-          <div className="flex items-center">
+      <div className="p-5">
+        {/* Tags */}
+        {tags && tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-3">
+            {tags.slice(0, 3).map((tag) => (
+              <Badge 
+                key={tag.id}
+                variant="outline"
+                style={{ 
+                  borderColor: tag.color,
+                  color: tag.color 
+                }}
+                className="text-xs font-medium"
+              >
+                {tag.name}
+              </Badge>
+            ))}
+            {tags.length > 3 && (
+              <span className="text-xs text-gray-500">
+                +{tags.length - 3}
+              </span>
+            )}
+          </div>
+        )}
+        
+        <h3 className="text-xl font-bold mb-2 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">
+          <Link to={`/blog/${slug}`}>{title}</Link>
+        </h3>
+        
+        {excerpt && (
+          <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
+            {excerpt}
+          </p>
+        )}
+        
+        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 flex-wrap gap-y-2">
+          <div className="flex items-center mr-4">
             <Calendar className="h-4 w-4 mr-1" />
             <span>{date}</span>
           </div>
+          
+          <div className="flex items-center">
+            <Clock className="h-4 w-4 mr-1" />
+            <span>{readTime} min read</span>
+          </div>
         </div>
         
-        <Link to={`/blog/${slug}`} className="block group">
-          <h3 className="text-xl font-bold mb-3 group-hover:text-tamec-600 transition-colors line-clamp-2">
-            {title}
-          </h3>
-        </Link>
-        
-        <p className="text-muted-foreground line-clamp-3 mb-4">
-          {excerpt || (language === 'en' ? 'Discover more about this travel experience...' : 'Descubre más sobre esta experiencia de viaje...')}
-        </p>
-        
-        <Link to={`/blog/${slug}`} className="inline-flex items-center text-tamec-600 hover:text-tamec-700 font-medium group">
-          {t('blog.readMore')}
-          <ArrowRight className="h-4 w-4 ml-1 transition-transform transform group-hover:translate-x-1" />
-        </Link>
-      </CardContent>
-    </Card>
+        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+          <Link
+            to={`/blog/${slug}`}
+            className="inline-flex items-center font-medium text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 transition-colors"
+          >
+            Read More
+            <ArrowRight className="ml-1 h-4 w-4" />
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 };
 
