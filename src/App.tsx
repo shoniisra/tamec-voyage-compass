@@ -1,6 +1,6 @@
 
 import { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 import AuthPage from '@/pages/AuthPage';
 import HomePage from '@/pages/HomePage';
@@ -8,20 +8,20 @@ import BlogPage from '@/pages/BlogPage';
 import BlogDetailPage from '@/pages/BlogDetailPage';
 import ContactPage from '@/pages/ContactPage';
 import AdminDashboardPage from '@/pages/AdminDashboardPage';
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import NotFound from '@/pages/NotFound';
-import ThemeProvider from '@/providers/ThemeProvider';
+
 import BlogPostsPage from '@/pages/admin/blog/BlogPostsPage';
 import CreateBlogPostPage from '@/pages/admin/blog/CreateBlogPostPage';
 import EditBlogPostPage from '@/pages/admin/blog/EditBlogPostPage';
 import TagsPage from '@/pages/admin/blog/TagsPage';
 
 import './App.css';
+import { ThemeProvider } from './providers/ThemeProvider';
 
 function App() {
   return (
     <ThemeProvider>
-      <Router>
         <Suspense fallback={<div>Loading...</div>}>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -61,7 +61,6 @@ function App() {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
-      </Router>
       <Toaster />
     </ThemeProvider>
   );
