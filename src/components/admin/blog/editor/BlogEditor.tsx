@@ -336,18 +336,6 @@ const BlogEditor = ({
     };
   }, [initialContent_en, activeTab]);
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue('title', e.target.value);
-  };
-
-  const handleTitle_enChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue('title_en', e.target.value);
-  };
-
-  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue('slug', e.target.value);
-  };
-
   const handleGenerateSlug = () => {
     // Generate slug from Spanish title if available, otherwise from English title
     const sourceTitle = watch('title') || watch('title_en');
@@ -509,8 +497,6 @@ const BlogEditor = ({
                   id="blog-slug"
                   placeholder="url-friendly-slug"
                   className="flex-1"
-                  value={watch('slug')}
-                  onChange={handleSlugChange}
                   {...register('slug', { required: 'URL slug is required' })}
                 />
                 <Button
@@ -619,8 +605,6 @@ const BlogEditor = ({
                   id="blog-title"
                   placeholder="Ingresa el título del blog"
                   className="w-full"
-                  value={watch('title')}
-                  onChange={handleTitleChange}
                   {...register('title', { required: 'El título es requerido' })}
                 />
                 
@@ -650,8 +634,6 @@ const BlogEditor = ({
                   id="blog-title-en"
                   placeholder="Enter blog title"
                   className="w-full"
-                  value={watch('title_en')}
-                  onChange={handleTitle_enChange}
                   {...register('title_en')}
                 />
               </div>
