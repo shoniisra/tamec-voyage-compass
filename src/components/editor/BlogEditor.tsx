@@ -1,6 +1,5 @@
 
-import React, { useEffect, useRef } from "react";
-import { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 import List from "@editorjs/list";
@@ -13,16 +12,21 @@ import { useNavigate } from "react-router-dom";
 import { Image as ImageIcon, Save } from "lucide-react";
 import { toKebabCase } from "@/utils/stringUtils";
 import { useForm } from "react-hook-form";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FormValues {
   title: string;
+  title_en: string;
   slug: string;
   coverImage: string;
 }
 
 interface BlogEditorProps {
   initialTitle?: string;
+  initialTitle_en?: string;
   initialContent?: any;
+  initialContent_en?: any;
   initialCoverImage?: string;
   initialSlug?: string;
   blogId?: string;
@@ -31,7 +35,9 @@ interface BlogEditorProps {
 
 const BlogEditor = ({ 
   initialTitle = "", 
+  initialTitle_en = "",
   initialContent = {}, 
+  initialContent_en = {},
   initialCoverImage = "",
   initialSlug = "",
   blogId, 
@@ -39,12 +45,16 @@ const BlogEditor = ({
 }: BlogEditorProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const editorRef = useRef<EditorJS | null>(null);
-  const editorInstanceRef = useRef<any>(null);
+  const { t, language } = useLanguage();
+  
+  // Create separate refs for Spanish and English editors
+  const spanishEditorRef = useRef<EditorJS | null>(null);
+  const englishEditorRef = useRef<EditorJS | null>(null);
   
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormValues>({
     defaultValues: {
       title: initialTitle,
+      title_en: initialTitle_en,
       slug: initialSlug,
       coverImage: initialCoverImage
     }
@@ -52,129 +62,272 @@ const BlogEditor = ({
 
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("spanish");
 
   const coverImage = watch('coverImage');
+  const title = watch('title');
+  const title_en = watch('title_en');
 
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue('title', e.target.value);
+  };
+
+  const handleTitleEnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue('title_en', e.target.value);
+  };
+
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue('slug', e.target.value);
+  };
+
+  // Initialize Spanish editor
   useEffect(() => {
     let editor: EditorJS | null = null;
 
     const initEditor = async () => {
       // Only attempt to destroy if the editor instance exists and is ready
-      if (editorRef.current) {
+      if (spanishEditorRef.current) {
         try {
           const isReady = await Promise.race([
-            editorRef.current.isReady,
+            spanishEditorRef.current.isReady,
             new Promise((_, reject) => setTimeout(() => reject(new Error('Editor not ready')), 1000))
           ]);
           
           if (isReady) {
-            await editorRef.current.destroy();
+            await spanishEditorRef.current.destroy();
           }
         } catch (e) {
           console.error("Editor cleanup skipped:", e);
         }
-        editorRef.current = null;
+        spanishEditorRef.current = null;
       }
 
       // Create new editor instance with proper error handling
       try {
         editor = new EditorJS({
-        holder: "editorjs",
-        tools: {
-          header: {
-            class: Header,
-            inlineToolbar: true,
-            config: {
-              levels: [2, 3, 4],
-              defaultLevel: 2
-            }
-          },
-          list: {
-            class: List as any,
-            inlineToolbar: true
-          },
-          image: {
-            class: Image,
-            config: {
-              uploader: {
-                async uploadByFile(file: File) {
-                  try {
-                    const fileExt = file.name.split('.').pop();
-                    const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-                    const filePath = `blog-images/${fileName}`;
-                    
-                    const { error: uploadError } = await supabaseExtended.storage
-                      .from('blog-content')
-                      .upload(filePath, file);
+          holder: "spanish-editor",
+          tools: {
+            header: {
+              class: Header,
+              inlineToolbar: true,
+              config: {
+                levels: [2, 3, 4],
+                defaultLevel: 2
+              }
+            },
+            list: {
+              class: List as any,
+              inlineToolbar: true
+            },
+            image: {
+              class: Image,
+              config: {
+                uploader: {
+                  async uploadByFile(file: File) {
+                    try {
+                      const fileExt = file.name.split('.').pop();
+                      const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+                      const filePath = `blog-images/${fileName}`;
                       
-                    if (uploadError) {
-                      throw uploadError;
+                      const { error: uploadError } = await supabaseExtended.storage
+                        .from('blog-content')
+                        .upload(filePath, file);
+                        
+                      if (uploadError) {
+                        throw uploadError;
+                      }
+                      
+                      const { data } = supabaseExtended.storage
+                        .from('blog-content')
+                        .getPublicUrl(filePath);
+                        
+                      return {
+                        success: 1,
+                        file: {
+                          url: data.publicUrl
+                        }
+                      };
+                    } catch (error) {
+                      console.error('Error uploading image:', error);
+                      return {
+                        success: 0,
+                        file: {
+                          url: null
+                        }
+                      };
                     }
-                    
-                    const { data } = supabaseExtended.storage
-                      .from('blog-content')
-                      .getPublicUrl(filePath);
-                      
+                  },
+                  async uploadByUrl(url: string) {
                     return {
                       success: 1,
                       file: {
-                        url: data.publicUrl
-                      }
-                    };
-                  } catch (error) {
-                    console.error('Error uploading image:', error);
-                    return {
-                      success: 0,
-                      file: {
-                        url: null
+                        url
                       }
                     };
                   }
-                },
-                async uploadByUrl(url: string) {
-                  return {
-                    success: 1,
-                    file: {
-                      url
-                    }
-                  };
                 }
               }
             }
-          }
-        },
-        data: Object.keys(initialContent).length > 0 ? initialContent : {}
+          },
+          data: Object.keys(initialContent).length > 0 ? initialContent : {}
+        });
+
+        // Wait for editor to be ready before assigning to ref
+        await editor.isReady;
+        spanishEditorRef.current = editor;
+      } catch (error) {
+        console.error('Error initializing Spanish editor:', error);
+        spanishEditorRef.current = null;
+      }
+    };
+
+    // Initialize editor with error handling
+    if (activeTab === "spanish") {
+      initEditor().catch(error => {
+        console.error('Spanish editor initialization failed:', error);
       });
-
-      // Wait for editor to be ready before assigning to ref
-      await editor.isReady;
-      editorRef.current = editor;
-    } catch (error) {
-      console.error('Error initializing editor:', error);
-      editorRef.current = null;
     }
-  };
-
-  // Initialize editor with error handling
-  initEditor().catch(error => {
-    console.error('Editor initialization failed:', error);
-  });
 
     return () => {
       if (editor) {
         editor.isReady.then(() => {
           editor?.destroy();
-          editorRef.current = null;
+          if (activeTab === "spanish") {
+            spanishEditorRef.current = null;
+          }
         }).catch((e) => {
-          console.error("Error destroying editor", e);
+          console.error("Error destroying Spanish editor", e);
         });
       }
     };
-  }, [initialContent]);
+  }, [initialContent, activeTab]);
+
+  // Initialize English editor
+  useEffect(() => {
+    let editor: EditorJS | null = null;
+
+    const initEditor = async () => {
+      // Only attempt to destroy if the editor instance exists and is ready
+      if (englishEditorRef.current) {
+        try {
+          const isReady = await Promise.race([
+            englishEditorRef.current.isReady,
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Editor not ready')), 1000))
+          ]);
+          
+          if (isReady) {
+            await englishEditorRef.current.destroy();
+          }
+        } catch (e) {
+          console.error("Editor cleanup skipped:", e);
+        }
+        englishEditorRef.current = null;
+      }
+
+      // Create new editor instance with proper error handling
+      try {
+        editor = new EditorJS({
+          holder: "english-editor",
+          tools: {
+            header: {
+              class: Header,
+              inlineToolbar: true,
+              config: {
+                levels: [2, 3, 4],
+                defaultLevel: 2
+              }
+            },
+            list: {
+              class: List as any,
+              inlineToolbar: true
+            },
+            image: {
+              class: Image,
+              config: {
+                uploader: {
+                  async uploadByFile(file: File) {
+                    try {
+                      const fileExt = file.name.split('.').pop();
+                      const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+                      const filePath = `blog-images/${fileName}`;
+                      
+                      const { error: uploadError } = await supabaseExtended.storage
+                        .from('blog-content')
+                        .upload(filePath, file);
+                        
+                      if (uploadError) {
+                        throw uploadError;
+                      }
+                      
+                      const { data } = supabaseExtended.storage
+                        .from('blog-content')
+                        .getPublicUrl(filePath);
+                        
+                      return {
+                        success: 1,
+                        file: {
+                          url: data.publicUrl
+                        }
+                      };
+                    } catch (error) {
+                      console.error('Error uploading image:', error);
+                      return {
+                        success: 0,
+                        file: {
+                          url: null
+                        }
+                      };
+                    }
+                  },
+                  async uploadByUrl(url: string) {
+                    return {
+                      success: 1,
+                      file: {
+                        url
+                      }
+                    };
+                  }
+                }
+              }
+            }
+          },
+          data: Object.keys(initialContent_en).length > 0 ? initialContent_en : {}
+        });
+
+        // Wait for editor to be ready before assigning to ref
+        await editor.isReady;
+        englishEditorRef.current = editor;
+      } catch (error) {
+        console.error('Error initializing English editor:', error);
+        englishEditorRef.current = null;
+      }
+    };
+
+    // Initialize editor with error handling
+    if (activeTab === "english") {
+      initEditor().catch(error => {
+        console.error('English editor initialization failed:', error);
+      });
+    }
+
+    return () => {
+      if (editor) {
+        editor.isReady.then(() => {
+          editor?.destroy();
+          if (activeTab === "english") {
+            englishEditorRef.current = null;
+          }
+        }).catch((e) => {
+          console.error("Error destroying English editor", e);
+        });
+      }
+    };
+  }, [initialContent_en, activeTab]);
 
   const handleGenerateSlug = () => {
-    const currentTitle = watch('title');
-    setValue('slug', toKebabCase(currentTitle));
+    // Generate slug from Spanish title if available, otherwise from English title
+    const sourceTitle = title || title_en;
+    setValue('slug', toKebabCase(sourceTitle));
   };
 
   const handleCoverImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -222,19 +375,29 @@ const BlogEditor = ({
     try {
       setIsSaving(true);
       
-      if (!editorRef.current) {
-        throw new Error("Editor not initialized");
+      if (!spanishEditorRef.current) {
+        throw new Error("Spanish editor not initialized");
       }
       
-      const outputData = await editorRef.current.save();
-      const contentData = outputData as any;
+      // Save Spanish content
+      const spanishOutputData = await spanishEditorRef.current.save();
+      const spanishContentData = spanishOutputData as any;
+      
+      // Save English content if available
+      let englishContentData = {};
+      if (englishEditorRef.current) {
+        const englishOutputData = await englishEditorRef.current.save();
+        englishContentData = englishOutputData as any;
+      }
       
       if (isEdit && blogId) {
         const { error } = await supabaseExtended
           .from('blogs')
           .update({ 
             title: formData.title, 
-            content: contentData,
+            title_en: formData.title_en,
+            content: spanishContentData,
+            content_en: englishContentData,
             cover_image: formData.coverImage,
             slug: formData.slug,
             updated_at: new Date().toISOString()
@@ -252,7 +415,9 @@ const BlogEditor = ({
           .from('blogs')
           .insert({ 
             title: formData.title, 
-            content: contentData,
+            title_en: formData.title_en,
+            content: spanishContentData,
+            content_en: englishContentData,
             cover_image: formData.coverImage,
             slug: formData.slug,
             created_at: new Date().toISOString()
@@ -296,22 +461,8 @@ const BlogEditor = ({
           </Button>
         </div>
         
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="blog-title" className="block text-sm font-medium mb-1">
-              Blog Title
-            </label>
-             <Input
-              id="blog-title"
-              placeholder="Enter blog title"
-              className="w-full"
-              {...register('title', { required: 'Title is required' })}
-            /> 
-            {errors.title && (
-              <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
-            )}
-          </div>
-          
+        <div className="space-y-4 mt-4">
+          {/* URL Slug - Common for both languages */}
           <div>
             <label htmlFor="blog-slug" className="block text-sm font-medium mb-1">
               URL Slug
@@ -323,6 +474,8 @@ const BlogEditor = ({
                   id="blog-slug"
                   placeholder="url-friendly-slug"
                   className="flex-1"
+                  value={watch('slug')}
+                  onChange={handleSlugChange}
                   {...register('slug', { required: 'URL slug is required' })}
                 />
                 <Button
@@ -343,6 +496,7 @@ const BlogEditor = ({
             </p>
           </div>
           
+          {/* Cover Image - Common for both languages */}
           <div>
             <label htmlFor="cover-image" className="block text-sm font-medium mb-1">
               Cover Image
@@ -388,15 +542,70 @@ const BlogEditor = ({
             </div>
           </div>
           
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Blog Content
-            </label>
-            <div 
-              id="editorjs" 
-              className="border rounded-md min-h-[400px] p-4"
-            />
-          </div>
+          {/* Language Tabs */}
+          <Tabs defaultValue="spanish" onValueChange={setActiveTab} value={activeTab}>
+            <TabsList className="mb-4">
+              <TabsTrigger value="spanish">Español</TabsTrigger>
+              <TabsTrigger value="english">English</TabsTrigger>
+            </TabsList>
+            
+            {/* Spanish Content Tab */}
+            <TabsContent value="spanish" className="space-y-4">
+              <div>
+                <label htmlFor="blog-title" className="block text-sm font-medium mb-1">
+                  Título del Blog (Español)
+                </label>
+                <Input
+                  id="blog-title"
+                  placeholder="Ingresa el título del blog"
+                  className="w-full"
+                  value={watch('title')}
+                  onChange={handleTitleChange}
+                  {...register('title', { required: 'El título es requerido' })}
+                />
+                {errors.title && (
+                  <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
+                )}
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Contenido del Blog (Español)
+                </label>
+                <div 
+                  id="spanish-editor" 
+                  className="border rounded-md min-h-[400px] p-4"
+                />
+              </div>
+            </TabsContent>
+            
+            {/* English Content Tab */}
+            <TabsContent value="english" className="space-y-4">
+              <div>
+                <label htmlFor="blog-title-en" className="block text-sm font-medium mb-1">
+                  Blog Title (English)
+                </label>
+                <Input
+                  id="blog-title-en"
+                  placeholder="Enter blog title"
+                  className="w-full"
+                  value={watch('title_en')}
+                  onChange={handleTitleEnChange}
+                  {...register('title_en')}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Blog Content (English)
+                </label>
+                <div 
+                  id="english-editor" 
+                  className="border rounded-md min-h-[400px] p-4"
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </form>
     </div>
