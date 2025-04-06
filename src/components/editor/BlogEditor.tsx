@@ -65,20 +65,6 @@ const BlogEditor = ({
   const [activeTab, setActiveTab] = useState<string>("spanish");
 
   const coverImage = watch('coverImage');
-  // const title = watch('title');
-  // const title_en = watch('title_en');
-
-  // const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setValue('title', e.target.value);
-  // };
-
-  // const handleTitleEnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setValue('title_en', e.target.value);
-  // };
-
-  // const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setValue('slug', e.target.value);
-  // };
 
   // Initialize Spanish editor
   useEffect(() => {
