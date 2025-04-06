@@ -558,9 +558,9 @@ const BlogEditor = ({
                   id="blog-title"
                   placeholder="Ingresa el título del blog"
                   className="w-full"
-                  value={watch('title')}
                   {...register('title', { required: 'El título es requerido' })}
                 />
+                
                 {errors.title && (
                   <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
                 )}
@@ -587,7 +587,6 @@ const BlogEditor = ({
                   id="blog-title-en"
                   placeholder="Enter blog title"
                   className="w-full"
-                  value={watch('title_en')}
                   {...register('title_en')}
                 />
               </div>
