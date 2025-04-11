@@ -1,15 +1,15 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Calendar, MessageCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Link } from 'react-router-dom';
 
 const HeroSection = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   
   return (
-    <div className="relative h-[600px] overflow-hidden">
+    <div className="relative h-[650px] overflow-hidden">
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
         style={{ 
@@ -21,27 +21,25 @@ const HeroSection = () => {
       </div>
       
       <div className="relative container mx-auto h-full flex flex-col justify-center px-4">
-        <div className="max-w-xl animate-fade-up opacity-0" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
+        <div className="max-w-2xl animate-fade-up opacity-0" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
-            {t('home.hero.title')}
+            {language === 'en' ? 'Your next trip starts with us' : 'Tu próximo viaje empieza con nosotros'}
           </h1>
-          <p className="text-lg text-white/90 mb-8">
-            {t('home.hero.subtitle')}
+          <p className="text-lg md:text-xl text-white/90 mb-8">
+            {language === 'en' 
+              ? 'Authentic travel, human attention, and zero worries. At TAMEC, we plan every step with you, so you can just focus on living the experience.' 
+              : 'Viajes auténticos, atención humana y cero preocupaciones. En TAMEC planificamos contigo cada paso, para que solo te dediques a vivir la experiencia.'}
           </p>
           
-          <div className="bg-white p-4 rounded-lg shadow-xl">
-            <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
-              <div className="flex-grow">
-                <Input 
-                  type="text" 
-                  placeholder={t('home.hero.search')}
-                  className="border-gray-300 focus:ring-tamec-500"
-                />
-              </div>
-              <Button className="bg-tamec-600 hover:bg-tamec-700">
-                <Search className="mr-2 h-4 w-4" /> {t('home.hero.searchButton')}
-              </Button>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button size="lg" className="bg-tamec-600 hover:bg-tamec-700 text-white py-6">
+              <Calendar className="mr-2 h-5 w-5" />
+              {language === 'en' ? 'Schedule a free meeting' : 'Agenda tu cita gratis'}
+            </Button>
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 py-6">
+              <MessageCircle className="mr-2 h-5 w-5" />
+              {language === 'en' ? 'Contact us via WhatsApp' : 'Contáctanos por WhatsApp'}
+            </Button>
           </div>
         </div>
       </div>

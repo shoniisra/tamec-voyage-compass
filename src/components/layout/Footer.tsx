@@ -1,11 +1,11 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Mail, Phone, MapPin, Globe } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const Footer = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const currentYear = new Date().getFullYear();
   
   return (
@@ -15,16 +15,16 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-bold text-tamec-300 mb-4">TAMEC Travel</h3>
             <p className="text-gray-400 mb-4">
-              {t('footer.description')}
+              {language === 'en' ? 'Unique travels, eternal memories.' : 'Viajes únicos, recuerdos eternos.'}
             </p>
             <div className="flex space-x-4">
-              <a href="https://facebook.com" className="text-gray-400 hover:text-tamec-300 transition-colors">
-                <Facebook size={20} />
-              </a>
               <a href="https://instagram.com" className="text-gray-400 hover:text-tamec-300 transition-colors">
                 <Instagram size={20} />
               </a>
-              <a href="https://twitter.com" className="text-gray-400 hover:text-tamec-300 transition-colors">
+              <a href="https://facebook.com" className="text-gray-400 hover:text-tamec-300 transition-colors">
+                <Facebook size={20} />
+              </a>
+              <a href="https://wa.me/593999778220" className="text-gray-400 hover:text-tamec-300 transition-colors">
                 <Twitter size={20} />
               </a>
             </div>
@@ -52,16 +52,16 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">{t('footer.popularDestinations')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/destinations/bali" className="text-gray-400 hover:text-tamec-300 transition-colors">Bali, Indonesia</Link>
+                <Link to="/destinations/galapagos" className="text-gray-400 hover:text-tamec-300 transition-colors">Galápagos, Ecuador</Link>
               </li>
               <li>
-                <Link to="/destinations/santorini" className="text-gray-400 hover:text-tamec-300 transition-colors">Santorini, Greece</Link>
+                <Link to="/destinations/cancun" className="text-gray-400 hover:text-tamec-300 transition-colors">Cancún, México</Link>
               </li>
               <li>
-                <Link to="/destinations/kyoto" className="text-gray-400 hover:text-tamec-300 transition-colors">Kyoto, Japan</Link>
+                <Link to="/destinations/paris" className="text-gray-400 hover:text-tamec-300 transition-colors">París, Francia</Link>
               </li>
               <li>
-                <Link to="/destinations/maldives" className="text-gray-400 hover:text-tamec-300 transition-colors">Maldives</Link>
+                <Link to="/destinations/new-york" className="text-gray-400 hover:text-tamec-300 transition-colors">Nueva York, USA</Link>
               </li>
             </ul>
           </div>
@@ -70,16 +70,24 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">{t('footer.contactUs')}</h3>
             <ul className="space-y-3">
               <li className="flex items-start">
-                <MapPin className="mr-2 h-5 w-5 text-tamec-300" />
-                <span className="text-gray-400">123 Travel Street, City, Country</span>
+                <MapPin className="mr-2 h-5 w-5 text-tamec-300 flex-shrink-0" />
+                <span className="text-gray-400">
+                  {language === 'en' 
+                    ? 'Quito, Ecuador - Francisco Ruiz & Jorge Gutiérrez Ave.'
+                    : 'Quito, Ecuador - Av. Francisco Ruiz y Jorge Gutiérrez'}
+                </span>
               </li>
               <li className="flex items-center">
-                <Phone className="mr-2 h-5 w-5 text-tamec-300" />
-                <span className="text-gray-400">+1 (555) 123-4567</span>
+                <Mail className="mr-2 h-5 w-5 text-tamec-300 flex-shrink-0" />
+                <span className="text-gray-400">tamecviajes@gmail.com</span>
               </li>
               <li className="flex items-center">
-                <Mail className="mr-2 h-5 w-5 text-tamec-300" />
-                <span className="text-gray-400">info@tamectravel.com</span>
+                <Phone className="mr-2 h-5 w-5 text-tamec-300 flex-shrink-0" />
+                <span className="text-gray-400">+593 999778220</span>
+              </li>
+              <li className="flex items-center">
+                <Globe className="mr-2 h-5 w-5 text-tamec-300 flex-shrink-0" />
+                <span className="text-gray-400">Ecuador</span>
               </li>
             </ul>
           </div>

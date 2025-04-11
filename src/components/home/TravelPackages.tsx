@@ -1,126 +1,161 @@
 
 import React from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Check, Calendar, Users, Clock } from 'lucide-react';
-
-const packages = [
-  {
-    id: 1,
-    title: 'Beach Getaway',
-    description: 'Enjoy a relaxing week at stunning beach destinations with luxury accommodations.',
-    price: '999',
-    duration: '7 Days',
-    groupSize: '2-10',
-    features: [
-      'Luxury beachfront accommodations',
-      'Daily breakfast and dinner',
-      'Guided local tours',
-      'Airport transfers',
-      'Water activities included',
-    ],
-    popular: true,
-  },
-  {
-    id: 2,
-    title: 'City Explorer',
-    description: 'Discover the culture, cuisine, and hidden gems of iconic cities around the world.',
-    price: '1,299',
-    duration: '5 Days',
-    groupSize: '2-15',
-    features: [
-      'Boutique hotel stay',
-      'City tours with local guides',
-      'Museum and attraction passes',
-      'Transportation between sites',
-      'Welcome dinner experience',
-    ],
-    popular: false,
-  },
-  {
-    id: 3,
-    title: 'Adventure Trek',
-    description: 'Challenge yourself with exciting outdoor adventures in breathtaking landscapes.',
-    price: '1,499',
-    duration: '10 Days',
-    groupSize: '4-12',
-    features: [
-      'Guided hiking expeditions',
-      'Camping and outdoor meals',
-      'Safety equipment provided',
-      'Expert adventure guides',
-      'Transportation to trail starts',
-    ],
-    popular: false,
-  },
-];
+import { Plane, Passport, Map, Check } from 'lucide-react';
 
 const TravelPackages = () => {
+  const { language } = useLanguage();
+  
+  const services = [
+    {
+      id: 1,
+      icon: <Plane className="h-12 w-12 text-tamec-600 mb-4" />,
+      title: language === 'en' ? 'Airfares' : 'Vuelos Aéreos',
+      features: [
+        language === 'en' ? 'Accessible and personalized rates' : 'Tarifas accesibles y personalizadas',
+        language === 'en' ? 'International destination network' : 'Red de destinos internacionales',
+        language === 'en' ? 'Easy reservations, flexible changes' : 'Reservas fáciles, cambios flexibles'
+      ]
+    },
+    {
+      id: 2,
+      icon: <Passport className="h-12 w-12 text-tamec-600 mb-4" />,
+      title: language === 'en' ? 'Visa Processing' : 'Trámite de Visas',
+      features: [
+        language === 'en' ? 'American, Schengen, Mexican visas and more' : 'Visa americana, Schengen, mexicana y más',
+        language === 'en' ? 'Support at every step' : 'Acompañamiento en cada paso',
+        language === 'en' ? 'Documentation and appointments without complications' : 'Documentación y turnos sin complicaciones'
+      ]
+    },
+    {
+      id: 3,
+      icon: <Map className="h-12 w-12 text-tamec-600 mb-4" />,
+      title: language === 'en' ? 'Tours and Programs' : 'Tours y Programas',
+      features: [
+        language === 'en' ? '3, 4, and 5-star hotels' : 'Hoteles de 3, 4 y 5 estrellas',
+        language === 'en' ? 'Itineraries adapted to your style' : 'Itinerarios adaptados a tu estilo',
+        language === 'en' ? 'Activities for all tastes' : 'Actividades para todos los gustos'
+      ]
+    }
+  ];
+
+  const tripTypes = [
+    {
+      id: 1,
+      name: language === 'en' ? 'Urban Trips' : 'Viajes urbanos',
+      image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=500&q=80',
+    },
+    {
+      id: 2,
+      name: language === 'en' ? 'Nature Adventures' : 'Aventura en la naturaleza',
+      image: 'https://images.unsplash.com/photo-1542332213-31f87c6a4428?auto=format&fit=crop&w=500&q=80',
+    },
+    {
+      id: 3,
+      name: language === 'en' ? 'Relaxation Getaways' : 'Escapadas de relax',
+      image: 'https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?auto=format&fit=crop&w=500&q=80',
+    },
+    {
+      id: 4,
+      name: language === 'en' ? 'Group or Custom Tours' : 'Tours grupales o personalizados',
+      image: 'https://images.unsplash.com/photo-1581688440584-8044f057df2a?auto=format&fit=crop&w=500&q=80',
+    }
+  ];
+  
   return (
-    <section className="py-16 bg-[#f8f8f8]">
+    <section className="py-16 bg-gray-50 dark:bg-gray-800 hero-pattern">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-3">Popular Travel Packages</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            All-inclusive packages designed to give you the perfect travel experience without the hassle.
-          </p>
-        </div>
+        <h2 className="text-3xl font-bold text-center mb-12">
+          {language === 'en' ? 'Our Services' : 'Nuestros Servicios'}
+        </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {packages.map((pkg) => (
-            <Card 
-              key={pkg.id} 
-              className={`overflow-hidden h-full flex flex-col ${pkg.popular ? 'border-tamec-600 shadow-lg' : ''}`}
-            >
-              {pkg.popular && (
-                <div className="bg-tamec-600 text-white text-center py-2 text-sm font-medium">
-                  Most Popular
-                </div>
-              )}
-              
-              <CardContent className="p-6 flex-grow flex flex-col">
-                <div className="mb-6">
-                  <h3 className="text-xl font-bold mb-2">{pkg.title}</h3>
-                  <p className="text-gray-600">{pkg.description}</p>
-                </div>
-                
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center text-gray-600">
-                      <Clock className="h-4 w-4 mr-1" />
-                      <span className="text-sm">{pkg.duration}</span>
-                    </div>
-                    <div className="flex items-center text-gray-600">
-                      <Users className="h-4 w-4 mr-1" />
-                      <span className="text-sm">{pkg.groupSize} people</span>
-                    </div>
-                  </div>
-                  
-                  <ul className="space-y-2 mb-6">
-                    {pkg.features.map((feature, index) => (
-                      <li key={index} className="flex items-start">
-                        <Check className="h-4 w-4 text-tamec-600 mr-2 mt-1" />
-                        <span className="text-gray-600 text-sm">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                
-                <div className="mt-auto">
-                  <div className="flex items-baseline justify-center mb-4">
-                    <span className="text-2xl font-bold text-tamec-600">${pkg.price}</span>
-                    <span className="text-gray-600 ml-1">/ person</span>
-                  </div>
-                  
-                  <Button 
-                    className={`w-full ${pkg.popular ? 'bg-tamec-600 hover:bg-tamec-700' : 'bg-gray-700 hover:bg-gray-800'}`}
-                  >
-                    Book This Package
-                  </Button>
-                </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          {services.map(service => (
+            <Card key={service.id} className="border-0 shadow-lg h-full transition-transform hover:-translate-y-1 duration-300">
+              <CardContent className="p-6 flex flex-col items-center text-center">
+                {service.icon}
+                <h3 className="text-xl font-bold mb-4">{service.title}</h3>
+                <ul className="space-y-3">
+                  {service.features.map((feature, index) => (
+                    <li key={index} className="flex items-start">
+                      <Check className="h-5 w-5 text-tamec-600 mr-2 mt-0.5" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
               </CardContent>
             </Card>
           ))}
+        </div>
+        
+        <div className="mb-16">
+          <h3 className="text-2xl font-bold text-center mb-8">
+            {language === 'en' ? 'Types of Trips We Offer' : 'Tipos de Viajes que Ofrecemos'}
+          </h3>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {tripTypes.map(type => (
+              <div 
+                key={type.id}
+                className="rounded-lg overflow-hidden shadow-md relative group"
+              >
+                <img 
+                  src={type.image} 
+                  alt={type.name} 
+                  className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
+                  <h4 className="text-white text-xl font-semibold">{type.name}</h4>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        <div className="bg-tamec-600 text-white rounded-xl p-8 max-w-4xl mx-auto">
+          <h3 className="text-2xl font-bold text-center mb-6">
+            {language === 'en' ? 'Travel to Galapagos in 3 steps' : 'Viaja a Galápagos en 3 pasos'}
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="text-center">
+              <div className="bg-white text-tamec-600 w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">1</div>
+              <h4 className="font-semibold mb-2">
+                {language === 'en' ? 'Choose your favorite plan' : 'Elige tu plan favorito'}
+              </h4>
+              <p className="text-tamec-100">
+                {language === 'en' ? 'Hotels, activities, number of islands. You decide.' : 'Hoteles, actividades, número de islas. Tú decides.'}
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="bg-white text-tamec-600 w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">2</div>
+              <h4 className="font-semibold mb-2">
+                {language === 'en' ? 'Choose the dates' : 'Escoge las fechas'}
+              </h4>
+              <p className="text-tamec-100">
+                {language === 'en' ? 'We have confirmed departures all year round.' : 'Tenemos salidas confirmadas todo el año.'}
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="bg-white text-tamec-600 w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">3</div>
+              <h4 className="font-semibold mb-2">
+                {language === 'en' ? 'Book with just $100' : 'Reserva con solo $100'}
+              </h4>
+              <p className="text-tamec-100">
+                {language === 'en' ? 'Plan today and pay up to 30 days before.' : 'Planifica hoy y paga hasta 30 días antes.'}
+              </p>
+            </div>
+          </div>
+          
+          <div className="text-center">
+            <Button className="bg-white text-tamec-600 hover:bg-tamec-50">
+              {language === 'en' ? 'Book Now' : 'Reserva ahora'}
+            </Button>
+          </div>
         </div>
       </div>
     </section>

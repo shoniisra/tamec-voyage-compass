@@ -21,9 +21,84 @@ const translations: Translations = {
       logout: 'Logout',
     },
     home: {
-      heroTitle: 'Discover the World with TAMEC Travels',
-      heroSubtitle: 'Exceptional travel experiences tailored to your desires',
-      exploreCta: 'Explore Destinations',
+      hero: {
+        title: 'Your next trip starts with us',
+        subtitle: 'Authentic travel, human attention, and zero worries. At TAMEC, we plan every step with you, so you can just focus on living the experience.',
+        search: 'Where do you want to go?',
+        searchButton: 'Search',
+      },
+      differentiators: {
+        title: 'Our Differentiators',
+        noHiddenPrices: 'No hidden prices',
+        noHiddenPricesDesc: 'Total transparency from the first contact.',
+        personalizedAttention: 'Personalized attention',
+        personalizedAttentionDesc: 'We accompany you every step of the way, as if you were part of the family.',
+        visaProcessing: 'Visa processing',
+        visaProcessingDesc: 'Visa specialists, we advise you with real experience.',
+        stressFreeTravel: 'Stress-free travel',
+        stressFreeTravelDesc: 'We take care of everything: flights, accommodations, tours, insurance and more.'
+      },
+      whyUs: {
+        title: 'Why TAMEC?',
+        happyClients: 'Happy clients',
+        destinations: 'Destinations worldwide',
+        visasApproved: 'Visas approved',
+        support: 'Support before, during and after your trip'
+      },
+      experiences: {
+        title: 'Experiences you will remember for a lifetime',
+        description: 'From the most vibrant cities to the quietest beaches, we design unique trips for people who want to discover the world with excitement, safety, and warmth.',
+        urbanTrips: 'Urban Trips',
+        natureAdventures: 'Nature Adventures',
+        relaxGetaways: 'Relaxation Getaways',
+        groupTours: 'Group or Custom Tours'
+      },
+      services: {
+        title: 'Our Services',
+        airfares: {
+          title: 'Airfares',
+          features: [
+            'Accessible and personalized rates',
+            'International destination network',
+            'Easy reservations, flexible changes'
+          ]
+        },
+        visas: {
+          title: 'Visa Processing',
+          features: [
+            'American, Schengen, Mexican visas and more',
+            'Support at every step',
+            'Documentation and appointments without complications'
+          ]
+        },
+        tours: {
+          title: 'Tours and Programs',
+          features: [
+            '3, 4, and 5-star hotels',
+            'Itineraries adapted to your style',
+            'Activities for all tastes'
+          ]
+        }
+      },
+      galapagos: {
+        title: 'Travel to Galapagos in 3 steps',
+        step1: 'Choose your favorite plan',
+        step1Desc: 'Hotels, activities, number of islands. You decide.',
+        step2: 'Choose the dates',
+        step2Desc: 'We have confirmed departures all year round.',
+        step3: 'Book with just $100',
+        step3Desc: 'Plan today and pay up to 30 days before.',
+        bookNow: 'Book Now'
+      },
+      cta: {
+        title: 'Ready for your next adventure?',
+        description: 'Schedule your first appointment at no cost and receive expert advice. We help you plan a unique trip, tailored to you and stress-free.',
+        button: 'Schedule your free appointment now'
+      },
+      testimonials: {
+        title: 'Real Testimonials',
+        subtitle: 'Hear from our satisfied customers who've experienced unforgettable journeys with TAMEC Travel.'
+      },
       featuredDestinations: 'Featured Destinations',
       viewAllDestinations: 'View All Destinations',
       testimonialsTitle: 'What Our Travelers Say',
@@ -112,13 +187,88 @@ const translations: Translations = {
       logout: 'Cerrar Sesión',
     },
     home: {
-      heroTitle: 'Descubre el mundo con TAMEC Viajes',
-      heroSubtitle: 'Experiencias de viaje excepcionales adaptadas a tus deseos',
-      exploreCta: 'Explorar Destinos',
+      hero: {
+        title: 'Tu próximo viaje empieza con nosotros',
+        subtitle: 'Viajes auténticos, atención humana y cero preocupaciones. En TAMEC planificamos contigo cada paso, para que solo te dediques a vivir la experiencia.',
+        search: '¿Dónde quieres ir?',
+        searchButton: 'Buscar',
+      },
+      differentiators: {
+        title: 'Nuestros Diferenciadores',
+        noHiddenPrices: 'Cero precios ocultos',
+        noHiddenPricesDesc: 'Transparencia total desde el primer contacto.',
+        personalizedAttention: 'Atención personalizada',
+        personalizedAttentionDesc: 'Te acompañamos en cada paso, como si fueras parte de la familia.',
+        visaProcessing: 'Trámite de visas',
+        visaProcessingDesc: 'Especialistas en visados, te asesoramos con experiencia real.',
+        stressFreeTravel: 'Viajes sin estrés',
+        stressFreeTravelDesc: 'Nos encargamos de todo: vuelos, hospedajes, tours, seguros y más.'
+      },
+      whyUs: {
+        title: '¿Por qué TAMEC?',
+        happyClients: 'Clientes felices',
+        destinations: 'Destinos alrededor del mundo',
+        visasApproved: 'Visas aprobadas',
+        support: 'Atención antes, durante y después de tu viaje'
+      },
+      experiences: {
+        title: 'Experiencias que vas a recordar toda la vida',
+        description: 'Desde las ciudades más vibrantes hasta las playas más tranquilas, diseñamos viajes únicos para personas que quieren descubrir el mundo con emoción, seguridad y calidez.',
+        urbanTrips: 'Viajes urbanos',
+        natureAdventures: 'Aventura en la naturaleza',
+        relaxGetaways: 'Escapadas de relax',
+        groupTours: 'Tours grupales o personalizados'
+      },
+      services: {
+        title: 'Nuestros Servicios',
+        airfares: {
+          title: 'Vuelos Aéreos',
+          features: [
+            'Tarifas accesibles y personalizadas',
+            'Red de destinos internacionales',
+            'Reservas fáciles, cambios flexibles'
+          ]
+        },
+        visas: {
+          title: 'Trámite de Visas',
+          features: [
+            'Visa americana, Schengen, mexicana y más',
+            'Acompañamiento en cada paso',
+            'Documentación y turnos sin complicaciones'
+          ]
+        },
+        tours: {
+          title: 'Tours y Programas',
+          features: [
+            'Hoteles de 3, 4 y 5 estrellas',
+            'Itinerarios adaptados a tu estilo',
+            'Actividades para todos los gustos'
+          ]
+        }
+      },
+      galapagos: {
+        title: 'Viaja a Galápagos en 3 pasos',
+        step1: 'Elige tu plan favorito',
+        step1Desc: 'Hoteles, actividades, número de islas. Tú decides.',
+        step2: 'Escoge las fechas',
+        step2Desc: 'Tenemos salidas confirmadas todo el año.',
+        step3: 'Reserva con solo $100',
+        step3Desc: 'Planifica hoy y paga hasta 30 días antes.',
+        bookNow: 'Reserva ahora'
+      },
+      cta: {
+        title: '¿Listo para tu próxima aventura?',
+        description: 'Agenda tu primera cita sin costo y recibe asesoría experta. Te ayudamos a planificar un viaje único, a tu medida y sin estrés.',
+        button: 'Agenda tu cita gratis ahora'
+      },
+      testimonials: {
+        title: 'Testimonios reales',
+        subtitle: 'Escucha a nuestros clientes satisfechos que han experimentado viajes inolvidables con TAMEC Travel.'
+      },
       featuredDestinations: 'Destinos Destacados',
       viewAllDestinations: 'Ver Todos los Destinos',
       testimonialsTitle: 'Lo que dicen nuestros viajeros',
-      testimonialsSubtitle: 'Escucha a nuestros clientes satisfechos sobre sus experiencias',
+      testimonialsSubtitle: 'Hear from our satisfied clients about their experiences',
       packagesTitle: 'Paquetes de Viaje Populares',
       packagesSubtitle: 'Experiencias de viaje seleccionadas para tu próxima aventura',
       newsletterTitle: 'Suscríbete a nuestro boletín',

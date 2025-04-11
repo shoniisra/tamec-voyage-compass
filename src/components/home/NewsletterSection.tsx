@@ -1,40 +1,32 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { toast } from 'sonner';
+import { Calendar } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { Link } from 'react-router-dom';
 
 const NewsletterSection = () => {
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Here you would normally handle the newsletter subscription
-    toast.success('Thank you for subscribing to our newsletter!');
-  };
+  const { language } = useLanguage();
   
   return (
-    <section className="py-16 bg-gray-50 hero-pattern">
+    <section className="py-16 bg-gray-50 dark:bg-gray-800 hero-pattern">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-3">Join Our Travel Community</h2>
-          <p className="text-gray-600 mb-8">
-            Subscribe to our newsletter and get exclusive travel tips, special offers, and inspiration for your next adventure.
+          <h2 className="text-3xl font-bold mb-4">
+            {language === 'en' ? 'Ready for your next adventure?' : '¿Listo para tu próxima aventura?'}
+          </h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-8 text-lg">
+            {language === 'en'
+              ? 'Schedule your first appointment at no cost and receive expert advice. We help you plan a unique trip, tailored to you and stress-free.'
+              : 'Agenda tu primera cita sin costo y recibe asesoría experta. Te ayudamos a planificar un viaje único, a tu medida y sin estrés.'}
           </p>
           
-          <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-3 max-w-lg mx-auto">
-            <Input 
-              type="email" 
-              placeholder="Enter your email address" 
-              className="flex-grow"
-              required
-            />
-            <Button type="submit" className="bg-tamec-600 hover:bg-tamec-700">
-              Subscribe
+          <div className="flex justify-center">
+            <Button size="lg" className="bg-tamec-600 hover:bg-tamec-700 py-6 px-8">
+              <Calendar className="mr-2 h-5 w-5" />
+              {language === 'en' ? 'Schedule your free appointment now' : 'Agenda tu cita gratis ahora'}
             </Button>
-          </form>
-          
-          <p className="text-gray-500 text-xs mt-4">
-            By subscribing, you agree to our privacy policy and consent to receive updates from our company.
-          </p>
+          </div>
         </div>
       </div>
     </section>

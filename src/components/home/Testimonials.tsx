@@ -2,42 +2,52 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-
-const testimonials = [
-  {
-    id: 1,
-    name: 'Sarah Johnson',
-    location: 'New York, USA',
-    text: 'Our trip to Greece with TAMEC was absolutely perfect! Every detail was taken care of, and our guide was knowledgeable and friendly. I would book with them again in a heartbeat.',
-    image: 'https://i.pravatar.cc/150?img=1',
-    initials: 'SJ',
-  },
-  {
-    id: 2,
-    name: 'Michael Chen',
-    location: 'Vancouver, Canada',
-    text: 'I was impressed by how smoothly everything went with our Japan tour. The accommodations were excellent, and we got to experience authentic local culture thanks to our guide.',
-    image: 'https://i.pravatar.cc/150?img=3',
-    initials: 'MC',
-  },
-  {
-    id: 3,
-    name: 'Emma Rodriguez',
-    location: 'London, UK',
-    text: 'TAMEC arranged our family vacation to Bali, and it exceeded all expectations. The kids loved the activities, and we appreciated the perfect mix of adventure and relaxation.',
-    image: 'https://i.pravatar.cc/150?img=5',
-    initials: 'ER',
-  },
-];
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Testimonials = () => {
+  const { language } = useLanguage();
+
+  const testimonials = [
+    {
+      id: 1,
+      name: 'Andrea M.',
+      text: language === 'en' 
+        ? 'With TAMEC, traveling was easier than I imagined. They helped me with everything, even with the visa.'
+        : 'Con TAMEC viajar fue más fácil de lo que imaginé. Me ayudaron con todo, incluso con la visa.',
+      image: 'https://i.pravatar.cc/150?img=5',
+      initials: 'AM',
+    },
+    {
+      id: 2,
+      name: 'Diego R.',
+      text: language === 'en'
+        ? 'Total transparency from day one. Thank you for making my dream of getting to know Europe come true!'
+        : 'Transparencia total desde el día uno. ¡Gracias por hacer realidad mi sueño de conocer Europa!',
+      image: 'https://i.pravatar.cc/150?img=3',
+      initials: 'DR',
+    },
+    {
+      id: 3,
+      name: 'Lucia P.',
+      text: language === 'en'
+        ? 'I traveled with my family and everything was perfect. The hotels, the tours, everything. We will definitely travel with TAMEC again.'
+        : 'Viajé con mi familia y todo fue perfecto. Los hoteles, los tours, todo. Definitivamente volveremos a viajar con TAMEC.',
+      image: 'https://i.pravatar.cc/150?img=1',
+      initials: 'LP',
+    },
+  ];
+
   return (
     <section className="py-16 bg-tamec-600">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-white mb-3">What Our Travelers Say</h2>
+          <h2 className="text-3xl font-bold text-white mb-3">
+            {language === 'en' ? 'Real Testimonials' : 'Testimonios reales'}
+          </h2>
           <p className="text-tamec-100 max-w-2xl mx-auto">
-            Hear from our satisfied customers who've experienced unforgettable journeys with TAMEC Travel.
+            {language === 'en' 
+              ? 'Hear from our satisfied customers who've experienced unforgettable journeys with TAMEC Travel.'
+              : 'Escucha a nuestros clientes satisfechos que han experimentado viajes inolvidables con TAMEC Travel.'}
           </p>
         </div>
         
@@ -55,7 +65,6 @@ const Testimonials = () => {
                     </Avatar>
                     <div>
                       <p className="font-semibold">{testimonial.name}</p>
-                      <p className="text-sm text-gray-500">{testimonial.location}</p>
                     </div>
                   </div>
                   
