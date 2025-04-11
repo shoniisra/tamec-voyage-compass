@@ -3,7 +3,7 @@ import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Card } from '@/components/ui/card';
 import { Check, Plane, FileText, Map, Globe, GraduationCap } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/common/buttons/button';
 
 const ServicesSection = () => {
   const { language } = useLanguage();
@@ -118,9 +118,10 @@ const ServicesSection = () => {
           </p>
         </div>
 
-        <div className="space-y-12">
+        <div className="space-y-12 ">
           {services.map((service, index) => (
-            <Card key={service.id} className="overflow-hidden border-0 shadow-lg border border-gray-50">
+            <Card key={service.id} className=" bg-gray-100 dark:bg-gray-800  overflow-hidden border shadow-lg border border-gray-400 dark:border-gray-50 cursor-pointer
+            transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:bg-white dark:hover:bg-gray-700">
               <div className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} h-full`}>
                 <div className="lg:w-1/2">
                   <img 
@@ -129,7 +130,7 @@ const ServicesSection = () => {
                     className="w-full h-64 lg:h-full object-cover"
                   />
                 </div>
-                <div className="lg:w-1/2 p-8 flex flex-col justify-between bg-white dark:bg-gray-800">
+                <div className="lg:w-1/2 p-8 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center mb-4">
                       <div className="p-2 rounded-full bg-tamec-50 dark:bg-tamec-900 mr-3">

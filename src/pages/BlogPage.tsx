@@ -3,7 +3,7 @@ import React from 'react';
 import Layout from '@/components/layout/Layout';
 import BlogList from '@/components/blog/BlogList';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/common/buttons/button';
 import { ArrowDown } from 'lucide-react';
 
 const BlogPage = () => {

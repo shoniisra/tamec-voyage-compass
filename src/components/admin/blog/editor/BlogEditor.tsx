@@ -5,7 +5,7 @@ import Header from "@editorjs/header";
 import List from "@editorjs/list";
 import Image from "@editorjs/image";
 import { supabaseExtended } from "@/integrations/supabase/client-extended";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/buttons/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";

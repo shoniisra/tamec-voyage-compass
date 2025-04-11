@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/common/buttons/button';
 import Layout from '@/components/layout/Layout';
 
 const NotFound = () => {

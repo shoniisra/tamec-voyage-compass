@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/common/buttons/button';
 import { useNavigate } from 'react-router-dom';
 import { PlusCircle, Search, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';

@@ -18,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/common/buttons/button';
 import { MoreHorizontal, Plus, Eye, Pencil, Trash2 } from 'lucide-react';
 import {
   AlertDialog,

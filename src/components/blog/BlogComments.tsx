@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useComments } from '@/hooks/use-comments';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/common/buttons/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';

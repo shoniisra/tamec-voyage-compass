@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/buttons/button";
 import { Menu, X, LogOut, User, Settings } from "lucide-react";
 import LanguageSwitch from '../language/LanguageSwitch';
 import { useLanguage } from '@/contexts/LanguageContext';

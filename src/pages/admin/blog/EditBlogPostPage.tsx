@@ -11,7 +11,7 @@ import { supabaseExtended } from '@/integrations/supabase/client-extended';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toKebabCase } from '@/utils/stringUtils';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/common/buttons/button';
 import { useToast } from '@/hooks/use-toast';
 import { Trash2 } from 'lucide-react';
 
