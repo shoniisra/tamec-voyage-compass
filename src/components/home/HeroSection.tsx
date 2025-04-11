@@ -22,9 +22,12 @@ const HeroSection = () => {
       
       <div className="container mx-auto px-4 relative h-full flex flex-col justify-center px-8 lg:px-16">
         <div className="max-w-2xl animate-fade-up opacity-0" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
-            {language === 'en' ? 'Your next trip starts with us' : 'Tu próximo viaje empieza con nosotros'}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-2">
+            {language === 'en' ? 'The travel agency you deserves' : 'La agencia de viajes que mereces'}
           </h1>
+          <h2 className="text-small font-bold uppercase text-center mb-6 text-yellow-400">
+          {language === 'en' ? 'Our Services' : 'Orgullosamente  ecuatoriana'}
+        </h2>
           <p className="text-lg md:text-xl text-white/90 mb-8">
             {language === 'en' 
               ? 'Authentic travel, human attention, and zero worries. At TAMEC, we plan every step with you, so you can just focus on living the experience.' 
@@ -34,11 +37,11 @@ const HeroSection = () => {
           <div className="flex flex-col sm:flex-row gap-4">
             <Button size="lg" className="bg-tamec-600 hover:bg-tamec-700 text-white py-6">
               <Calendar className="mr-2 h-5 w-5" />
-              {language === 'en' ? 'Schedule a free meeting' : 'Agenda tu cita gratis'}
+              {language === 'en' ? 'Explore Destinations' : 'Ver Destinos'}
             </Button>
             <Button size="lg" variant="outline" className="border-white text-white bg-white/20 hover:bg-white/10 py-6">
               <MessageCircle className="mr-2 h-5 w-5" />
-              {language === 'en' ? 'Contact us via WhatsApp' : 'Contáctanos por WhatsApp'}
+              {language === 'en' ? 'Contact us' : 'Contáctanos'}
             </Button>
           </div>
         </div>

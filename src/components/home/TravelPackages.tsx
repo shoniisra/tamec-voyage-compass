@@ -95,16 +95,16 @@ const TravelPackages = () => {
             {language === 'en' ? 'Types of Trips We Offer' : 'Tipos de Viajes que Ofrecemos'}
           </h3>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 h-[25rem]">
             {tripTypes.map(type => (
               <div 
                 key={type.id}
-                className="rounded-lg overflow-hidden shadow-md relative group"
+                className="rounded-lg overflow-hidden shadow-md relative group h-[25rem]"
               >
                 <img 
                   src={type.image} 
                   alt={type.name} 
-                  className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
+                  className="w-full h-[25rem] object-cover transition-transform duration-300 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
                   <h4 className="text-white text-xl font-semibold">{type.name}</h4>

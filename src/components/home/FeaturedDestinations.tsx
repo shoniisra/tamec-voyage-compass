@@ -22,14 +22,14 @@ const FeaturedDestinations = () => {
     {
       id: 3,
       icon: <FileUser className="h-10 w-10 text-tamec-600" />,
-      title: language === 'en' ? 'Visa processing' : 'Trámite de visas',
-      description: language === 'en' ? 'Visa specialists, we advise you with real experience.' : 'Especialistas en visados, te asesoramos con experiencia real.'
+      title: language === 'en' ? 'Honesty' : 'Honestidad',
+      description: language === 'en' ? 'Total transparency at every step: no small print, no surprises.' : 'Transparencia total en cada paso: sin letras pequeñas, sin sorpresas.'
     },
     {
       id: 4,
       icon: <Plane className="h-10 w-10 text-tamec-600" />,
-      title: language === 'en' ? 'Stress-free travel' : 'Viajes sin estrés',
-      description: language === 'en' ? 'We take care of everything: flights, accommodations, tours, insurance and more.' : 'Nos encargamos de todo: vuelos, hospedajes, tours, seguros y más.'
+      title: language === 'en' ? 'Experience' : 'Experiencia',
+      description: language === 'en' ? 'We are experts in providing you with authentic, safe and memorable trips.' : 'Somos expertos en brindarte viajes auténticos, seguros y memorables.'
     }
   ];
 
@@ -58,9 +58,12 @@ const FeaturedDestinations = () => {
   ];
   
   return (
-    <section className="py-16">
+    <section className="py-16 bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4">
         <div className="mb-16">
+        <h1 className="text-sm font-bold text-center text-yellow-400 uppercase">
+            {language === 'en' ? 'Why TAMEC' : '¿Por qué TAMEC?'}
+          </h1>
           <h2 className="text-3xl font-bold text-center mb-12">
             {language === 'en' ? 'Our Differentiators' : 'Nuestros Diferenciadores'}
           </h2>
@@ -69,10 +72,10 @@ const FeaturedDestinations = () => {
             {differentiators.map(item => (
               <div 
                 key={item.id} 
-                className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md transition-transform hover:-translate-y-1 duration-300"
+                className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:bg-tamec-50 dark:hover:bg-gray-700 group"
               >
-                <div className="flex flex-col items-center text-center">
-                  {item.icon}
+                <div className="flex flex-col items-center text-center cursor-default">
+                  <div className="transform transition-transform duration-300 group-hover:scale-110">{item.icon}</div>
                   <h3 className="mt-4 mb-2 text-xl font-semibold text-gray-900 dark:text-gray-100">{item.title}</h3>
                   <p className="text-gray-600 dark:text-gray-300">{item.description}</p>
                 </div>
