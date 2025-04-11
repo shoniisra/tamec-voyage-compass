@@ -7,6 +7,7 @@ import LanguageSwitch from '../language/LanguageSwitch';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { ThemeToggle } from '../theme/ThemeToggle';
+import { useTheme } from '@/providers/ThemeProvider';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +21,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t } = useLanguage();
   const { user, signOut, isAdmin } = useAuth();
+  const { theme } = useTheme();
   const navigate = useNavigate();
 
   const toggleMenu = () => {
@@ -46,9 +48,9 @@ const Header = () => {
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <Link to="/" className="flex items-center">
           <img
-            src={`/assets/images/logos/${theme === 'dark' ? 'light' : 'dark'} horizontal.png`}
+            src={`/assets/images/logos/${theme === 'dark' ? 'dark':'light'} horizontal.png`}
             alt="TAMEC Travel Agency"
-            className="h-8 w-auto"
+            className="h-16 w-auto"
           />
         </Link>
         

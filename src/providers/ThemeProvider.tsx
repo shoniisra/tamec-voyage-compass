@@ -1,6 +1,8 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { ThemeProvider as NextThemesProvider, useTheme as useNextTheme } from "next-themes";
+
+export const useTheme = useNextTheme;
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
