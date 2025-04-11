@@ -268,7 +268,7 @@ const translations: Translations = {
       featuredDestinations: 'Destinos Destacados',
       viewAllDestinations: 'Ver Todos los Destinos',
       testimonialsTitle: 'Lo que dicen nuestros viajeros',
-      testimonialsSubtitle: 'Hear from our satisfied clients about their experiences',
+      testimonialsSubtitle: 'Escucha las experiencias de nuestros clientes satisfechos',
       packagesTitle: 'Paquetes de Viaje Populares',
       packagesSubtitle: 'Experiencias de viaje seleccionadas para tu próxima aventura',
       newsletterTitle: 'Suscríbete a nuestro boletín',
