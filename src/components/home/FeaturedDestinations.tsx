@@ -58,9 +58,9 @@ const FeaturedDestinations = () => {
   ];
   
   return (
-    <section className="py-16 bg-gray-50 dark:bg-gray-900">
+    <section className="my-16 bg-gray-50 dark:bg-transparent">
       <div className="container mx-auto px-4">
-        <div className="mb-16">
+        <div >
         <h1 className="text-sm font-bold text-center text-yellow-400 uppercase">
             {language === 'en' ? 'Why TAMEC' : '¿Por qué TAMEC?'}
           </h1>
@@ -84,7 +84,7 @@ const FeaturedDestinations = () => {
           </div>
         </div>
         
-        <div className="mb-16">
+        {/* <div className="mb-16">
           <h2 className="text-3xl font-bold text-center mb-12">
             {language === 'en' ? 'Why TAMEC?' : '¿Por qué TAMEC?'}
           </h2>
@@ -100,18 +100,9 @@ const FeaturedDestinations = () => {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
         
-        <div>
-          <h2 className="text-3xl font-bold text-center mb-6">
-            {language === 'en' ? 'Experiences you will remember for a lifetime' : 'Experiencias que vas a recordar toda la vida'}
-          </h2>
-          <p className="text-center text-lg text-gray-600 dark:text-gray-300 max-w-4xl mx-auto mb-12">
-            {language === 'en' 
-              ? 'From the most vibrant cities to the quietest beaches, we design unique trips for people who want to discover the world with excitement, safety, and warmth.' 
-              : 'Desde las ciudades más vibrantes hasta las playas más tranquilas, diseñamos viajes únicos para personas que quieren descubrir el mundo con emoción, seguridad y calidez.'}
-          </p>
-        </div>
+       
       </div>
     </section>
   );

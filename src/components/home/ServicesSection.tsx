@@ -15,7 +15,7 @@ const ServicesSection = () => {
       description: language === 'en' 
         ? 'Expert assistance with American, Schengen, Mexican visas and more. We guide you through every step of the process.'
         : 'Asistencia experta con visas americanas, Schengen, mexicanas y más. Te guiamos en cada paso del proceso.',
-      image: '/lovable-uploads/9f1f88ca-713b-453a-93a4-03fa4bd68c67.png',
+      image: 'https://blob.diariodelyaqui.mx/images/2024/04/24/visa-americana-que-hacer-si-fue-aprobada-y-aun-no-te-llega-198f0ee6-focus-0-0-1479-828.webp',
       icon: <FileText className="h-6 w-6 text-tamec-600" />,
       features: [
         language === 'en' ? 'American, Schengen, Mexican visas and more' : 'Visa americana, Schengen, mexicana y más',
@@ -69,7 +69,7 @@ const ServicesSection = () => {
       description: language === 'en'
         ? 'Discover one of the most amazing natural paradises in the world with our specialized Galapagos packages.'
         : 'Descubre uno de los paraísos naturales más asombrosos del mundo con nuestros paquetes especializados a Galápagos.',
-      image: 'https://images.unsplash.com/photo-1580739811154-a7f69d912ce9?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+      image: 'https://media.viajando.travel/p/f6c1afd28f13a4d893f2af36c93b2921/adjuntos/236/imagenes/000/745/0000745467/1200x675/smart/galapagosjpg.jpg',
       icon: <Globe className="h-6 w-6 text-tamec-600" />,
       features: [
         language === 'en' ? 'All-inclusive packages' : 'Paquetes todo incluido',
@@ -120,7 +120,7 @@ const ServicesSection = () => {
 
         <div className="space-y-12">
           {services.map((service, index) => (
-            <Card key={service.id} className="overflow-hidden border-0 shadow-lg">
+            <Card key={service.id} className="overflow-hidden border-0 shadow-lg border border-gray-50">
               <div className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} h-full`}>
                 <div className="lg:w-1/2">
                   <img 
@@ -164,6 +164,17 @@ const ServicesSection = () => {
           ))}
         </div>
       </div>
+
+      <div className='my-16'>
+          <h2 className="text-3xl font-bold text-center mb-6">
+            {language === 'en' ? 'Experiences you will remember for a lifetime' : 'Experiencias que vas a recordar toda la vida'}
+          </h2>
+          <p className="text-center text-lg text-gray-600 dark:text-gray-300 max-w-4xl mx-auto mb-12">
+            {language === 'en' 
+              ? 'From the most vibrant cities to the quietest beaches, we design unique trips for people who want to discover the world with excitement, safety, and warmth.' 
+              : 'Desde las ciudades más vibrantes hasta las playas más tranquilas, diseñamos viajes únicos para personas que quieren descubrir el mundo con emoción, seguridad y calidez.'}
+          </p>
+        </div>
     </section>
   );
 };
