@@ -97,7 +97,7 @@ const translations: Translations = {
       },
       testimonials: {
         title: 'Real Testimonials',
-        subtitle: 'Hear from our satisfied customers who've experienced unforgettable journeys with TAMEC Travel.'
+        subtitle: 'Hear from our satisfied customers who\'ve experienced unforgettable journeys with TAMEC Travel.'
       },
       featuredDestinations: 'Featured Destinations',
       viewAllDestinations: 'View All Destinations',

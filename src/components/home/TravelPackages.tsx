@@ -3,7 +3,7 @@ import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plane, Passport, Map, Check } from 'lucide-react';
+import { Plane, FileUser, Map, Check } from 'lucide-react';
 
 const TravelPackages = () => {
   const { language } = useLanguage();
@@ -21,7 +21,7 @@ const TravelPackages = () => {
     },
     {
       id: 2,
-      icon: <Passport className="h-12 w-12 text-tamec-600 mb-4" />,
+      icon: <FileUser className="h-12 w-12 text-tamec-600 mb-4" />,
       title: language === 'en' ? 'Visa Processing' : 'Trámite de Visas',
       features: [
         language === 'en' ? 'American, Schengen, Mexican visas and more' : 'Visa americana, Schengen, mexicana y más',

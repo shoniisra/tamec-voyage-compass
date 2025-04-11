@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { CircleCheck, Users, Passport, Plane } from 'lucide-react';
+import { CircleCheck, Users, FileUser, Plane } from 'lucide-react';
 
 const FeaturedDestinations = () => {
   const { language } = useLanguage();
@@ -21,7 +21,7 @@ const FeaturedDestinations = () => {
     },
     {
       id: 3,
-      icon: <Passport className="h-10 w-10 text-tamec-600" />,
+      icon: <FileUser className="h-10 w-10 text-tamec-600" />,
       title: language === 'en' ? 'Visa processing' : 'Trámite de visas',
       description: language === 'en' ? 'Visa specialists, we advise you with real experience.' : 'Especialistas en visados, te asesoramos con experiencia real.'
     },

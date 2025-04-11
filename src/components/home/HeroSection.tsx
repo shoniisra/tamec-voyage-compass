@@ -13,7 +13,7 @@ const HeroSection = () => {
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
         style={{ 
-          backgroundImage: "url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1920&q=80')",
+          backgroundImage: "url('/assets/images/hero/hero-background.webp')",
           backgroundPosition: 'center 30%',
         }}
       >
@@ -36,7 +36,7 @@ const HeroSection = () => {
               <Calendar className="mr-2 h-5 w-5" />
               {language === 'en' ? 'Schedule a free meeting' : 'Agenda tu cita gratis'}
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 py-6">
+            <Button size="lg" variant="outline" className="border-white text-white bg-white/20 hover:bg-white/10 py-6">
               <MessageCircle className="mr-2 h-5 w-5" />
               {language === 'en' ? 'Contact us via WhatsApp' : 'Contáctanos por WhatsApp'}
             </Button>

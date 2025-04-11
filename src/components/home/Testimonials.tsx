@@ -46,7 +46,7 @@ const Testimonials = () => {
           </h2>
           <p className="text-tamec-100 max-w-2xl mx-auto">
             {language === 'en' 
-              ? 'Hear from our satisfied customers who've experienced unforgettable journeys with TAMEC Travel.'
+              ? 'Hear from our satisfied customers who\'ve experienced unforgettable journeys with TAMEC Travel.'
               : 'Escucha a nuestros clientes satisfechos que han experimentado viajes inolvidables con TAMEC Travel.'}
           </p>
         </div>
