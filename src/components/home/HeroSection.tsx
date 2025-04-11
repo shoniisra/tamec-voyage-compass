@@ -20,7 +20,7 @@ const HeroSection = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
       </div>
       
-      <div className="relative container mx-auto h-full flex flex-col justify-center px-4">
+      <div className="container mx-auto px-4 relative h-full flex flex-col justify-center px-8 lg:px-16">
         <div className="max-w-2xl animate-fade-up opacity-0" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
             {language === 'en' ? 'Your next trip starts with us' : 'Tu próximo viaje empieza con nosotros'}

@@ -21,7 +21,7 @@ const Layout = ({
   return (
     <div className={`flex flex-col min-h-screen bg-background text-foreground ${className}`}>
       {!hideHeader && <Header />}
-      <main className={`flex-grow ${fullWidth ? '' : 'container mx-auto px-4'}`}>{children}</main>
+      <main className="flex-grow w-full">{children}</main>
       {!hideFooter && <Footer />}
     </div>
   );

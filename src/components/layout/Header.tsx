@@ -45,8 +45,11 @@ const Header = () => {
     <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-md border-b">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <Link to="/" className="flex items-center">
-          <span className="text-2xl font-bold text-tamec-600">TAMEC</span>
-          <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">Travel Agency</span>
+          <img
+            src={`/assets/images/logos/${theme === 'dark' ? 'light' : 'dark'} horizontal.png`}
+            alt="TAMEC Travel Agency"
+            className="h-8 w-auto"
+          />
         </Link>
         
         {/* Desktop Navigation */}
