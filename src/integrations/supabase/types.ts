@@ -9,6 +9,73 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      actividades: {
+        Row: {
+          costo_adicional: number | null
+          descripcion: string | null
+          id: number
+          incluida: boolean | null
+          nombre: string
+          tour_id: number | null
+        }
+        Insert: {
+          costo_adicional?: number | null
+          descripcion?: string | null
+          id?: number
+          incluida?: boolean | null
+          nombre: string
+          tour_id?: number | null
+        }
+        Update: {
+          costo_adicional?: number | null
+          descripcion?: string | null
+          id?: number
+          incluida?: boolean | null
+          nombre?: string
+          tour_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "actividades_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      adjuntos: {
+        Row: {
+          descripcion: string | null
+          id: number
+          tipo_archivo: string | null
+          tour_id: number | null
+          url_archivo: string
+        }
+        Insert: {
+          descripcion?: string | null
+          id?: number
+          tipo_archivo?: string | null
+          tour_id?: number | null
+          url_archivo: string
+        }
+        Update: {
+          descripcion?: string | null
+          id?: number
+          tipo_archivo?: string | null
+          tour_id?: number | null
+          url_archivo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "adjuntos_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_comments: {
         Row: {
           blog_id: string | null
@@ -110,6 +177,56 @@ export type Database = {
         }
         Relationships: []
       }
+      destinos: {
+        Row: {
+          ciudad: string | null
+          id: number
+          pais: string
+        }
+        Insert: {
+          ciudad?: string | null
+          id?: number
+          pais: string
+        }
+        Update: {
+          ciudad?: string | null
+          id?: number
+          pais?: string
+        }
+        Relationships: []
+      }
+      fotos: {
+        Row: {
+          descripcion: string | null
+          id: number
+          orden: number | null
+          tour_id: number | null
+          url_imagen: string
+        }
+        Insert: {
+          descripcion?: string | null
+          id?: number
+          orden?: number | null
+          tour_id?: number | null
+          url_imagen: string
+        }
+        Update: {
+          descripcion?: string | null
+          id?: number
+          orden?: number | null
+          tour_id?: number | null
+          url_imagen?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fotos_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           created_at: string | null
@@ -146,6 +263,38 @@ export type Database = {
         }
         Relationships: []
       }
+      precios: {
+        Row: {
+          forma_pago: Database["public"]["Enums"]["forma_pago_enum"]
+          id: number
+          precio: number
+          salida_id: number | null
+          tipo_habitacion: Database["public"]["Enums"]["tipo_habitacion_enum"]
+        }
+        Insert: {
+          forma_pago: Database["public"]["Enums"]["forma_pago_enum"]
+          id?: number
+          precio: number
+          salida_id?: number | null
+          tipo_habitacion: Database["public"]["Enums"]["tipo_habitacion_enum"]
+        }
+        Update: {
+          forma_pago?: Database["public"]["Enums"]["forma_pago_enum"]
+          id?: number
+          precio?: number
+          salida_id?: number | null
+          tipo_habitacion?: Database["public"]["Enums"]["tipo_habitacion_enum"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "precios_salida_id_fkey"
+            columns: ["salida_id"]
+            isOneToOne: false
+            referencedRelation: "salidas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -163,6 +312,38 @@ export type Database = {
           id?: string
         }
         Relationships: []
+      }
+      salidas: {
+        Row: {
+          cupos_disponibles: number | null
+          dias_duracion: number
+          fecha_salida: string | null
+          id: number
+          tour_id: number | null
+        }
+        Insert: {
+          cupos_disponibles?: number | null
+          dias_duracion: number
+          fecha_salida?: string | null
+          id?: number
+          tour_id?: number | null
+        }
+        Update: {
+          cupos_disponibles?: number | null
+          dias_duracion?: number
+          fecha_salida?: string | null
+          id?: number
+          tour_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "salidas_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tag_categories: {
         Row: {
@@ -214,6 +395,87 @@ export type Database = {
           },
         ]
       }
+      tour_destinos: {
+        Row: {
+          destino_id: number | null
+          id: number
+          orden: number | null
+          tour_id: number | null
+        }
+        Insert: {
+          destino_id?: number | null
+          id?: number
+          orden?: number | null
+          tour_id?: number | null
+        }
+        Update: {
+          destino_id?: number | null
+          id?: number
+          orden?: number | null
+          tour_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_destinos_destino_id_fkey"
+            columns: ["destino_id"]
+            isOneToOne: false
+            referencedRelation: "destinos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_destinos_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tours: {
+        Row: {
+          coortesias: string | null
+          descripcion: string | null
+          dias_duracion: number | null
+          fecha_caducidad: string | null
+          fecha_publicacion: string | null
+          id: number
+          incluye_boleto_aereo: boolean | null
+          pdf_detalles_url: string | null
+          politicas_cancelacion: string | null
+          slug: string | null
+          terminos_condiciones: string | null
+          titulo: string
+        }
+        Insert: {
+          coortesias?: string | null
+          descripcion?: string | null
+          dias_duracion?: number | null
+          fecha_caducidad?: string | null
+          fecha_publicacion?: string | null
+          id?: number
+          incluye_boleto_aereo?: boolean | null
+          pdf_detalles_url?: string | null
+          politicas_cancelacion?: string | null
+          slug?: string | null
+          terminos_condiciones?: string | null
+          titulo: string
+        }
+        Update: {
+          coortesias?: string | null
+          descripcion?: string | null
+          dias_duracion?: number | null
+          fecha_caducidad?: string | null
+          fecha_publicacion?: string | null
+          id?: number
+          incluye_boleto_aereo?: boolean | null
+          pdf_detalles_url?: string | null
+          politicas_cancelacion?: string | null
+          slug?: string | null
+          terminos_condiciones?: string | null
+          titulo?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -247,6 +509,8 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      forma_pago_enum: "efectivo" | "tarjeta"
+      tipo_habitacion_enum: "doble" | "triple" | "individual" | "niño"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -363,6 +627,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      forma_pago_enum: ["efectivo", "tarjeta"],
+      tipo_habitacion_enum: ["doble", "triple", "individual", "niño"],
     },
   },
 } as const

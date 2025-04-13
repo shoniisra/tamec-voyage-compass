@@ -1,83 +1,156 @@
-
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Sidebar, SidebarContent, SidebarHeader, SidebarTrigger } from '@/components/ui/sidebar';
-import { ChevronRight, PieChart, FileText, Users, MessageSquare, Settings, Tags } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import {
+  LayoutDashboard,
+  FileText,
+  Tag,
+  Plane
+} from 'lucide-react';
 
-const AdminSidebar = () => {
-  const { t } = useLanguage();
+interface NavItemProps {
+  name: string;
+  icon: React.ReactNode;
+  href?: string;
+  submenu?: { name: string; href: string; current: boolean }[];
+  current?: boolean;
+  open?: boolean;
+}
+
+const NavItem: React.FC<NavItemProps> = ({ name, icon, href, submenu, current, open }) => {
+  const [isSubmenuOpen, setIsSubmenuOpen] = React.useState(open || false);
+  
+  const toggleSubmenu = () => {
+    setIsSubmenuOpen(!isSubmenuOpen);
+  };
+  
+  if (submenu) {
+    return (
+      <li className="mb-1">
+        <button
+          className={cn(
+            "flex items-center w-full p-3 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
+            isSubmenuOpen ? "bg-accent text-accent-foreground" : "text-muted-foreground"
+          )}
+          onClick={toggleSubmenu}
+        >
+          {icon}
+          <span className="ml-3 flex-1">{name}</span>
+          <svg
+            className={cn(
+              "ml-2 h-4 w-4 shrink-0 transition-transform duration-200",
+              isSubmenuOpen ? "rotate-90" : ""
+            )}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </button>
+        {isSubmenuOpen && (
+          <ul className="ml-6 mt-2 space-y-1">
+            {submenu.map(sub => (
+              <li key={sub.name}>
+                <NavLink
+                  to={sub.href}
+                  className={({ isActive }) =>
+                    cn(
+                      "block p-3 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
+                      isActive ? "bg-accent text-accent-foreground" : "text-muted-foreground"
+                    )
+                  }
+                >
+                  {sub.name}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        )}
+      </li>
+    );
+  } else {
+    return (
+      <li>
+        <NavLink
+          to={href || '#'}
+          className={({ isActive }) =>
+            cn(
+              "flex items-center p-3 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
+              isActive ? "bg-accent text-accent-foreground" : "text-muted-foreground"
+            )
+          }
+        >
+          {icon}
+          <span className="ml-3">{name}</span>
+        </NavLink>
+      </li>
+    );
+  }
+};
+
+const AdminSidebar: React.FC = () => {
+  const { language } = useLanguage();
   const location = useLocation();
-
-  const isLinkActive = (path: string) => {
-    return location.pathname.startsWith(path);
-  };
-
-  const navLinkClasses = (path: string) => {
-    const baseClasses = "flex items-center gap-3 py-3 px-4 rounded-md text-sm font-medium transition-colors";
-    const activeClasses = "bg-tamec-100 text-tamec-900 dark:bg-tamec-900/20 dark:text-tamec-200";
-    const inactiveClasses = "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800";
-    
-    return `${baseClasses} ${isLinkActive(path) ? activeClasses : inactiveClasses}`;
-  };
+  
+  const navItems = [
+    { 
+      name: language === 'en' ? 'Dashboard' : 'Panel', 
+      icon: <LayoutDashboard className="w-5 h-5" />, 
+      href: '/admin/dashboard',
+      current: location.pathname === '/admin/dashboard'
+    },
+    { 
+      name: 'Blog', 
+      icon: <FileText className="w-5 h-5" />,
+      submenu: [
+        { 
+          name: language === 'en' ? 'Posts' : 'Publicaciones', 
+          href: '/admin/blog/posts',
+          current: location.pathname === '/admin/blog/posts'
+        },
+        { 
+          name: language === 'en' ? 'Tags' : 'Etiquetas', 
+          href: '/admin/blog/tags',
+          current: location.pathname === '/admin/blog/tags'
+        }
+      ],
+      open: location.pathname.includes('/admin/blog')
+    },
+    { 
+      name: language === 'en' ? 'Tours' : 'Tours', 
+      icon: <Plane className="w-5 h-5" />,
+      submenu: [
+        { 
+          name: language === 'en' ? 'All Tours' : 'Todos los Tours', 
+          href: '/admin/tours',
+          current: location.pathname === '/admin/tours'
+        },
+        { 
+          name: language === 'en' ? 'Destinations' : 'Destinos', 
+          href: '/admin/destinations',
+          current: location.pathname === '/admin/destinations'
+        }
+      ],
+      open: location.pathname.includes('/admin/tours') || location.pathname.includes('/admin/destinations')
+    }
+  ];
 
   return (
-    <Sidebar>
-      <SidebarHeader className="flex h-16 items-center border-b px-6">
-        <h2 className="text-lg font-semibold">Admin</h2>
-        <SidebarTrigger className="ml-auto h-8 w-8">
-          <ChevronRight className="h-4 w-4" />
-        </SidebarTrigger>
-      </SidebarHeader>
-      <SidebarContent className="p-4">
-        <div className="flex flex-col gap-1">
-          <NavLink to="/admin/dashboard" className={navLinkClasses('/admin/dashboard')}>
-            <PieChart className="h-5 w-5" />
-            Dashboard
-          </NavLink>
-          <div className="mt-3 mb-1 px-4">
-            <h3 className="text-xs uppercase text-gray-500 dark:text-gray-400 font-semibold">
-              Blog
-            </h3>
-          </div>
-          <NavLink to="/admin/blog/posts" className={navLinkClasses('/admin/blog/posts')}>
-            <FileText className="h-5 w-5" />
-            Posts
-          </NavLink>
-          <NavLink to="/admin/blog/tags" className={navLinkClasses('/admin/blog/tags')}>
-            <Tags className="h-5 w-5" />
-            Tags
-          </NavLink>
-          <div className="mt-3 mb-1 px-4">
-            <h3 className="text-xs uppercase text-gray-500 dark:text-gray-400 font-semibold">
-              Users
-            </h3>
-          </div>
-          <NavLink to="/admin/users" className={navLinkClasses('/admin/users')}>
-            <Users className="h-5 w-5" />
-            User Management
-          </NavLink>
-          <div className="mt-3 mb-1 px-4">
-            <h3 className="text-xs uppercase text-gray-500 dark:text-gray-400 font-semibold">
-              Communications
-            </h3>
-          </div>
-          <NavLink to="/admin/communications/messages" className={navLinkClasses('/admin/communications/messages')}>
-            <MessageSquare className="h-5 w-5" />
-            Messages
-          </NavLink>
-          <div className="mt-3 mb-1 px-4">
-            <h3 className="text-xs uppercase text-gray-500 dark:text-gray-400 font-semibold">
-              Configuration
-            </h3>
-          </div>
-          <NavLink to="/admin/settings" className={navLinkClasses('/admin/settings')}>
-            <Settings className="h-5 w-5" />
-            Settings
-          </NavLink>
-        </div>
-      </SidebarContent>
-    </Sidebar>
+    <div className="w-full h-full bg-gray-50 dark:bg-gray-900 border rounded-md p-4">
+      <nav className="flex flex-col space-y-1">
+        <ul>
+          {navItems.map(item => (
+            <NavItem key={item.name} {...item} />
+          ))}
+        </ul>
+      </nav>
+    </div>
   );
 };
 

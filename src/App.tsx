@@ -7,6 +7,8 @@ import HomePage from '@/pages/HomePage';
 import BlogPage from '@/pages/BlogPage';
 import BlogDetailPage from '@/pages/BlogDetailPage';
 import ContactPage from '@/pages/ContactPage';
+import DestinationsPage from '@/pages/DestinationsPage';
+import TourDetailPage from '@/pages/TourDetailPage';
 import AdminDashboardPage from '@/pages/AdminDashboardPage';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import NotFound from '@/pages/NotFound';
@@ -15,6 +17,7 @@ import BlogPostsPage from '@/pages/admin/blog/BlogPostsPage';
 import CreateBlogPostPage from '@/pages/admin/blog/CreateBlogPostPage';
 import EditBlogPostPage from '@/pages/admin/blog/EditBlogPostPage';
 import TagsPage from '@/pages/admin/blog/TagsPage';
+import ToursPage from '@/pages/admin/tours/ToursPage';
 
 import './App.css';
 import { ThemeProvider } from './providers/ThemeProvider';
@@ -29,6 +32,8 @@ function App() {
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogDetailPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/destinations" element={<DestinationsPage />} />
+            <Route path="/destinations/:slug" element={<TourDetailPage />} />
 
             {/* Admin Routes */}
             <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
@@ -55,6 +60,11 @@ function App() {
             <Route path="/admin/blog/tags" element={
               <ProtectedRoute>
                 <TagsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/tours" element={
+              <ProtectedRoute>
+                <ToursPage />
               </ProtectedRoute>
             } />
 

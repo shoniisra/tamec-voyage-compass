@@ -1,4 +1,3 @@
-
 // Blog related types
 export interface BlogPost {
   id: string;
@@ -33,3 +32,12 @@ export interface BlogComment {
   content: string;
   created_at: string;
 }
+
+export type Comment = {
+  id: string;
+  blog_id: string;
+  name: string;
+  email: string;
+  content: string;
+  created_at: string;
+};

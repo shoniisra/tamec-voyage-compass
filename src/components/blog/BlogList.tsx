@@ -1,229 +1,251 @@
 
-import React, { useState } from 'react';
-import BlogCard from './BlogCard';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useBlogPosts } from '@/hooks/use-blog-posts';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
-import { PlusCircle, Search, Filter } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { supabase } from '@/integrations/supabase/client';
+import { useTags } from '@/hooks/use-tags';
+import BlogCard from './BlogCard';
 import TagsFilter from './TagsFilter';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { BiSearch } from 'react-icons/bi';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { BlogPost } from '@/types/blog';
 
-const BlogList = () => {
-  const { posts, loading } = useBlogPosts();
-  const { t, language } = useLanguage();
-  const { isAdmin } = useAuth();
-  const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
+const PAGE_SIZE = 6;
+
+const BlogList: React.FC = () => {
+  const { language } = useLanguage();
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const { posts, loading, error } = useBlogPosts();
+  const { tags, loading: tagsLoading } = useTags();
+  const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
   
-  // Filter posts based on search query and tags
-  const filteredPosts = posts.filter(post => {
-    // First, check if there are any selected tags
-    if (selectedTags.length > 0) {
-      // Check if this post has any of the selected tags
-      // We'll need to fetch tags for each post - in a real app,
-      // you might want to optimize this by fetching tags with posts
-      const postHasSelectedTag = post.tags?.some(tag => 
-        selectedTags.includes(tag.id)
-      );
+  useEffect(() => {
+    if (!loading && posts.length > 0) {
+      let filtered = [...posts];
       
-      if (!postHasSelectedTag) return false;
+      // Filter by search term
+      if (searchTerm) {
+        const lowerSearchTerm = searchTerm.toLowerCase();
+        filtered = filtered.filter(post => {
+          const title = language === 'en' && post.data.title_en 
+            ? post.data.title_en 
+            : post.data.title;
+          
+          return title.toLowerCase().includes(lowerSearchTerm);
+        });
+      }
+      
+      // Filter by selected tags
+      if (selectedTags.length > 0) {
+        filtered = filtered.filter(post => {
+          if (!post.tags || post.tags.length === 0) return false;
+          return post.tags.some(tag => selectedTags.includes(tag.id));
+        });
+      }
+      
+      // Sort by date (most recent first)
+      filtered = filtered.sort((a, b) => {
+        const dateA = a.data.created_at ? new Date(a.data.created_at).getTime() : 0;
+        const dateB = b.data.created_at ? new Date(b.data.created_at).getTime() : 0;
+        return dateB - dateA;
+      });
+      
+      // Calculate total pages
+      const total = Math.ceil(filtered.length / PAGE_SIZE);
+      setTotalPages(total || 1);
+      
+      // Reset to first page when filters change
+      if (currentPage > total) {
+        setCurrentPage(1);
+      }
+      
+      // Apply pagination
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const paginatedPosts = filtered.slice(start, start + PAGE_SIZE);
+      
+      setFilteredPosts(paginatedPosts);
+    } else {
+      setFilteredPosts([]);
     }
-    
-    // Then check search query
-    const title = typeof post.title === 'string' ? post.title.toLowerCase() : 
-      (language === 'en' && post.title_en ? post.title_en.toLowerCase() : 'untitled').toLowerCase();
-      
-    const excerpt = language === 'en' 
-      ? (post.excerpt_en || '').toLowerCase()
-      : (post.excerpt_es || '').toLowerCase();
-      
-    const category = language === 'en' 
-      ? (post.category_en || '').toLowerCase() 
-      : (post.category_es || '').toLowerCase();
-      
-    const query = searchQuery.toLowerCase();
-    
-    return title.includes(query) || excerpt.includes(query) || category.includes(query);
-  });
+  }, [posts, searchTerm, selectedTags, currentPage, language, loading]);
   
-  // Display loading skeletons when data is being fetched
-  if (loading) {
-    return (
-      <section className="container mx-auto px-4">
-        <div className="mb-8">
-          <Skeleton className="h-12 w-60 mb-4" />
-          <Skeleton className="h-10 w-full max-w-md" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="border rounded-lg overflow-hidden">
-              <Skeleton className="h-48 w-full" />
-              <div className="p-6">
-                <Skeleton className="h-4 w-20 mb-3" />
-                <Skeleton className="h-6 w-full mb-4" />
-                <Skeleton className="h-4 w-full mb-2" />
-                <Skeleton className="h-4 w-3/4 mb-4" />
-                <Skeleton className="h-4 w-24 mt-2" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+  const handleTagSelect = (tagId: string) => {
+    setSelectedTags(prev => {
+      if (prev.includes(tagId)) {
+        return prev.filter(id => id !== tagId);
+      } else {
+        return [...prev, tagId];
+      }
+    });
+    
+    // Reset to first page when changing filters
+    setCurrentPage(1);
+  };
+  
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    
+    // Reset to first page when changing filters
+    setCurrentPage(1);
+  };
+  
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    
+    // Scroll to top on page change
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  
+  // Formatted dates for displaying in a readable format
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return '';
+    
+    return format(
+      new Date(dateString), 
+      language === 'en' ? 'MMM d, yyyy' : 'd MMM yyyy', 
+      { locale: language === 'es' ? es : undefined }
     );
-  }
+  };
   
   return (
-    <section className="container mx-auto px-4">
-      <div className="mb-12 text-center">
-        <h2 className="text-3xl font-bold mb-4">{language === 'en' ? 'Latest Travel Stories' : 'Últimas Historias de Viaje'}</h2>
-        <p className="text-muted-foreground max-w-2xl mx-auto mb-8">{language === 'en' ? 'Discover travel tips, destination guides, and personal stories from our global adventures' : 'Descubre consejos de viaje, guías de destinos e historias personales de nuestras aventuras globales'}</p>
-        
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 max-w-lg mx-auto">
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex flex-col-reverse md:flex-row gap-8">
+        <div className="w-full md:w-3/4">
+          {/* Search */}
+          <div className="mb-6 relative">
+            <input
               type="text"
-              placeholder={language === 'en' ? 'Search articles...' : 'Buscar artículos...'}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 w-full"
+              placeholder={language === 'en' ? "Search blog posts..." : "Buscar publicaciones..."}
+              className="w-full p-3 pl-10 border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-800"
+              value={searchTerm}
+              onChange={handleSearchChange}
             />
+            <BiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
           </div>
           
-          <div className="flex gap-2">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-2">
-                  <Filter className="h-4 w-4" />
-                  {language === 'en' ? 'Filter' : 'Filtrar'}
-                  {selectedTags.length > 0 && (
-                    <span className="ml-1 inline-flex items-center justify-center w-5 h-5 text-xs font-semibold rounded-full bg-primary text-primary-foreground">
-                      {selectedTags.length}
-                    </span>
-                  )}
-                </Button>
-              </SheetTrigger>
-              <SheetContent>
-                <SheetHeader>
-                  <SheetTitle>{language === 'en' ? 'Filter Blog Posts' : 'Filtrar Artículos'}</SheetTitle>
-                  <SheetDescription>
-                    {language === 'en' 
-                      ? 'Select tags to filter the blog posts'
-                      : 'Selecciona etiquetas para filtrar los artículos'}
-                  </SheetDescription>
-                </SheetHeader>
-                <div className="py-6">
-                  <TagsFilter 
-                    selectedTags={selectedTags} 
-                    onTagsChange={setSelectedTags} 
-                  />
-                </div>
-                {selectedTags.length > 0 && (
-                  <div className="pt-2">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setSelectedTags([])}
-                      className="w-full"
+          {/* Posts */}
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[...Array(PAGE_SIZE)].map((_, i) => (
+                <div key={i} className="bg-gray-100 dark:bg-gray-800 rounded-lg h-72 animate-pulse"></div>
+              ))}
+            </div>
+          ) : error ? (
+            <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg text-center">
+              <p className="text-red-700 dark:text-red-400">
+                {language === 'en' 
+                  ? 'Error loading blog posts. Please try again later.' 
+                  : 'Error al cargar las publicaciones. Por favor, inténtalo nuevamente más tarde.'}
+              </p>
+            </div>
+          ) : filteredPosts.length === 0 ? (
+            <div className="text-center p-8 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
+              <h3 className="text-xl font-medium mb-2">
+                {language === 'en' 
+                  ? 'No blog posts found' 
+                  : 'No se encontraron publicaciones'}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                {language === 'en' 
+                  ? 'Try adjusting your search or filter criteria.' 
+                  : 'Intenta ajustar tus criterios de búsqueda o filtros.'}
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {filteredPosts.map(post => {
+                  const postTitle = language === 'en' && post.data.title_en 
+                    ? post.data.title_en 
+                    : post.data.title;
+                    
+                  const formattedDate = post.data.created_at ? formatDate(post.data.created_at) : '';
+                  
+                  return (
+                    <Link key={post.data.id} to={`/blog/${post.data.slug}`}>
+                      <BlogCard
+                        title={postTitle}
+                        image={post.data.cover_image || ''}
+                        date={formattedDate}
+                        tags={post.tags || []}
+                      />
+                    </Link>
+                  );
+                })}
+              </div>
+              
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex justify-center mt-10">
+                  <div className="flex space-x-1">
+                    <button
+                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                      disabled={currentPage === 1}
+                      className="px-4 py-2 border rounded-md dark:border-gray-700 disabled:opacity-50"
                     >
-                      {language === 'en' ? 'Clear Filters' : 'Borrar Filtros'}
-                    </Button>
+                      {language === 'en' ? 'Previous' : 'Anterior'}
+                    </button>
+                    
+                    {Array.from({ length: Math.min(5, totalPages) }).map((_, idx) => {
+                      let pageNum;
+                      
+                      // Logic to show relevant page numbers around current page
+                      if (totalPages <= 5) {
+                        pageNum = idx + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = idx + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNum = totalPages - 4 + idx;
+                      } else {
+                        pageNum = currentPage - 2 + idx;
+                      }
+                      
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => handlePageChange(pageNum)}
+                          className={`w-10 h-10 flex items-center justify-center rounded-md ${
+                            currentPage === pageNum
+                              ? 'bg-tamec-600 text-white'
+                              : 'border dark:border-gray-700'
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                    
+                    <button
+                      onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                      disabled={currentPage === totalPages}
+                      className="px-4 py-2 border rounded-md dark:border-gray-700 disabled:opacity-50"
+                    >
+                      {language === 'en' ? 'Next' : 'Siguiente'}
+                    </button>
                   </div>
-                )}
-              </SheetContent>
-            </Sheet>
-            
-            {isAdmin && (
-              <Button 
-                onClick={() => navigate('/admin/blog/posts/create')}
-                className="bg-tamec-600 hover:bg-tamec-700 whitespace-nowrap"
-              >
-                <PlusCircle className="mr-2 h-4 w-4" />
-                {language === 'en' ? 'New Article' : 'Nuevo Artículo'}
-              </Button>
-            )}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+        
+        {/* Sidebar */}
+        <div className="w-full md:w-1/4">
+          <div className="sticky top-24 space-y-6">
+            <TagsFilter 
+              tags={tags} 
+              selectedTags={selectedTags} 
+              onTagSelect={handleTagSelect}
+              loading={tagsLoading}
+            />
           </div>
         </div>
       </div>
-      
-      {filteredPosts.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredPosts.map((post) => {
-            // Ensure title is a string, not an object
-            const title = typeof post.title === 'string' ? post.title :
-                        language === 'en' && post.title_en ? post.title_en : 
-                        'Untitled Post';
-            
-            const excerpt = language === 'en' 
-              ? post.excerpt_en || '' 
-              : post.excerpt_es || '';
-              
-            const category = language === 'en' 
-              ? post.category_en || '' 
-              : post.category_es || '';
-            
-            // Use slug if available, otherwise fall back to ID
-            const postSlug = post.slug || post.id;
-              
-            return (
-              <BlogCard
-                key={post.id}
-                id={post.id}
-                title={title}
-                excerpt={excerpt}
-                coverImage={post.cover_image}
-                date={new Date(post.date || post.created_at || '').toLocaleDateString(language === 'en' ? 'en-US' : 'es-ES', { 
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-                category={category}
-                slug={postSlug}
-                tags={post.tags}
-              />
-            );
-          })}
-        </div>
-      ) : (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground text-lg">
-            {language === 'en' ? 'No articles found matching your search.' : 'No se encontraron artículos que coincidan con tu búsqueda.'}
-          </p>
-          {selectedTags.length > 0 && (
-            <Button 
-              variant="outline" 
-              onClick={() => setSelectedTags([])}
-              className="mt-4"
-            >
-              {language === 'en' ? 'Clear Tag Filters' : 'Borrar Filtros de Etiquetas'}
-            </Button>
-          )}
-        </div>
-      )}
-      
-      {/* Simple pagination for future expansion */}
-      {filteredPosts.length > 0 && (
-        <Pagination className="mt-16">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious href="#" />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#" isActive>1</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationNext href="#" />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      )}
-    </section>
+    </div>
   );
 };
 
