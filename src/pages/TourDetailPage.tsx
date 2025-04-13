@@ -185,7 +185,7 @@ const TourDetailPage: React.FC = () => {
             
             {/* Tour Information Tabs */}
             <Tabs defaultValue="description" className="mb-6">
-              <TabsList className="grid grid-cols-5 w-full">
+              <TabsList className="grid grid-cols-6 w-full">
                 <TabsTrigger value="description">
                   {language === 'en' ? 'Description' : 'Descripción'}
                 </TabsTrigger>
@@ -200,6 +200,9 @@ const TourDetailPage: React.FC = () => {
                 </TabsTrigger>
                 <TabsTrigger value="terms">
                   {language === 'en' ? 'Terms' : 'Términos'}
+                </TabsTrigger>
+                <TabsTrigger value="docs">
+                  {language === 'en' ? 'Docs' : 'Archivos'}
                 </TabsTrigger>
               </TabsList>
               
@@ -527,6 +530,16 @@ const TourDetailPage: React.FC = () => {
                     </div>
                   </>
                 )}
+              </TabsContent>
+
+                {/* Documents */}
+                <TabsContent value="docs" className="p-4">
+                <h3 className="text-xl font-semibold mb-4">
+                  {language === 'en' ? 'Docs' : 'Archivos Adjuntos'}
+                </h3>
+                
+//TODO descargar pdfs y documentos adjuntos en caso de existir
+
               </TabsContent>
             </Tabs>
           </div>
