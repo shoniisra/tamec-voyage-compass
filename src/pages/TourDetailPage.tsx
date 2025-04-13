@@ -6,7 +6,7 @@ import { useTour } from '@/hooks/use-tour';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { 
   Calendar, 
-  MapPin, 
+  MapPinned, 
   PlaneIcon, 
   Clock, 
   Users, 
@@ -168,7 +168,7 @@ const TourDetailPage: React.FC = () => {
               
               {formattedDestinations && (
                 <div className="flex items-center text-gray-600 dark:text-gray-300 mb-2">
-                  <MapPin className="h-5 w-5 mr-2 text-tamec-600" />
+                  <MapPinned className="h-5 w-5 mr-2 text-tamec-600" />
                   <span>{formattedDestinations}</span>
                 </div>
               )}

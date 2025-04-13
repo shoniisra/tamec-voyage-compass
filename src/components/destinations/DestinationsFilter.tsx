@@ -18,7 +18,8 @@ import {
   Search,
   PlaneIcon,
   DollarSign,
-  X
+  X,
+  MapPinned
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -148,7 +149,7 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
           {/* Destinations Filter */}
           <div className="space-y-2">
             <label className="text-sm font-medium flex items-center">
-              <MapPin className="mr-2 h-4 w-4 text-tamec-600" /> 
+              <MapPinned className="mr-2 h-4 w-4 text-tamec-600" /> 
               {language === 'en' ? 'Destinations' : 'Destinos'}
             </label>
             <MultiSelect

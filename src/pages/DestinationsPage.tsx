@@ -6,7 +6,7 @@ import DestinationsList from '@/components/destinations/DestinationsList';
 import { useTours } from '@/hooks/use-tours';
 import { TourFilterParams } from '@/types/tour';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { MapPin } from 'lucide-react';
+import { MapPinned } from 'lucide-react';
 
 const DestinationsPage: React.FC = () => {
   const { language } = useLanguage();
@@ -22,7 +22,7 @@ const DestinationsPage: React.FC = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2 flex items-center justify-center">
-            <MapPin className="h-6 w-6 mr-2 text-tamec-600" />
+            <MapPinned className="h-6 w-6 mr-2 text-tamec-600" />
             {language === 'en' ? 'Our Destinations' : 'Nuestros Destinos'}
           </h1>
           <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin, Globe } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Mail, Phone, MapPinned, Globe } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const Footer = () => {
@@ -74,7 +74,7 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">{t('footer.contactUs')}</h3>
             <ul className="space-y-3">
               <li className="flex items-start">
-                <MapPin className="mr-2 h-5 w-5 text-tamec-300 flex-shrink-0" />
+                <MapPinned className="mr-2 h-5 w-5 text-tamec-300 flex-shrink-0" />
                 <span className="text-gray-400">
                   {language === 'en' 
                     ? 'Quito, Ecuador - Francisco Ruiz & Jorge Gutiérrez Ave.'

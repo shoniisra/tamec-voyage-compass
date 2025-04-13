@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MapPin } from 'lucide-react';
+import { MapPinned } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface DestinationCardProps {
@@ -34,7 +34,7 @@ const DestinationCard = ({ name, location, image, price, rating }: DestinationCa
           <div>
             <h3 className="text-lg font-semibold">{name}</h3>
             <div className="flex items-center text-gray-500 mt-1">
-              <MapPin className="h-4 w-4 mr-1" />
+              <MapPinned className="h-4 w-4 mr-1" />
               <span className="text-sm">{location}</span>
             </div>
           </div>

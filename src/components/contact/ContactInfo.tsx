@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Mail, MapPin, Phone, Clock } from 'lucide-react';
+import { Mail, MapPinned, Phone, Clock } from 'lucide-react';
 
 const ContactInfo = () => {
   return (
@@ -10,7 +10,8 @@ const ContactInfo = () => {
       <div className="space-y-6">
         <div className="flex items-start">
           <div className="bg-tamec-50 p-3 rounded-full mr-4">
-            <MapPin className="h-6 w-6 text-tamec-600" />
+            <MapPinned className="h-6 w-6 text-tamec-600" />
+            
           </div>
           <div>
             <h4 className="font-semibold text-lg mb-1">Our Location</h4>

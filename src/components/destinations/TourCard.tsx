@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Tour } from '@/types/tour';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, MapPin, PlaneIcon, Star, Users } from 'lucide-react';
+import { Calendar, MapPinned, PlaneIcon, Star, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -84,7 +84,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
             {/* Destination */}
             {destinationText && (
               <div className="flex items-center text-gray-500 text-sm mb-2">
-                <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
+                <MapPinned className="h-4 w-4 mr-1 flex-shrink-0" />
                 <span className="line-clamp-1">{destinationText}</span>
               </div>
             )}

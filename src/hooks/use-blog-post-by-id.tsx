@@ -1,83 +1,68 @@
 
 import { useState, useEffect } from 'react';
-import { supabaseExtended } from '@/integrations/supabase/client-extended';
-import { BlogPost, Tags } from '@/types/blog';
+import { supabase } from '@/integrations/supabase/client';
+import { BlogPost } from '@/types/blog';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
-export const useBlogPostById = (id: string | undefined) => {
-  const [blog, setBlog] = useState<BlogPost | null>(null);
+export function useBlogPostById(id: string | undefined) {
+  const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!id) {
-      setLoading(false);
-      return;
-    }
-    
-    const fetchBlogPost = async () => {
-      setLoading(true);
-      setError(null);
+    async function fetchPost() {
+      if (!id) {
+        setLoading(false);
+        return;
+      }
 
       try {
-        const { data: blogData, error: blogError } = await supabaseExtended
+        setLoading(true);
+        
+        const { data, error } = await supabase
           .from('blogs')
           .select('*')
           .eq('id', id)
-          .single();
+          .maybeSingle();
 
-        if (blogError) throw blogError;
-
-        // Fetch tags for the blog
-        const { data: tagRelations, error: tagRelationsError } = await supabaseExtended
-          .from('blog_tags')
-          .select('tag_id')
-          .eq('blog_id', id);
-
-        if (tagRelationsError) throw tagRelationsError;
-
-        let tags: Tags[] = [];
-        
-        if (tagRelations && tagRelations.length > 0) {
-          const tagIds = tagRelations.map(relation => relation.tag_id);
-          
-          const { data: tagData, error: tagError } = await supabaseExtended
-            .from('tags')
-            .select('*')
-            .in('id', tagIds);
-
-          if (tagError) throw tagError;
-          
-          tags = tagData || [];
+        if (error) {
+          throw error;
         }
 
-        if (blogData) {
-          // Convert to BlogPost format
-          const formattedBlog: BlogPost = {
-            id: blogData.id,
-            slug: blogData.slug,
-            title: blogData.title,
-            title_en: blogData.title_en,
-            content: blogData.content,
-            content_en: blogData.content_en,
-            cover_image: blogData.cover_image,
-            created_at: blogData.created_at,
-            updated_at: blogData.updated_at,
-            date: blogData.created_at || new Date().toISOString(), // Ensure date property is set
-            tags: tags
-          };
-
-          setBlog(formattedBlog);
+        if (!data) {
+          toast({
+            variant: "destructive",
+            title: "Post not found",
+            description: "The requested blog post could not be found.",
+          });
+          navigate('/admin/blog/posts');
+          return;
         }
-      } catch (err: any) {
-        console.error('Error fetching blog post:', err);
-        setError(err.message || 'An error occurred while fetching the blog post.');
+
+        // Convert to BlogPost type with title field
+        const blogPost: BlogPost = {
+          ...data,
+          title: data.title_en || data.title || '',
+          isLegacy: false
+        };
+
+        setPost(blogPost);
+      } catch (error) {
+        console.error('Error fetching blog post:', error);
+        toast({
+          variant: "destructive",
+          title: "Error loading blog post",
+          description: "Please try again later.",
+        });
       } finally {
         setLoading(false);
       }
-    };
+    }
 
-    fetchBlogPost();
-  }, [id]);
+    fetchPost();
+  }, [id, toast, navigate]);
 
-  return { blog, loading, error };
-};
+  return { post, loading };
+}

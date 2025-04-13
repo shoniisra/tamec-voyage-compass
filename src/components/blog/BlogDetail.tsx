@@ -1,119 +1,87 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useComments } from '@/hooks/use-comments';
-import { useBlogPost } from '@/hooks/use-blog-post';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
-import EditorJsRenderer from '@/components/admin/blog/editor/BlogRenderer';
+import { Skeleton } from '@/components/ui/skeleton';
+import BlogRenderer from '@/components/admin/blog/editor/BlogRenderer';
+import RecentPosts from './RecentPosts';
 import BlogComments from './BlogComments';
-import { Tags } from '@/types/blog';
+import { useBlogPost } from '@/hooks/use-blog-post';
 
 interface BlogDetailProps {
   slug: string;
 }
 
-const BlogDetail: React.FC<BlogDetailProps> = ({ slug }) => {
+const BlogDetail = ({ slug }: BlogDetailProps) => {
   const { language } = useLanguage();
-  const { blog, loading, error } = useBlogPost(slug);
-  const { comments, fetchComments, submitComment, submitting, commentError } = useComments(slug);
-  
-  useEffect(() => {
-    if (blog) {
-      fetchComments();
-    }
-  }, [blog, fetchComments]);
+  const { post, loading } = useBlogPost(slug);
 
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded mb-4 w-2/3"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded mb-6 w-1/3"></div>
-          <div className="h-64 bg-gray-200 dark:bg-gray-800 rounded mb-6"></div>
-          <div className="space-y-3">
-            <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-full"></div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-full"></div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-3/4"></div>
-          </div>
+        <Skeleton className="h-12 w-3/4 mb-6" />
+        <Skeleton className="h-6 w-1/4 mb-8" />
+        <Skeleton className="h-96 w-full mb-8" />
+        <div className="space-y-4">
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-3/4" />
         </div>
       </div>
     );
   }
 
-  if (error || !blog) {
+  if (!post) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-center">
-          <h2 className="text-red-800 dark:text-red-400 text-lg font-semibold">Error</h2>
-          <p className="text-red-600 dark:text-red-300">{error || 'Blog post not found'}</p>
-        </div>
+        <h1 className="text-2xl font-bold text-red-500 mb-4">Error</h1>
+        <p>Blog post not found</p>
       </div>
     );
   }
 
-  const content = language === 'en' && blog.data.content_en ? blog.data.content_en : blog.data.content;
-  const title = language === 'en' && blog.data.title_en ? blog.data.title_en : blog.data.title;
+  // Make sure we always have a string title
+  const title = typeof post.title === 'string' ? post.title : 
+                 (language === 'en' && post.title_en ? post.title_en : 
+                 (typeof post.title === 'object' ? JSON.stringify(post.title) : 'Untitled Post'));
   
-  const formattedDate = blog.data.created_at 
-    ? format(
-        new Date(blog.data.created_at), 
-        'MMMM d, yyyy', 
-        { locale: language === 'es' ? es : undefined }
-      )
-    : '';
+  const content = post.isLegacy 
+    ? (language === 'en' ? post.content_en : post.content)
+    : post.content || post.newContent;
+    
+  const formattedDate = post.date 
+    ? new Date(post.date).toLocaleDateString() 
+    : post.created_at 
+      ? new Date(post.created_at).toLocaleDateString()
+      : '';
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <article className="max-w-4xl mx-auto">
-        <header className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-3">{title}</h1>
-          <div className="flex items-center text-gray-600 dark:text-gray-400 text-sm">
-            <time dateTime={blog.data.created_at || ''}>{formattedDate}</time>
-            {blog.tags && blog.tags.length > 0 && (
-              <>
-                <span className="mx-2">•</span>
-                <div className="flex gap-2">
-                  {blog.tags.map((tag: Tags) => (
-                    <span 
-                      key={tag.id} 
-                      className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-md text-xs"
-                      style={{ backgroundColor: `${tag.color}30`, color: tag.color }}
-                    >
-                      {tag.name}
-                    </span>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-        </header>
+      <h1 className="text-3xl md:text-4xl font-bold mb-4">{title}</h1>
+      <div className="text-gray-500 mb-8">{formattedDate}</div>
+      
+      {post.cover_image && (
+        <img 
+          src={post.cover_image} 
+          alt={title} 
+          className="w-full h-auto max-h-96 object-cover rounded-lg mb-8"
+        />
+      )}
 
-        {blog.data.cover_image && (
-          <div className="mb-8">
-            <img 
-              src={blog.data.cover_image} 
-              alt={title} 
-              className="w-full h-auto rounded-lg object-cover"
-              style={{ maxHeight: '500px' }}
-            />
-          </div>
-        )}
+      {post.isLegacy ? (
+        // Render legacy content as HTML
+        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: typeof content === 'string' ? content : JSON.stringify(content) }} />
+      ) : (
+        // Render new content with EditorJS renderer
+        <BlogRenderer content={content} />
+      )}
 
-        <div className="prose prose-lg dark:prose-invert max-w-none">
-          <EditorJsRenderer data={content} />
-        </div>
+      {/* Comments Section */}
+      <BlogComments postId={post.id} />
 
-        <div className="mt-12">
-          <BlogComments 
-            blogId={blog.data.id} 
-            comments={comments} 
-            submitComment={submitComment}
-            submitting={submitting}
-            error={commentError}
-          />
-        </div>
-      </article>
+      {/* Recent Posts Section */}
+      <div className="mt-12 border-t pt-8">
+        <RecentPosts currentPostId={post.id} />
+      </div>
     </div>
   );
 };
