@@ -58,7 +58,7 @@ const Header = () => {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-4">
           <Link
-            to="/destinations"
+            to="/"
             className="text-foreground hover:text-tamec-600 transition-colors"
           >
             {t("nav.destinations")}
