@@ -58,7 +58,7 @@ export interface EditorJSBlogData {
 // Price, Salida, and TourDestino types to fix build errors
 export interface Precio {
   id: number;
-  salida_id: number;
+  salida_id: number | null;
   tipo_habitacion: 'doble' | 'triple' | 'individual' | 'niño';
   forma_pago: 'efectivo' | 'tarjeta';
   precio: number;
@@ -66,18 +66,18 @@ export interface Precio {
 
 export interface Salida {
   id: number;
-  tour_id: number;
-  fecha_salida: string;
+  tour_id: number | null;
+  fecha_salida: string | null;
   dias_duracion: number;
-  cupos_disponibles: number;
-  precios: Precio[];
+  cupos_disponibles: number | null;
+  precios?: Precio[];
 }
 
 export interface TourDestino {
   id: number;
-  tour_id: number;
-  destino_id: number;
-  orden: number;
+  tour_id: number | null;
+  destino_id: number | null;
+  orden: number | null;
   pais?: string;
   ciudad?: string;
 }

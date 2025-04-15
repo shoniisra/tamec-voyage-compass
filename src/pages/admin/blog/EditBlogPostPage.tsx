@@ -130,12 +130,11 @@ const EditBlogPostPage = () => {
               </div>
             ) : blog ? (
               <BlogEditor 
-                initialTitle={blog.title} 
-                initialTitle_en={blog.title_en}
-                initialContent={blog.content} 
-                initialContent_en={blog.content_en}
+                initialTitle={blog.title}
+                initialContent={blog.content}
                 initialCoverImage={blog.cover_image}
                 initialSlug={blog.slug || ''}
+                initialTags={[]}  // We'll load these separately via the hook
                 blogId={blog.id} 
                 isEdit={true} 
               />

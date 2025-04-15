@@ -69,8 +69,9 @@ const BlogEditor = ({
     color: tag.color || '#CBD5E1' // Provide a default color if none exists
   }));
 
-  // Create ref for Spanish editor
+  // Create ref for editor
   const editorRef = useRef<EditorJS | null>(null);
+  const editorInstanceRef = useRef<boolean>(false);
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormValues>({
     defaultValues: {
@@ -112,6 +113,7 @@ const BlogEditor = ({
         try {
           editorRef.current.destroy();
           editorRef.current = null;
+          editorInstanceRef.current = false;
         } catch (e) {
           console.error("Error destroying editor", e);
         }
@@ -120,6 +122,11 @@ const BlogEditor = ({
 
     // Initialize new editor
     const initEditor = async () => {
+      // Check if editor is already initialized to prevent multiple instances
+      if (editorInstanceRef.current) {
+        return;
+      }
+
       // Clean up any existing editor first
       cleanupEditor();
 
@@ -164,10 +171,7 @@ const BlogEditor = ({
             },
             link: {
               class: Link,
-              inlineToolbar: true,
-              config: {
-                endpoint: 'http://localhost:8008/fetchUrl'
-              }
+              inlineToolbar: true
             },
             underline: Underline,
             marker: {
@@ -261,6 +265,7 @@ const BlogEditor = ({
           data: Object.keys(initialContent).length > 0 ? initialContent : undefined,
           onReady: () => {
             console.log('Editor is ready to work');
+            editorInstanceRef.current = true;
           },
           onChange: () => {
             console.log('Editor content changed');
@@ -272,6 +277,7 @@ const BlogEditor = ({
       } catch (error) {
         console.error('Error initializing editor:', error);
         editorRef.current = null;
+        editorInstanceRef.current = false;
       }
     };
 
