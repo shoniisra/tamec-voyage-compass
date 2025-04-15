@@ -1,13 +1,12 @@
-
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, LogOut, User, Settings } from "lucide-react";
-import LanguageSwitch from '../language/LanguageSwitch';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { ThemeToggle } from '../theme/ThemeToggle';
-import { useTheme } from '@/providers/ThemeProvider';
+import LanguageSwitch from "../language/LanguageSwitch";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { ThemeToggle } from "../theme/ThemeToggle";
+import { useTheme } from "@/providers/ThemeProvider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,7 +28,7 @@ const Header = () => {
   };
 
   const handleAdminDashboard = () => {
-    navigate('/admin');
+    navigate("/admin");
     if (isMenuOpen) setIsMenuOpen(false);
   };
 
@@ -39,7 +38,7 @@ const Header = () => {
   };
 
   const handleLogin = () => {
-    navigate('/auth');
+    navigate("/auth");
     if (isMenuOpen) setIsMenuOpen(false);
   };
 
@@ -48,35 +47,54 @@ const Header = () => {
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <Link to="/" className="flex items-center">
           <img
-            src={`/assets/images/logos/${theme === 'dark' ? 'dark':'light'} horizontal.png`}
+            src={`/assets/images/logos/${
+              theme === "dark" ? "dark" : "light"
+            } horizontal.png`}
             alt="TAMEC Travel Agency"
             className="h-16 w-auto"
           />
         </Link>
-        
+
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-4">
-          <Link to="/" className="text-foreground hover:text-tamec-600 transition-colors">
-            {t('nav.home')}
+          <Link
+            to="/destinations"
+            className="text-foreground hover:text-tamec-600 transition-colors"
+          >
+            {t("nav.destinations")}
           </Link>
-          <Link to="/destinations" className="text-foreground hover:text-tamec-600 transition-colors">
-            {t('nav.destinations')}
+          <Link
+            to="/about-us"
+            className="text-foreground hover:text-tamec-600 transition-colors"
+          >
+            {t("nav.about")}
           </Link>
-          <Link to="/blog" className="text-foreground hover:text-tamec-600 transition-colors">
-            {t('nav.blog')}
+
+          <Link
+            to="/blog"
+            className="text-foreground hover:text-tamec-600 transition-colors"
+          >
+            {t("nav.blog")}
           </Link>
-          <Link to="/contact" className="text-foreground hover:text-tamec-600 transition-colors">
-            {t('nav.contact')}
+          <Link
+            to="/contact"
+            className="text-foreground hover:text-tamec-600 transition-colors"
+          >
+            {t("nav.contact")}
           </Link>
-          
+
           <div className="flex items-center space-x-2">
             <ThemeToggle />
             <LanguageSwitch />
-            
+
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon" className="rounded-full">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="rounded-full"
+                  >
                     <User size={18} />
                   </Button>
                 </DropdownMenuTrigger>
@@ -84,30 +102,36 @@ const Header = () => {
                   <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {isAdmin && (
-                    <DropdownMenuItem onClick={handleAdminDashboard} className="cursor-pointer">
+                    <DropdownMenuItem
+                      onClick={handleAdminDashboard}
+                      className="cursor-pointer"
+                    >
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Admin Dashboard</span>
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                  <DropdownMenuItem
+                    onClick={handleSignOut}
+                    className="cursor-pointer"
+                  >
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>{t('nav.logout')}</span>
+                    <span>{t("nav.logout")}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button onClick={handleLogin}>{t('nav.login')}</Button>
+              <Button onClick={handleLogin}>{t("nav.login")}</Button>
             )}
           </div>
         </nav>
-        
+
         {/* Mobile menu button */}
         <div className="md:hidden flex items-center gap-4">
           <ThemeToggle />
           <LanguageSwitch />
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={toggleMenu}
             aria-label="Toggle menu"
           >
@@ -115,45 +139,45 @@ const Header = () => {
           </Button>
         </div>
       </div>
-      
+
       {/* Mobile Navigation */}
       {isMenuOpen && (
         <div className="md:hidden bg-background border-b animate-fade-in">
           <div className="flex flex-col space-y-4 px-4 py-6">
-            <Link 
-              to="/" 
+            <Link
+              to="/about-us"
               className="text-foreground hover:text-tamec-600 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
-              {t('nav.home')}
+              {t("nav.home")}
             </Link>
-            <Link 
-              to="/destinations" 
+            <Link
+              to="/destinations"
               className="text-foreground hover:text-tamec-600 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
-              {t('nav.destinations')}
+              {t("nav.destinations")}
             </Link>
-            <Link 
-              to="/blog" 
+            <Link
+              to="/blog"
               className="text-foreground hover:text-tamec-600 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
-              {t('nav.blog')}
+              {t("nav.blog")}
             </Link>
-            <Link 
-              to="/contact" 
+            <Link
+              to="/contact"
               className="text-foreground hover:text-tamec-600 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
-              {t('nav.contact')}
+              {t("nav.contact")}
             </Link>
-            
+
             {user ? (
               <>
                 {isAdmin && (
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full flex justify-start"
                     onClick={handleAdminDashboard}
                   >
@@ -161,21 +185,18 @@ const Header = () => {
                     Admin Dashboard
                   </Button>
                 )}
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full flex justify-start"
                   onClick={handleSignOut}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  {t('nav.logout')}
+                  {t("nav.logout")}
                 </Button>
               </>
             ) : (
-              <Button 
-                className="w-full"
-                onClick={handleLogin}
-              >
-                {t('nav.login')}
+              <Button className="w-full" onClick={handleLogin}>
+                {t("nav.login")}
               </Button>
             )}
           </div>
