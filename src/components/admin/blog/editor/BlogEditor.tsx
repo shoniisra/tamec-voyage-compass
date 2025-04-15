@@ -10,6 +10,14 @@ import Underline from "@editorjs/underline";
 import InlineCode from "@editorjs/inline-code";
 import Marker from "@editorjs/marker";
 import Quote from "@editorjs/quote";
+import Table from "@editorjs/table";
+import Warning from "@editorjs/warning";
+import Delimiter from "@editorjs/delimiter";
+import Raw from "@editorjs/raw";
+// import Strikethrough from "@editorjs/strikethrough";
+import AlignmentTuneTool from "editorjs-text-alignment-blocktune";
+// import Subscript from "@editorjs/subscript";
+// import Superscript from "@editorjs/superscript";
 import { supabaseExtended } from "@/integrations/supabase/client-extended";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -124,6 +132,7 @@ const BlogEditor = ({
               class: Header,
               shortcut: 'CMD+SHIFT+H',
               inlineToolbar: true,
+              tunes: ['alignmentTune'],
               config: {
                 levels: [1, 2, 3, 4],
                 defaultLevel: 1
@@ -131,18 +140,28 @@ const BlogEditor = ({
             },
             list: {
               class: List as any,
-              inlineToolbar: true
+              inlineToolbar: true,
+              tunes: ['alignmentTune']
             },
             paragraph: {
               class: Paragraph,
-              // inlineToolbar: ['link', 'bold', 'italic', 'underline', 'marker'],
-              inlineToolbar: true,
+              inlineToolbar: ['link', 'bold', 'italic', 'underline', 'marker', 'inlineCode', 'strikethrough', 'subscript', 'superscript'],
+              tunes: ['alignmentTune'],
               config: {
                 preserveBlank: true,
-                placeholder: 'Write your content here...',
-                textAlignment: {
-                  default: 'left',
-                  alignments: ['left', 'center', 'right', 'justify']
+                placeholder: 'Write your content here...'
+              }
+            },
+            // strikethrough: Strikethrough,
+            // subscript: Subscript,
+            // superscript: Superscript,
+            alignmentTune: {
+              class: AlignmentTuneTool,
+              config: {
+                default: 'left',
+                blocks: {
+                  header: 'center',
+                  list: 'left'
                 }
               }
             },
@@ -171,6 +190,32 @@ const BlogEditor = ({
                 captionPlaceholder: 'Quote\'s author'
               }
             },
+          
+            table: {
+              class: Table as any,
+              inlineToolbar: true,
+              tunes: ['alignmentTune'],
+              config: {
+                rows: 2,
+                cols: 3,
+                withHeadings: true,
+                withRowNums: false,
+                defaultBorderWidth: 1,
+                defaultAlignment: 'left',
+                placeholder: 'Table content'
+              }
+            },
+            warning: {
+              class: Warning,
+              inlineToolbar: true,
+              shortcut: 'CMD+SHIFT+W',
+              config: {
+                titlePlaceholder: 'Title',
+                messagePlaceholder: 'Message'
+              }
+            },
+            delimiter: Delimiter,
+            raw: Raw,
             image: {
               class: Image,
               config: {
