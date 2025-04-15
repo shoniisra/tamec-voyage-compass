@@ -13,10 +13,9 @@ export function useBlogPosts() {
   const { toast } = useToast();
   const { language } = useLanguage();
 
-  useEffect(() => {
-    async function fetchPosts() {
-      try {
-        setLoading(true);
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
         
         // Fetch blog posts from the blogs table
         const { data, error } = await supabaseExtended
@@ -92,8 +91,9 @@ export function useBlogPosts() {
       }
     }
 
+  useEffect(() => {
     fetchPosts();
   }, [toast, language]);
 
-  return { posts, loading };
+  return { posts, loading, fetchPosts };
 }

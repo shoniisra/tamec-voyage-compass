@@ -12,8 +12,14 @@ import AdminSidebar from '@/components/admin/AdminSidebar';
 const BlogPostsPage = () => {
   const { isAdmin } = useAuth();
   const { t } = useLanguage();
-  const { posts, loading } = useBlogPosts();
+  const { posts, loading, fetchPosts } = useBlogPosts();
   const { deleteBlogPost } = useBlogPostManagement();
+
+  const handleDelete = async (id: string) => {
+    await deleteBlogPost(id, () => {
+      fetchPosts(); // Refresh the posts list after successful deletion
+    });
+  };
 
   if (!isAdmin) {
     return (
@@ -41,7 +47,7 @@ const BlogPostsPage = () => {
             <BlogPostsTable 
               posts={posts} 
               isLoading={loading} 
-              onDelete={deleteBlogPost} 
+              onDelete={handleDelete} 
             />
           </div>
         </div>

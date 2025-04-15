@@ -124,7 +124,7 @@ export function useBlogPostManagement() {
   };
 
   // Delete a blog post
-  const deleteBlogPost = async (id: string) => {
+  const deleteBlogPost = async (id: string, onSuccess?: () => void) => {
     try {
       setIsLoading(true);
       
@@ -140,6 +140,11 @@ export function useBlogPostManagement() {
         title: "Success",
         description: "Blog post deleted successfully",
       });
+      
+      // Call the onSuccess callback if provided
+      if (onSuccess) {
+        onSuccess();
+      }
       
     } catch (error: any) {
       console.error('Error deleting blog post:', error);
