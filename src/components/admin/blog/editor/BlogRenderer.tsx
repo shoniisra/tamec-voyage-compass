@@ -10,14 +10,14 @@ interface BlogRendererProps {
 const renderers = {
   header: ({ data, style }: any) => {
     const Tag = `h${data.level}` as keyof JSX.IntrinsicElements;
-    return <Tag className="mt-6 mb-3 font-bold">{data.text}</Tag>;
+    return <Tag className="mt-6 mb-3 font-bold text-left">{data.text}</Tag>;
   },
   paragraph: ({ data }: any) => {
-    return <p className="my-4" dangerouslySetInnerHTML={{ __html: data.text }} />;
+    return <p className="my-4 text-left" dangerouslySetInnerHTML={{ __html: data.text }} />;
   },
   list: ({ data }: any) => {
     const ListTag = data.style === 'ordered' ? 'ol' : 'ul';
-    const listClasses = "list-inside my-4 " + 
+    const listClasses = "list-inside my-4 text-left " + 
       (data.style === 'ordered' ? 'list-decimal' : 'list-disc');
     
     return (
@@ -37,7 +37,7 @@ const renderers = {
           className="max-w-full rounded-md" 
         />
         {data.caption && (
-          <p className="text-center text-gray-500 mt-1">{data.caption}</p>
+          <p className="text-center text-gray-500 mt-1 text-left">{data.caption}</p>
         )}
       </div>
     );
@@ -50,7 +50,7 @@ const BlogRenderer = ({ content }: BlogRendererProps) => {
   }
 
   return (
-    <div className="blog-content prose max-w-none">
+    <div className="blog-content prose max-w-none text-left">
       <Output data={content} renderers={renderers} />
     </div>
   );

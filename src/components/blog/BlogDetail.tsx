@@ -44,15 +44,9 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
                  (language === 'en' && post.title_en ? post.title_en : 
                  (typeof post.title === 'object' ? JSON.stringify(post.title) : 'Untitled Post'));
   
-  const content = post.isLegacy 
-    ? (language === 'en' ? post.content_en : post.content)
-    : post.content || post.newContent;
+  const content = language === 'en' ? post.content_en : post.content_es;
     
-  const formattedDate = post.date 
-    ? new Date(post.date).toLocaleDateString() 
-    : post.created_at 
-      ? new Date(post.created_at).toLocaleDateString()
-      : '';
+  const formattedDate =  new Date(post.date).toLocaleDateString() || '';
 
   return (
     <div className="container mx-auto px-4 py-8">
