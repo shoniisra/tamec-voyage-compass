@@ -71,7 +71,7 @@ const BlogEditor = ({
 
   // Create ref for editor
   const editorRef = useRef<EditorJS | null>(null);
-  const editorInstanceRef = useRef<boolean>(false);
+  const editorInitializedRef = useRef<boolean>(false);
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormValues>({
     defaultValues: {
@@ -113,7 +113,8 @@ const BlogEditor = ({
         try {
           editorRef.current.destroy();
           editorRef.current = null;
-          editorInstanceRef.current = false;
+          editorInitializedRef.current = false;
+          console.log("Editor destroyed successfully");
         } catch (e) {
           console.error("Error destroying editor", e);
         }
@@ -123,15 +124,24 @@ const BlogEditor = ({
     // Initialize new editor
     const initEditor = async () => {
       // Check if editor is already initialized to prevent multiple instances
-      if (editorInstanceRef.current) {
+      if (editorInitializedRef.current) {
+        console.log("Editor already initialized, skipping initialization");
         return;
       }
 
       // Clean up any existing editor first
       cleanupEditor();
 
+      const editorElement = document.getElementById('editor');
+      if (!editorElement) {
+        console.error("Editor element not found");
+        return;
+      }
+
       // Create new editor instance with proper error handling
       try {
+        console.log("Initializing editor with data:", initialContent);
+        
         const editor = new EditorJS({
           holder: "editor",
           tools: {
@@ -265,29 +275,44 @@ const BlogEditor = ({
           data: Object.keys(initialContent).length > 0 ? initialContent : undefined,
           onReady: () => {
             console.log('Editor is ready to work');
-            editorInstanceRef.current = true;
+            editorInitializedRef.current = true;
           },
           onChange: () => {
             console.log('Editor content changed');
           },
           autofocus: true,
+          // Enable paste handling with configuration
+          minHeight: 300,
+          logLevel: 'VERBOSE',
+          
+          // Fix paste functionality
+          paste: {
+            // Enable plain text paste handling
+            plainText: true,
+            // Enable HTML paste handling
+            htmlText: true,
+            // Optional handlers for specific types of pasted content
+            imageTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp'],
+            patterns: {
+              image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png|webp|bmp)$/i,
+              video: /https?:\/\/\S+\.(mp4|webm|ogv|mov|avi)$/i,
+            }
+          }
         });
 
         editorRef.current = editor;
+        console.log("Editor initialized successfully");
       } catch (error) {
         console.error('Error initializing editor:', error);
         editorRef.current = null;
-        editorInstanceRef.current = false;
+        editorInitializedRef.current = false;
       }
     };
 
     // Initialize editor with error handling
-    const editorElement = document.getElementById('editor');
-    if (editorElement) {
-      initEditor().catch(error => {
-        console.error('Editor initialization failed:', error);
-      });
-    }
+    initEditor().catch(error => {
+      console.error('Editor initialization failed:', error);
+    });
 
     // Cleanup on component unmount
     return cleanupEditor;
