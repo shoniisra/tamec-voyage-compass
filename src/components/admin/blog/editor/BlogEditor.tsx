@@ -104,21 +104,9 @@ const BlogEditor = ({
     let editor: EditorJS | null = null;
 
     const initEditor = async () => {
-      // Only attempt to destroy if the editor instance exists and is ready
+      // If editor already exists and has content, don't reinitialize
       if (spanishEditorRef.current) {
-        try {
-          const isReady = await Promise.race([
-            spanishEditorRef.current.isReady,
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Editor not ready')), 1000))
-          ]);
-
-          if (isReady) {
-            await spanishEditorRef.current.destroy();
-          }
-        } catch (e) {
-          console.error("Editor cleanup skipped:", e);
-        }
-        spanishEditorRef.current = null;
+        return;
       }
 
       // Create new editor instance with proper error handling
@@ -201,46 +189,31 @@ const BlogEditor = ({
     };
 
     // Initialize editor with error handling
-    if (activeTab === "spanish") {
-      initEditor().catch(error => {
-        console.error('Spanish editor initialization failed:', error);
-      });
-    }
+    initEditor().catch(error => {
+      console.error('Spanish editor initialization failed:', error);
+    });
 
+    // Only destroy editor when component unmounts
     return () => {
-      if (editor) {
-        editor.isReady.then(() => {
-          editor?.destroy();
-          if (activeTab === "spanish") {
-            spanishEditorRef.current = null;
-          }
+      if (spanishEditorRef.current) {
+        spanishEditorRef.current.isReady.then(() => {
+          spanishEditorRef.current?.destroy();
+          spanishEditorRef.current = null;
         }).catch((e) => {
           console.error("Error destroying Spanish editor", e);
         });
       }
     };
-  }, [initialContent, activeTab]);
+  }, [initialContent]);
 
   // Initialize English editor
   useEffect(() => {
     let editor: EditorJS | null = null;
 
     const initEditor = async () => {
-      // Only attempt to destroy if the editor instance exists and is ready
+      // If editor already exists and has content, don't reinitialize
       if (englishEditorRef.current) {
-        try {
-          const isReady = await Promise.race([
-            englishEditorRef.current.isReady,
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Editor not ready')), 1000))
-          ]);
-
-          if (isReady) {
-            await englishEditorRef.current.destroy();
-          }
-        } catch (e) {
-          console.error("Editor cleanup skipped:", e);
-        }
-        englishEditorRef.current = null;
+        return;
       }
 
       // Create new editor instance with proper error handling
@@ -323,25 +296,22 @@ const BlogEditor = ({
     };
 
     // Initialize editor with error handling
-    if (activeTab === "english") {
-      initEditor().catch(error => {
-        console.error('English editor initialization failed:', error);
-      });
-    }
+    initEditor().catch(error => {
+      console.error('English editor initialization failed:', error);
+    });
 
+    // Only destroy editor when component unmounts
     return () => {
-      if (editor) {
-        editor.isReady.then(() => {
-          editor?.destroy();
-          if (activeTab === "english") {
-            englishEditorRef.current = null;
-          }
+      if (englishEditorRef.current) {
+        englishEditorRef.current.isReady.then(() => {
+          englishEditorRef.current?.destroy();
+          englishEditorRef.current = null;
         }).catch((e) => {
           console.error("Error destroying English editor", e);
         });
       }
     };
-  }, [initialContent_en, activeTab]);
+  }, [initialContent_en]);
 
   const handleGenerateSlug = () => {
     // Generate slug from Spanish title if available, otherwise from English title
