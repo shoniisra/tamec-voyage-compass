@@ -131,7 +131,9 @@ const EditBlogPostPage = () => {
             ) : blog ? (
               <BlogEditor 
                 initialTitle={blog.title} 
+                initialTitle_en={blog.title_en}
                 initialContent={blog.content} 
+                initialContent_en={blog.content_en}
                 initialCoverImage={blog.cover_image}
                 initialSlug={blog.slug || ''}
                 blogId={blog.id} 
