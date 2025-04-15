@@ -14,10 +14,7 @@ import Table from "@editorjs/table";
 import Warning from "@editorjs/warning";
 import Delimiter from "@editorjs/delimiter";
 import Raw from "@editorjs/raw";
-// import Strikethrough from "@editorjs/strikethrough";
 import AlignmentTuneTool from "editorjs-text-alignment-blocktune";
-// import Subscript from "@editorjs/subscript";
-// import Superscript from "@editorjs/superscript";
 import { supabaseExtended } from "@/integrations/supabase/client-extended";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,9 +25,10 @@ import { toKebabCase } from "@/utils/stringUtils";
 import { useForm } from "react-hook-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useTags, Tag } from "@/hooks/use-tags";
+import { useTags } from "@/hooks/use-tags";
 import { useBlogTags } from "@/hooks/use-blog-tags";
 import { MultiSelect } from "@/components/ui/multi-select";
+import { useBlogPostManagement } from "@/hooks/use-blog-post-management";
 
 interface FormValues {
   title: string;
@@ -68,6 +66,7 @@ const BlogEditor = ({
   const { t, language } = useLanguage();
   const { tags: allTags, loading: tagsLoading } = useTags();
   const { getBlogTags, updateBlogTags } = useBlogTags();
+  const { createEditorJSBlogPost, updateEditorJSBlogPost } = useBlogPostManagement();
 
   // Format tags for MultiSelect component
   const tagOptions = allTags.map(tag => ({
@@ -115,17 +114,26 @@ const BlogEditor = ({
 
   // Initialize Spanish editor
   useEffect(() => {
-    let editor: EditorJS | null = null;
-
-    const initEditor = async () => {
-      // If editor already exists and has content, don't reinitialize
+    // Cleanup function for editor instance
+    const cleanupEditor = () => {
       if (spanishEditorRef.current) {
-        return;
+        try {
+          spanishEditorRef.current.destroy();
+          spanishEditorRef.current = null;
+        } catch (e) {
+          console.error("Error destroying Spanish editor", e);
+        }
       }
+    };
+
+    // Initialize new editor
+    const initEditor = async () => {
+      // Clean up any existing editor first
+      cleanupEditor();
 
       // Create new editor instance with proper error handling
       try {
-        editor = new EditorJS({
+        const editor = new EditorJS({
           holder: "spanish-editor",
           tools: {
             header: {
@@ -145,16 +153,13 @@ const BlogEditor = ({
             },
             paragraph: {
               class: Paragraph,
-              inlineToolbar: ['link', 'bold', 'italic', 'underline', 'marker', 'inlineCode', 'strikethrough', 'subscript', 'superscript'],
+              inlineToolbar: ['link', 'bold', 'italic', 'underline', 'marker', 'inlineCode'],
               tunes: ['alignmentTune'],
               config: {
                 preserveBlank: true,
                 placeholder: 'Write your content here...'
               }
             },
-            // strikethrough: Strikethrough,
-            // subscript: Subscript,
-            // superscript: Superscript,
             alignmentTune: {
               class: AlignmentTuneTool,
               config: {
@@ -190,7 +195,6 @@ const BlogEditor = ({
                 captionPlaceholder: 'Quote\'s author'
               }
             },
-          
             table: {
               class: Table as any,
               inlineToolbar: true,
@@ -199,10 +203,6 @@ const BlogEditor = ({
                 rows: 2,
                 cols: 3,
                 withHeadings: true,
-                withRowNums: false,
-                defaultBorderWidth: 1,
-                defaultAlignment: 'left',
-                placeholder: 'Table content'
               }
             },
             warning: {
@@ -266,11 +266,16 @@ const BlogEditor = ({
               }
             }
           },
-          data: Object.keys(initialContent).length > 0 ? initialContent : {}
+          data: Object.keys(initialContent).length > 0 ? initialContent : undefined,
+          onReady: () => {
+            console.log('Spanish Editor is ready to work');
+          },
+          onChange: () => {
+            console.log('Spanish Editor content changed');
+          },
+          autofocus: true,
         });
 
-        // Wait for editor to be ready before assigning to ref
-        await editor.isReady;
         spanishEditorRef.current = editor;
       } catch (error) {
         console.error('Error initializing Spanish editor:', error);
@@ -279,41 +284,45 @@ const BlogEditor = ({
     };
 
     // Initialize editor with error handling
-    initEditor().catch(error => {
-      console.error('Spanish editor initialization failed:', error);
-    });
+    const editorElement = document.getElementById('spanish-editor');
+    if (editorElement) {
+      initEditor().catch(error => {
+        console.error('Spanish editor initialization failed:', error);
+      });
+    }
 
-    // Only destroy editor when component unmounts
-    return () => {
-      if (spanishEditorRef.current) {
-        spanishEditorRef.current.isReady.then(() => {
-          spanishEditorRef.current?.destroy();
-          spanishEditorRef.current = null;
-        }).catch((e) => {
-          console.error("Error destroying Spanish editor", e);
-        });
-      }
-    };
+    // Cleanup on component unmount
+    return cleanupEditor;
   }, [initialContent]);
 
   // Initialize English editor
   useEffect(() => {
-    let editor: EditorJS | null = null;
-
-    const initEditor = async () => {
-      // If editor already exists and has content, don't reinitialize
+    // Cleanup function for editor instance
+    const cleanupEditor = () => {
       if (englishEditorRef.current) {
-        return;
+        try {
+          englishEditorRef.current.destroy();
+          englishEditorRef.current = null;
+        } catch (e) {
+          console.error("Error destroying English editor", e);
+        }
       }
+    };
+
+    // Initialize new editor
+    const initEditor = async () => {
+      // Clean up any existing editor first
+      cleanupEditor();
 
       // Create new editor instance with proper error handling
       try {
-        editor = new EditorJS({
+        const editor = new EditorJS({
           holder: "english-editor",
           tools: {
             header: {
               class: Header,
               inlineToolbar: true,
+              tunes: ['alignmentTune'],
               config: {
                 levels: [1, 2, 3],
                 defaultLevel: 1
@@ -321,17 +330,25 @@ const BlogEditor = ({
             },
             list: {
               class: List as any,
-              inlineToolbar: true
+              inlineToolbar: true,
+              tunes: ['alignmentTune']
             },
             paragraph: {
               class: Paragraph,
               inlineToolbar: ['link', 'bold', 'italic', 'underline', 'marker'],
+              tunes: ['alignmentTune'],
               config: {
                 preserveBlank: true,
-                placeholder: 'Write your content here...',
-                textAlignment: {
-                  default: 'left',
-                  alignments: ['left', 'center', 'right', 'justify']
+                placeholder: 'Write your content here...'
+              }
+            },
+            alignmentTune: {
+              class: AlignmentTuneTool,
+              config: {
+                default: 'left',
+                blocks: {
+                  header: 'center',
+                  list: 'left'
                 }
               }
             },
@@ -410,11 +427,15 @@ const BlogEditor = ({
               }
             }
           },
-          data: Object.keys(initialContent_en).length > 0 ? initialContent_en : {}
+          data: Object.keys(initialContent_en).length > 0 ? initialContent_en : undefined,
+          onReady: () => {
+            console.log('English Editor is ready to work');
+          },
+          onChange: () => {
+            console.log('English Editor content changed');
+          },
         });
 
-        // Wait for editor to be ready before assigning to ref
-        await editor.isReady;
         englishEditorRef.current = editor;
       } catch (error) {
         console.error('Error initializing English editor:', error);
@@ -422,23 +443,22 @@ const BlogEditor = ({
       }
     };
 
-    // Initialize editor with error handling
-    initEditor().catch(error => {
-      console.error('English editor initialization failed:', error);
-    });
+    // Initialize editor only when the tab is active
+    const editorElement = document.getElementById('english-editor');
+    if (editorElement && activeTab === "english") {
+      initEditor().catch(error => {
+        console.error('English editor initialization failed:', error);
+      });
+    }
 
-    // Only destroy editor when component unmounts
-    return () => {
-      if (englishEditorRef.current) {
-        englishEditorRef.current.isReady.then(() => {
-          englishEditorRef.current?.destroy();
-          englishEditorRef.current = null;
-        }).catch((e) => {
-          console.error("Error destroying English editor", e);
-        });
-      }
-    };
-  }, [initialContent_en]);
+    // Cleanup on component unmount or tab change
+    return cleanupEditor;
+  }, [initialContent_en, activeTab]);
+
+  // Handle tab change to initialize editors only when needed
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
 
   const handleGenerateSlug = () => {
     // Generate slug from Spanish title if available, otherwise from English title
@@ -497,30 +517,23 @@ const BlogEditor = ({
 
       // Save Spanish content
       const spanishOutputData = await spanishEditorRef.current.save();
-      const spanishContentData = spanishOutputData as any;
-
+      
       // Save English content if available
-      let englishContentData = {};
+      let englishOutputData = {};
       if (englishEditorRef.current) {
-        const englishOutputData = await englishEditorRef.current.save();
-        englishContentData = englishOutputData as any;
+        englishOutputData = await englishEditorRef.current.save();
       }
 
       if (isEdit && blogId) {
-        const { error } = await supabaseExtended
-          .from('blogs')
-          .update({
-            title: formData.title,
-            title_en: formData.title_en,
-            content: spanishContentData,
-            content_en: englishContentData,
-            cover_image: formData.coverImage,
-            slug: formData.slug,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', blogId);
-
-        if (error) throw error;
+        // Use the hook for updating
+        await updateEditorJSBlogPost(blogId, {
+          title: formData.title,
+          title_en: formData.title_en,
+          content: spanishOutputData,
+          content_en: englishOutputData,
+          cover_image: formData.coverImage,
+          slug: formData.slug,
+        });
         
         // Update blog tags
         await updateBlogTags(blogId, formData.tags);
@@ -530,26 +543,19 @@ const BlogEditor = ({
           description: "Blog post updated successfully",
         });
       } else {
-        // Create new blog post
-        const { data, error } = await supabaseExtended
-          .from('blogs')
-          .insert({
-            title: formData.title,
-            title_en: formData.title_en,
-            content: spanishContentData,
-            content_en: englishContentData,
-            cover_image: formData.coverImage,
-            slug: formData.slug,
-            created_at: new Date().toISOString()
-          })
-          .select();
-
-        if (error) throw error;
+        // Use the hook for creating
+        const data = await createEditorJSBlogPost({
+          title: formData.title,
+          title_en: formData.title_en,
+          content: spanishOutputData,
+          content_en: englishOutputData,
+          cover_image: formData.coverImage,
+          slug: formData.slug,
+        });
         
         // If tags are selected, add them to the blog post
-        if (data && data.length > 0 && formData.tags.length > 0) {
-          const newBlogId = data[0].id;
-          await updateBlogTags(newBlogId, formData.tags);
+        if (data && formData.tags.length > 0) {
+          await updateBlogTags(data.id, formData.tags);
         }
 
         toast({
@@ -689,7 +695,7 @@ const BlogEditor = ({
           </div>
 
           {/* Language Tabs */}
-          <Tabs defaultValue="spanish" onValueChange={setActiveTab} value={activeTab}>
+          <Tabs defaultValue="spanish" onValueChange={handleTabChange} value={activeTab}>
             <TabsList className="mb-4">
               <TabsTrigger value="spanish">Español</TabsTrigger>
               <TabsTrigger value="english">English</TabsTrigger>

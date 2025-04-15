@@ -11,6 +11,7 @@ interface EditorJSBlogData {
   slug?: string;
   cover_image?: string;
   title_en?: string;
+  content_en?: any;
 }
 
 export function useBlogPostManagement() {
@@ -38,16 +39,19 @@ export function useBlogPostManagement() {
       }
       
       // Insert new post
-      const { error } = await supabaseExtended
+      const { data: newPost, error } = await supabaseExtended
         .from('blogs')
         .insert({
           title: data.title,
           title_en: data.title_en,
           content: data.content,
+          content_en: data.content_en,
           cover_image: data.cover_image,
           slug: data.slug,
           created_at: new Date().toISOString(),
-        });
+        })
+        .select('*')
+        .single();
       
       if (error) throw error;
       
@@ -55,6 +59,8 @@ export function useBlogPostManagement() {
         title: "Success",
         description: "Blog post created successfully",
       });
+      
+      return newPost;
       
     } catch (error: any) {
       console.error('Error creating EditorJS blog post:', error);
@@ -97,6 +103,7 @@ export function useBlogPostManagement() {
           title: data.title,
           title_en: data.title_en,
           content: data.content,
+          content_en: data.content_en,
           cover_image: data.cover_image,
           slug: data.slug,
           updated_at: new Date().toISOString(),

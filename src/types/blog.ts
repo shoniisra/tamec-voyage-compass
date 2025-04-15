@@ -4,7 +4,7 @@ export interface BlogPost {
   id: string;
   title: string;
   title_en?: string;
-  content_en?: string;
+  content_en?: any; // Changed from string to any to match EditorJS JSON structure
   content_es?: string;
   category_en?: string;
   category_es?: string;
