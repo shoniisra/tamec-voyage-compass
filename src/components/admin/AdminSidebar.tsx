@@ -142,7 +142,7 @@ const AdminSidebar: React.FC = () => {
   ];
 
   return (
-    <div className="w-full h-full bg-gray-50 dark:bg-gray-900 border rounded-md p-4">
+    <div className="w-full h-full bg-gray-50 dark:bg-gray-900 border rounded-md p-4 max-w-xs">
       <nav className="flex flex-col space-y-1">
         <ul>
           {navItems.map(item => (

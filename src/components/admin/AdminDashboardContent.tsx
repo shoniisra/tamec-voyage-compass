@@ -51,7 +51,7 @@ const AdminDashboardContent = () => {
   ];
 
   return (
-    <div className="container mx-auto p-6 bg-white rounded-lg shadow-sm">
+    <div className="container mx-auto p-6 bg-white rounded-lg shadow-sm dark:bg-gray-900">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">
