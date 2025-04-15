@@ -22,7 +22,7 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container md:px-32 mx-auto px-4 py-8">
         <Skeleton className="h-12 w-3/4 mb-6" />
         <Skeleton className="h-6 w-1/4 mb-8" />
         <Skeleton className="h-96 w-full mb-8" />
@@ -56,7 +56,7 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
   const formattedDate =  new Date(post.date).toLocaleDateString() || '';
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container md:px-32 mx-auto px-4 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main content area - takes up 2/3 of the space on large screens */}
         <div className="lg:col-span-2">
