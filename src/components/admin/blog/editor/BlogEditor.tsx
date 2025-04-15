@@ -52,8 +52,15 @@ const BlogEditor = ({
   const { toast } = useToast();
   const navigate = useNavigate();
   const { t, language } = useLanguage();
-  const { tags, loading: tagsLoading } = useTags();
+  const { tags: allTags, loading: tagsLoading } = useTags();
   const { getBlogTags, updateBlogTags } = useBlogTags();
+
+  // Format tags for MultiSelect component
+  const tagOptions = allTags.map(tag => ({
+    value: tag.id,
+    label: tag.name,
+    color: tag.color || '#CBD5E1' // Provide a default color if none exists
+  }));
 
   // Create separate refs for Spanish and English editors
   const spanishEditorRef = useRef<EditorJS | null>(null);
@@ -569,11 +576,7 @@ const BlogEditor = ({
               Tags
             </label>
             <MultiSelect
-              options={tags.map(tag => ({
-                value: tag.id,
-                label: tag.name,
-                color: tag.color
-              }))}
+              options={tagOptions}
               selected={watch('tags')}
               onChange={(selectedValues) => setValue('tags', selectedValues)}
               placeholder="Select tags for this post"

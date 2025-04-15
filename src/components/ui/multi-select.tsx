@@ -46,7 +46,11 @@ export function MultiSelect({
     return acc;
   }, {} as Record<string, OptionType>);
 
-  const getContrastColor = (hexColor: string): string => {
+  const getContrastColor = (hexColor?: string): string => {
+    if (!hexColor || !/^#[0-9A-Fa-f]{6}$/.test(hexColor)) {
+      return '#000000'; // Default to black for invalid or missing colors
+    }
+    
     // Convert hex to RGB
     const r = parseInt(hexColor.slice(1, 3), 16);
     const g = parseInt(hexColor.slice(3, 5), 16);
@@ -78,12 +82,12 @@ export function MultiSelect({
                     key={item} 
                     variant="secondary"
                     className="flex items-center gap-1"
-                    style={option.color ? { 
+                    style={option?.color ? { 
                       backgroundColor: option.color,
                       color: getContrastColor(option.color)
                     } : undefined}
                   >
-                    {option?.label}
+                    {option?.label || item}
                     <button
                       className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                       onKeyDown={(e) => {
