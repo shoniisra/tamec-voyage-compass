@@ -133,16 +133,23 @@ const translations: Translations = {
     contact: {
       title: 'Contact Us',
       subtitle: 'Have questions? Reach out to us and we\'ll be happy to help.',
-      formName: 'Your Name',
-      formEmail: 'Your Email',
-      formSubject: 'Subject',
-      formMessage: 'Message',
-      formSubmit: 'Send Message',
-      infoTitle: 'Get In Touch',
-      infoAddressLabel: 'Address',
-      infoEmailLabel: 'Email',
-      infoPhoneLabel: 'Phone',
-      infoSocialLabel: 'Follow Us',
+      form:{
+        title: 'Get In Touch',
+        description: 'Write us a message and we\'ll get back to you as soon as possible.',
+        fullName: 'Your Name',
+        email: 'Your Email',
+        phone: 'Phone',
+        message: 'Message',
+
+        namePlaceholder: 'Write your name',
+        emailPlaceholder: 'nombre@email.com',
+        phonePlaceholder: '0987654321',
+        messagePlaceholder: 'Write your message',
+        submit: 'Send Message',
+      },
+      
+      
+      findUs: 'Find Us',
     },
     auth: {
       login: 'Login',
@@ -299,16 +306,23 @@ const translations: Translations = {
     contact: {
       title: 'Contáctanos',
       subtitle: '¿Tienes preguntas? Comunícate con nosotros y estaremos encantados de ayudarte.',
-      formName: 'Tu Nombre',
-      formEmail: 'Tu Email',
-      formSubject: 'Asunto',
-      formMessage: 'Mensaje',
-      formSubmit: 'Enviar Mensaje',
-      infoTitle: 'Ponte en Contacto',
-      infoAddressLabel: 'Dirección',
-      infoEmailLabel: 'Email',
-      infoPhoneLabel: 'Teléfono',
-      infoSocialLabel: 'Síguenos',
+      form:{
+        title: 'Escríbenos un mensaje',
+        description: 'Envianos un mensaje y te responderemos lo antes posible.',
+        fullName: 'Tu Nombre',
+        email: 'Tu Email',
+        phone: 'Teléfono',
+        message: 'Mensaje',
+
+        namePlaceholder: 'Escribe tu nombre',
+        emailPlaceholder: 'nombre@email.com',
+        phonePlaceholder: '0987654321',
+        messagePlaceholder: 'Escribe tu Mensaje',
+        submit: 'Enviar Mensaje',
+      },
+      
+      
+      findUs: 'Encuéntranos',
     },
     auth: {
       login: 'Iniciar Sesión',

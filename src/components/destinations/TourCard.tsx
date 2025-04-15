@@ -53,7 +53,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
       <Card className="overflow-hidden h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
         <div className="relative">
           {/* Featured Image */}
-          <div className="relative h-48 overflow-hidden">
+          <div className="relative h-60 overflow-hidden">
             <img 
               src={featuredImage} 
               alt={tour.titulo} 

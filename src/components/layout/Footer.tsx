@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPinned, Globe } from 'lucide-react';
+import { Facebook, Instagram, Mail, Phone, MapPinned, Globe } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const Footer = () => {
@@ -16,20 +16,23 @@ const Footer = () => {
             <img
               src={`/assets/images/logos/dark vertical.png`}
               alt="TAMEC Travel Agency"
-              className="h-24 w-auto mb-4"
+              className="h-28 w-28 my-4 "
             />
             <p className="text-gray-400 mb-4">
               {language === 'en' ? 'Unique travels, eternal memories.' : 'Viajes únicos, recuerdos eternos.'}
             </p>
             <div className="flex space-x-4">
-              <a href="https://instagram.com" className="text-gray-400 hover:text-tamec-300 transition-colors">
-                <Instagram size={20} />
+              <a href="https://www.instagram.com/tamecviajes/" className="text-tamec-100 hover:text-tamec-300 transition-colors">
+                <Instagram size={20}  />
               </a>
-              <a href="https://facebook.com" className="text-gray-400 hover:text-tamec-300 transition-colors">
+              <a href="https://www.facebook.com/tamecviajes" className="text-tamec-100 hover:text-tamec-300 transition-colors">
                 <Facebook size={20} />
               </a>
-              <a href="https://wa.me/593999778220" className="text-gray-400 hover:text-tamec-300 transition-colors">
-                <Twitter size={20} />
+              <a href="https://www.tiktok.com/@tamecviajes" className="text-tamec-100 hover:text-tamec-300 transition-colors">
+                
+        <svg className="h-5 w-5 " viewBox="0 0 256 256" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <path d="M176 32c-13.25 0-24-10.75-24-24h-32v144a24 24 0 1 1-24-24v-32a56 56 0 1 0 56 56V86.1a89.6 89.6 0 0 0 48 13.9V64a32 32 0 0 1-24-32z" />
+</svg>
               </a>
             </div>
           </div>
