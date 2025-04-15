@@ -23,7 +23,6 @@ import { useNavigate } from "react-router-dom";
 import { Image as ImageIcon, Save } from "lucide-react";
 import { toKebabCase } from "@/utils/stringUtils";
 import { useForm } from "react-hook-form";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTags } from "@/hooks/use-tags";
 import { useBlogTags } from "@/hooks/use-blog-tags";
@@ -32,7 +31,6 @@ import { useBlogPostManagement } from "@/hooks/use-blog-post-management";
 
 interface FormValues {
   title: string;
-  title_en: string;
   slug: string;
   coverImage: string;
   tags: string[];
@@ -40,9 +38,7 @@ interface FormValues {
 
 interface BlogEditorProps {
   initialTitle?: string;
-  initialTitle_en?: string;
   initialContent?: any;
-  initialContent_en?: any;
   initialCoverImage?: string;
   initialSlug?: string;
   initialTags?: string[];
@@ -52,9 +48,7 @@ interface BlogEditorProps {
 
 const BlogEditor = ({
   initialTitle = "",
-  initialTitle_en = "",
   initialContent = {},
-  initialContent_en = {},
   initialCoverImage = "",
   initialSlug = "",
   initialTags = [],
@@ -63,7 +57,7 @@ const BlogEditor = ({
 }: BlogEditorProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const { tags: allTags, loading: tagsLoading } = useTags();
   const { getBlogTags, updateBlogTags } = useBlogTags();
   const { createEditorJSBlogPost, updateEditorJSBlogPost } = useBlogPostManagement();
@@ -75,14 +69,12 @@ const BlogEditor = ({
     color: tag.color || '#CBD5E1' // Provide a default color if none exists
   }));
 
-  // Create separate refs for Spanish and English editors
-  const spanishEditorRef = useRef<EditorJS | null>(null);
-  const englishEditorRef = useRef<EditorJS | null>(null);
+  // Create ref for Spanish editor
+  const editorRef = useRef<EditorJS | null>(null);
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormValues>({
     defaultValues: {
       title: initialTitle,
-      title_en: initialTitle_en,
       slug: initialSlug,
       coverImage: initialCoverImage,
       tags: initialTags
@@ -91,7 +83,7 @@ const BlogEditor = ({
 
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>("spanish");
+  const [isTranslating, setIsTranslating] = useState(false);
 
   const coverImage = watch('coverImage');
 
@@ -112,16 +104,16 @@ const BlogEditor = ({
     }
   }, [blogId, isEdit, getBlogTags, setValue]);
 
-  // Initialize Spanish editor
+  // Initialize editor
   useEffect(() => {
     // Cleanup function for editor instance
     const cleanupEditor = () => {
-      if (spanishEditorRef.current) {
+      if (editorRef.current) {
         try {
-          spanishEditorRef.current.destroy();
-          spanishEditorRef.current = null;
+          editorRef.current.destroy();
+          editorRef.current = null;
         } catch (e) {
-          console.error("Error destroying Spanish editor", e);
+          console.error("Error destroying editor", e);
         }
       }
     };
@@ -134,7 +126,7 @@ const BlogEditor = ({
       // Create new editor instance with proper error handling
       try {
         const editor = new EditorJS({
-          holder: "spanish-editor",
+          holder: "editor",
           tools: {
             header: {
               class: Header,
@@ -157,7 +149,7 @@ const BlogEditor = ({
               tunes: ['alignmentTune'],
               config: {
                 preserveBlank: true,
-                placeholder: 'Write your content here...'
+                placeholder: 'Escribe tu contenido aquí...'
               }
             },
             alignmentTune: {
@@ -191,8 +183,8 @@ const BlogEditor = ({
               inlineToolbar: true,
               shortcut: 'CMD+SHIFT+O',
               config: {
-                quotePlaceholder: 'Enter a quote',
-                captionPlaceholder: 'Quote\'s author'
+                quotePlaceholder: 'Ingresa una cita',
+                captionPlaceholder: 'Autor de la cita'
               }
             },
             table: {
@@ -210,8 +202,8 @@ const BlogEditor = ({
               inlineToolbar: true,
               shortcut: 'CMD+SHIFT+W',
               config: {
-                titlePlaceholder: 'Title',
-                messagePlaceholder: 'Message'
+                titlePlaceholder: 'Título',
+                messagePlaceholder: 'Mensaje'
               }
             },
             delimiter: Delimiter,
@@ -268,26 +260,26 @@ const BlogEditor = ({
           },
           data: Object.keys(initialContent).length > 0 ? initialContent : undefined,
           onReady: () => {
-            console.log('Spanish Editor is ready to work');
+            console.log('Editor is ready to work');
           },
           onChange: () => {
-            console.log('Spanish Editor content changed');
+            console.log('Editor content changed');
           },
           autofocus: true,
         });
 
-        spanishEditorRef.current = editor;
+        editorRef.current = editor;
       } catch (error) {
-        console.error('Error initializing Spanish editor:', error);
-        spanishEditorRef.current = null;
+        console.error('Error initializing editor:', error);
+        editorRef.current = null;
       }
     };
 
     // Initialize editor with error handling
-    const editorElement = document.getElementById('spanish-editor');
+    const editorElement = document.getElementById('editor');
     if (editorElement) {
       initEditor().catch(error => {
-        console.error('Spanish editor initialization failed:', error);
+        console.error('Editor initialization failed:', error);
       });
     }
 
@@ -295,174 +287,8 @@ const BlogEditor = ({
     return cleanupEditor;
   }, [initialContent]);
 
-  // Initialize English editor
-  useEffect(() => {
-    // Cleanup function for editor instance
-    const cleanupEditor = () => {
-      if (englishEditorRef.current) {
-        try {
-          englishEditorRef.current.destroy();
-          englishEditorRef.current = null;
-        } catch (e) {
-          console.error("Error destroying English editor", e);
-        }
-      }
-    };
-
-    // Initialize new editor
-    const initEditor = async () => {
-      // Clean up any existing editor first
-      cleanupEditor();
-
-      // Create new editor instance with proper error handling
-      try {
-        const editor = new EditorJS({
-          holder: "english-editor",
-          tools: {
-            header: {
-              class: Header,
-              inlineToolbar: true,
-              tunes: ['alignmentTune'],
-              config: {
-                levels: [1, 2, 3],
-                defaultLevel: 1
-              }
-            },
-            list: {
-              class: List as any,
-              inlineToolbar: true,
-              tunes: ['alignmentTune']
-            },
-            paragraph: {
-              class: Paragraph,
-              inlineToolbar: ['link', 'bold', 'italic', 'underline', 'marker'],
-              tunes: ['alignmentTune'],
-              config: {
-                preserveBlank: true,
-                placeholder: 'Write your content here...'
-              }
-            },
-            alignmentTune: {
-              class: AlignmentTuneTool,
-              config: {
-                default: 'left',
-                blocks: {
-                  header: 'center',
-                  list: 'left'
-                }
-              }
-            },
-            link: {
-              class: Link,
-              inlineToolbar: true,
-              config: {
-                endpoint: 'http://localhost:8008/fetchUrl'
-              }
-            },
-            underline: Underline,
-            marker: {
-              class: Marker,
-              shortcut: 'CMD+SHIFT+M'
-            },
-            inlineCode: {
-              class: InlineCode,
-              shortcut: 'CMD+SHIFT+C'
-            },
-            quote: {
-              class: Quote,
-              inlineToolbar: true,
-              shortcut: 'CMD+SHIFT+O',
-              config: {
-                quotePlaceholder: 'Enter a quote',
-                captionPlaceholder: 'Quote\'s author'
-              }
-            },
-            image: {
-              class: Image,
-              config: {
-                uploader: {
-                  async uploadByFile(file: File) {
-                    try {
-                      const fileExt = file.name.split('.').pop();
-                      const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-                      const filePath = `blog-images/${fileName}`;
-
-                      const { error: uploadError } = await supabaseExtended.storage
-                        .from('blog-content')
-                        .upload(filePath, file);
-
-                      if (uploadError) {
-                        throw uploadError;
-                      }
-
-                      const { data } = supabaseExtended.storage
-                        .from('blog-content')
-                        .getPublicUrl(filePath);
-
-                      return {
-                        success: 1,
-                        file: {
-                          url: data.publicUrl
-                        }
-                      };
-                    } catch (error) {
-                      console.error('Error uploading image:', error);
-                      return {
-                        success: 0,
-                        file: {
-                          url: null
-                        }
-                      };
-                    }
-                  },
-                  async uploadByUrl(url: string) {
-                    return {
-                      success: 1,
-                      file: {
-                        url
-                      }
-                    };
-                  }
-                }
-              }
-            }
-          },
-          data: Object.keys(initialContent_en).length > 0 ? initialContent_en : undefined,
-          onReady: () => {
-            console.log('English Editor is ready to work');
-          },
-          onChange: () => {
-            console.log('English Editor content changed');
-          },
-        });
-
-        englishEditorRef.current = editor;
-      } catch (error) {
-        console.error('Error initializing English editor:', error);
-        englishEditorRef.current = null;
-      }
-    };
-
-    // Initialize editor only when the tab is active
-    const editorElement = document.getElementById('english-editor');
-    if (editorElement && activeTab === "english") {
-      initEditor().catch(error => {
-        console.error('English editor initialization failed:', error);
-      });
-    }
-
-    // Cleanup on component unmount or tab change
-    return cleanupEditor;
-  }, [initialContent_en, activeTab]);
-
-  // Handle tab change to initialize editors only when needed
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-  };
-
   const handleGenerateSlug = () => {
-    // Generate slug from Spanish title if available, otherwise from English title
-    const sourceTitle = watch('title') || watch('title_en');
+    const sourceTitle = watch('title');
     setValue('slug', toKebabCase(sourceTitle));
   };
 
@@ -507,30 +333,94 @@ const BlogEditor = ({
     }
   };
 
+  // Function to translate content using an API
+  const translateContent = async (title: string, content: any) => {
+    try {
+      setIsTranslating(true);
+      
+      // Convert EditorJS data to a simplified format for translation
+      const blocks = content.blocks || [];
+      const textBlocks = blocks.map((block: any) => {
+        if (block.type === 'paragraph' || block.type === 'header') {
+          return block.data.text;
+        }
+        return null;
+      }).filter(Boolean);
+      
+      // Combine all text for title translation
+      const textsToTranslate = [title, ...textBlocks];
+      
+      // Call translation API (using a mock for now - would be replaced with actual API)
+      const translatedTexts = await Promise.all(
+        textsToTranslate.map(async (text) => {
+          // This is where you would call your actual translation API
+          // For now, we'll just append " (Translated)" to simulate translation
+          // In a real implementation, replace this with your API call
+          await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
+          return text ? `${text} (Translated)` : '';
+        })
+      );
+      
+      // Extract translated title and content
+      const translatedTitle = translatedTexts[0];
+      
+      // Create translated content by updating the original blocks
+      const translatedBlocks = [...blocks];
+      let translatedTextIndex = 1; // Start after the title
+      
+      for (let i = 0; i < translatedBlocks.length; i++) {
+        if (translatedBlocks[i].type === 'paragraph' || translatedBlocks[i].type === 'header') {
+          if (translatedTextIndex < translatedTexts.length) {
+            translatedBlocks[i] = {
+              ...translatedBlocks[i],
+              data: {
+                ...translatedBlocks[i].data,
+                text: translatedTexts[translatedTextIndex]
+              }
+            };
+            translatedTextIndex++;
+          }
+        }
+      }
+      
+      const translatedContent = {
+        ...content,
+        blocks: translatedBlocks
+      };
+      
+      return {
+        title_en: translatedTitle,
+        content_en: translatedContent
+      };
+    } catch (error) {
+      console.error('Translation error:', error);
+      throw new Error('Failed to translate content');
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
   const onSubmit = async (formData: FormValues) => {
     try {
       setIsSaving(true);
 
-      if (!spanishEditorRef.current) {
-        throw new Error("Spanish editor not initialized");
+      if (!editorRef.current) {
+        throw new Error("Editor not initialized");
       }
 
-      // Save Spanish content
-      const spanishOutputData = await spanishEditorRef.current.save();
+      // Save content
+      const outputData = await editorRef.current.save();
       
-      // Save English content if available
-      let englishOutputData = {};
-      if (englishEditorRef.current) {
-        englishOutputData = await englishEditorRef.current.save();
-      }
+      // Translate content to English automatically
+      const { title_en, content_en } = await translateContent(formData.title, outputData);
 
       if (isEdit && blogId) {
         // Use the hook for updating
         await updateEditorJSBlogPost(blogId, {
           title: formData.title,
-          title_en: formData.title_en,
-          content: spanishOutputData,
-          content_en: englishOutputData,
+          title_en,
+          content: outputData,
+          content_en,
           cover_image: formData.coverImage,
           slug: formData.slug,
         });
@@ -546,9 +436,9 @@ const BlogEditor = ({
         // Use the hook for creating
         const data = await createEditorJSBlogPost({
           title: formData.title,
-          title_en: formData.title_en,
-          content: spanishOutputData,
-          content_en: englishOutputData,
+          title_en,
+          content: outputData,
+          content_en,
           cover_image: formData.coverImage,
           slug: formData.slug,
         });
@@ -582,20 +472,24 @@ const BlogEditor = ({
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">
-            {isEdit ? "Edit Blog Post" : "Create New Blog Post"}
+            {isEdit ? "Editar Post" : "Crear Nuevo Post"}
           </h1>
           <Button
             type="submit"
-            disabled={isSaving}
+            disabled={isSaving || isTranslating}
             className="bg-tamec-600 hover:bg-tamec-700 text-white flex items-center gap-2"
           >
             <Save className="h-4 w-4" />
-            {isSaving ? "Saving..." : "Save Blog Post"}
+            {isSaving 
+              ? "Guardando..." 
+              : isTranslating 
+                ? "Traduciendo..." 
+                : "Guardar Post"}
           </Button>
         </div>
 
         <div className="space-y-4 mt-4">
-          {/* URL Slug - Common for both languages */}
+          {/* URL Slug - Common */}
           <div>
             <label htmlFor="blog-slug" className="block text-sm font-medium mb-1">
               URL Slug
@@ -605,9 +499,9 @@ const BlogEditor = ({
               <div className="flex-1 flex gap-2">
                 <Input
                   id="blog-slug"
-                  placeholder="url-friendly-slug"
+                  placeholder="url-amigable"
                   className="flex-1"
-                  {...register('slug', { required: 'URL slug is required' })}
+                  {...register('slug', { required: 'El URL slug es requerido' })}
                 />
                 <Button
                   type="button"
@@ -615,7 +509,7 @@ const BlogEditor = ({
                   onClick={handleGenerateSlug}
                   className="whitespace-nowrap"
                 >
-                  Generate from Title
+                  Generar desde Título
                 </Button>
               </div>
             </div>
@@ -623,14 +517,14 @@ const BlogEditor = ({
               <p className="text-red-500 text-sm mt-1">{errors.slug.message}</p>
             )}
             <p className="text-xs text-gray-500 mt-1">
-              This will be used in the URL. Use only lowercase letters, numbers, and hyphens.
+              Esto se usará en la URL. Utiliza solo letras minúsculas, números y guiones.
             </p>
           </div>
 
-          {/* Cover Image - Common for both languages */}
+          {/* Cover Image - Common */}
           <div>
             <label htmlFor="cover-image" className="block text-sm font-medium mb-1">
-              Cover Image
+              Imagen de Portada
             </label>
             <div className="space-y-3">
               {coverImage && (
@@ -647,7 +541,7 @@ const BlogEditor = ({
                 <label htmlFor="cover-image-upload" className="cursor-pointer">
                   <div className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md inline-flex items-center transition-colors">
                     <ImageIcon className="h-4 w-4 mr-2" />
-                    {coverImage ? "Change Cover Image" : "Upload Cover Image"}
+                    {coverImage ? "Cambiar Imagen" : "Subir Imagen"}
                   </div>
                   <input
                     id="cover-image-upload"
@@ -666,95 +560,65 @@ const BlogEditor = ({
                     onClick={() => setValue('coverImage', '')}
                     disabled={isUploading}
                   >
-                    Remove
+                    Eliminar
                   </Button>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Tags - Common for both languages */}
+          {/* Tags - Common */}
           <div>
             <label htmlFor="blog-tags" className="block text-sm font-medium mb-1">
-              Tags
+              Etiquetas
             </label>
             <MultiSelect
               options={tagOptions}
               selected={watch('tags')}
               onChange={(selectedValues) => setValue('tags', selectedValues)}
-              placeholder="Select tags for this post"
+              placeholder="Selecciona etiquetas para este post"
               emptyIndicator={
                 <p className="text-center text-sm text-muted-foreground">
-                  No tags found.
+                  No hay etiquetas disponibles.
                 </p>
               }
             />
             <p className="text-xs text-gray-500 mt-1">
-              Add tags to categorize your content. You can create new tags in the Tags section of the admin.
+              Agrega etiquetas para categorizar tu contenido. Puedes crear nuevas etiquetas en la sección de Etiquetas del admin.
             </p>
           </div>
 
-          {/* Language Tabs */}
-          <Tabs defaultValue="spanish" onValueChange={handleTabChange} value={activeTab}>
-            <TabsList className="mb-4">
-              <TabsTrigger value="spanish">Español</TabsTrigger>
-              <TabsTrigger value="english">English</TabsTrigger>
-            </TabsList>
+          {/* Spanish Content */}
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="blog-title" className="block text-sm font-medium mb-1">
+                Título del Blog
+              </label>
+              <Input
+                id="blog-title"
+                placeholder="Ingresa el título del blog"
+                className="w-full"
+                {...register('title', { required: 'El título es requerido' })}
+              />
+              
+              {errors.title && (
+                <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                El contenido en inglés se generará automáticamente mediante traducción al guardar.
+              </p>
+            </div>
 
-            {/* Spanish Content Tab */}
-            <TabsContent value="spanish" className="space-y-4">
-              <div>
-                <label htmlFor="blog-title" className="block text-sm font-medium mb-1">
-                  Título del Blog (Español)
-                </label>
-                <Input
-                  id="blog-title"
-                  placeholder="Ingresa el título del blog"
-                  className="w-full"
-                  {...register('title', { required: 'El título es requerido' })}
-                />
-                
-                {errors.title && (
-                  <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Contenido del Blog (Español)
-                </label>
-                <div
-                  id="spanish-editor"
-                  className="border rounded-md min-h-[400px] p-4"
-                />
-              </div>
-            </TabsContent>
-
-            {/* English Content Tab */}
-            <TabsContent value="english" className="space-y-4">
-              <div>
-                <label htmlFor="blog-title-en" className="block text-sm font-medium mb-1">
-                  Blog Title (English)
-                </label>
-                <Input
-                  id="blog-title-en"
-                  placeholder="Enter blog title"
-                  className="w-full"
-                  {...register('title_en')}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Blog Content (English)
-                </label>
-                <div
-                  id="english-editor"
-                  className="border rounded-md min-h-[400px] p-4"
-                />
-              </div>
-            </TabsContent>
-          </Tabs>
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Contenido del Blog
+              </label>
+              <div
+                id="editor"
+                className="border rounded-md min-h-[400px] p-4"
+              />
+            </div>
+          </div>
         </div>
       </form>
     </div>

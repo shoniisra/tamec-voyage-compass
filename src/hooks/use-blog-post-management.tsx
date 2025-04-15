@@ -1,18 +1,8 @@
 
 import { useState } from 'react';
-import { BlogPost } from '@/types/blog';
+import { BlogPost, EditorJSBlogData } from '@/types/blog';
 import { supabaseExtended } from '@/integrations/supabase/client-extended';
 import { useToast } from '@/hooks/use-toast';
-
-// Interface for EditorJS blog post
-interface EditorJSBlogData {
-  title: string;
-  content: any;
-  slug?: string;
-  cover_image?: string;
-  title_en?: string;
-  content_en?: any;
-}
 
 export function useBlogPostManagement() {
   const [isLoading, setIsLoading] = useState(false);
@@ -34,7 +24,7 @@ export function useBlogPostManagement() {
         if (checkError) throw checkError;
         
         if (existingPost) {
-          throw new Error('A post with this slug already exists. Please choose a different slug.');
+          throw new Error('Un post con este slug ya existe. Por favor, elige un slug diferente.');
         }
       }
       
@@ -56,8 +46,8 @@ export function useBlogPostManagement() {
       if (error) throw error;
       
       toast({
-        title: "Success",
-        description: "Blog post created successfully",
+        title: "Éxito",
+        description: "Post del blog creado exitosamente",
       });
       
       return newPost;
@@ -66,8 +56,8 @@ export function useBlogPostManagement() {
       console.error('Error creating EditorJS blog post:', error);
       toast({
         variant: "destructive",
-        title: "Error creating blog post",
-        description: error.message || "An unexpected error occurred",
+        title: "Error al crear el post",
+        description: error.message || "Ocurrió un error inesperado",
       });
       throw error;
     } finally {
@@ -92,7 +82,7 @@ export function useBlogPostManagement() {
         if (checkError) throw checkError;
         
         if (existingPost) {
-          throw new Error('Another post with this slug already exists. Please choose a different slug.');
+          throw new Error('Otro post con este slug ya existe. Por favor, elige un slug diferente.');
         }
       }
       
@@ -113,16 +103,16 @@ export function useBlogPostManagement() {
       if (error) throw error;
       
       toast({
-        title: "Success",
-        description: "Blog post updated successfully",
+        title: "Éxito",
+        description: "Post del blog actualizado exitosamente",
       });
       
     } catch (error: any) {
       console.error('Error updating EditorJS blog post:', error);
       toast({
         variant: "destructive",
-        title: "Error updating blog post",
-        description: error.message || "An unexpected error occurred",
+        title: "Error al actualizar el post",
+        description: error.message || "Ocurrió un error inesperado",
       });
       throw error;
     } finally {
@@ -144,8 +134,8 @@ export function useBlogPostManagement() {
       if (blogsError) throw blogsError;
       
       toast({
-        title: "Success",
-        description: "Blog post deleted successfully",
+        title: "Éxito",
+        description: "Post del blog eliminado exitosamente",
       });
       
       // Call the onSuccess callback if provided
@@ -157,8 +147,8 @@ export function useBlogPostManagement() {
       console.error('Error deleting blog post:', error);
       toast({
         variant: "destructive",
-        title: "Error deleting blog post",
-        description: error.message || "An unexpected error occurred",
+        title: "Error al eliminar el post",
+        description: error.message || "Ocurrió un error inesperado",
       });
       throw error;
     } finally {

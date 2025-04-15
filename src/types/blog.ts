@@ -44,3 +44,40 @@ export type Comment = {
   content: string;
   created_at: string;
 };
+
+// Types for blog management
+export interface EditorJSBlogData {
+  title: string;
+  title_en?: string;
+  content: any;
+  content_en?: any;
+  slug?: string;
+  cover_image?: string;
+}
+
+// Price, Salida, and TourDestino types to fix build errors
+export interface Precio {
+  id: number;
+  salida_id: number;
+  tipo_habitacion: 'doble' | 'triple' | 'individual' | 'niño';
+  forma_pago: 'efectivo' | 'tarjeta';
+  precio: number;
+}
+
+export interface Salida {
+  id: number;
+  tour_id: number;
+  fecha_salida: string;
+  dias_duracion: number;
+  cupos_disponibles: number;
+  precios: Precio[];
+}
+
+export interface TourDestino {
+  id: number;
+  tour_id: number;
+  destino_id: number;
+  orden: number;
+  pais?: string;
+  ciudad?: string;
+}
