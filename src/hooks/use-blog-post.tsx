@@ -30,6 +30,7 @@ export function useBlogPost(slug: string) {
             title: language === 'en' ? (postBySlug.title_en || postBySlug.title) : postBySlug.title,
             cover_image: postBySlug.cover_image || '',
             date: postBySlug.created_at || '',
+            created_at: postBySlug.created_at || '',
             slug: postBySlug.slug || '',
             isLegacy: false,
             newContent: postBySlug.content
@@ -51,6 +52,7 @@ export function useBlogPost(slug: string) {
             title: language === 'en' ? (postById.title_en || postById.title) : postById.title,
             cover_image: postById.cover_image || '',
             date: postById.created_at || '',
+            created_at: postById.created_at || '',
             slug: postById.slug || '',
             isLegacy: false,
             newContent: postById.content

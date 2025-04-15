@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import BlogCard from './BlogCard';
 import { useBlogPosts } from '@/hooks/use-blog-posts';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -7,10 +8,8 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
 import { PlusCircle, Search, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { supabase } from '@/integrations/supabase/client';
 import TagsFilter from './TagsFilter';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
@@ -19,16 +18,24 @@ const BlogList = () => {
   const { t, language } = useLanguage();
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  
+  // Extract tag from URL parameters on component mount
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const tagParam = queryParams.get('tag');
+    if (tagParam) {
+      setSelectedTags([tagParam]);
+    }
+  }, [location.search]);
   
   // Filter posts based on search query and tags
   const filteredPosts = posts.filter(post => {
     // First, check if there are any selected tags
     if (selectedTags.length > 0) {
       // Check if this post has any of the selected tags
-      // We'll need to fetch tags for each post - in a real app,
-      // you might want to optimize this by fetching tags with posts
       const postHasSelectedTag = post.tags?.some(tag => 
         selectedTags.includes(tag.id)
       );
@@ -129,7 +136,11 @@ const BlogList = () => {
                   <div className="pt-2">
                     <Button 
                       variant="outline" 
-                      onClick={() => setSelectedTags([])}
+                      onClick={() => {
+                        setSelectedTags([]);
+                        // Clear the URL parameter
+                        navigate('/blog');
+                      }}
                       className="w-full"
                     >
                       {language === 'en' ? 'Clear Filters' : 'Borrar Filtros'}
@@ -198,7 +209,11 @@ const BlogList = () => {
           {selectedTags.length > 0 && (
             <Button 
               variant="outline" 
-              onClick={() => setSelectedTags([])}
+              onClick={() => {
+                setSelectedTags([]);
+                // Clear the URL parameter
+                navigate('/blog');
+              }}
               className="mt-4"
             >
               {language === 'en' ? 'Clear Tag Filters' : 'Borrar Filtros de Etiquetas'}

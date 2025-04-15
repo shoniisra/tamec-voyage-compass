@@ -1,3 +1,4 @@
+
 // Blog related types
 export interface BlogPost {
   id: string;
@@ -11,7 +12,8 @@ export interface BlogPost {
   excerpt_es?: string;
   cover_image?: string;
   slug: string;
-  date: string;
+  date?: string;
+  created_at?: string;
   isLegacy?: boolean;
   // New content from EditorJS
   newContent?: any;

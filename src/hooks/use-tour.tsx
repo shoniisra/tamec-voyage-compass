@@ -1,88 +1,113 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Tour, Actividad, Adjunto } from '@/types/tour';
+import { Tour, Salida } from '@/types/tour';
+import { useToast } from '@/components/ui/use-toast';
 
-export const useTour = (slug: string | undefined) => {
+export function useTour(slug: string) {
   const [tour, setTour] = useState<Tour | null>(null);
-  const [actividades, setActividades] = useState<Actividad[]>([]);
-  const [adjuntos, setAdjuntos] = useState<Adjunto[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
+  const { toast } = useToast();
+  
   useEffect(() => {
-    if (!slug) {
-      setLoading(false);
-      return;
-    }
-
-    const fetchTour = async () => {
-      setLoading(true);
-      setError(null);
-
+    async function fetchTour() {
       try {
-        // Fetch tour details
+        setLoading(true);
+        
+        // Fetch tour by slug
         const { data: tourData, error: tourError } = await supabase
           .from('tours')
-          .select(`
-            *,
-            tour_destinos(
-              id,
-              orden,
-              destinos(id, pais, ciudad)
-            ),
-            salidas(
-              id,
-              fecha_salida,
-              dias_duracion, 
-              cupos_disponibles,
-              precios(id, tipo_habitacion, forma_pago, precio)
-            ),
-            fotos(id, url_imagen, descripcion, orden)
-          `)
+          .select('*')
           .eq('slug', slug)
           .single();
-
+          
         if (tourError) throw tourError;
-
-        // Fetch activities
-        const { data: actividadesData, error: actividadesError } = await supabase
-          .from('actividades')
+        
+        // Fetch destinations for this tour
+        const { data: destinosData, error: destinosError } = await supabase
+          .from('tour_destinos')
+          .select(`
+            id, 
+            orden,
+            destinos:destino_id(id, pais, ciudad)
+          `)
+          .eq('tour_id', tourData.id)
+          .order('orden', { ascending: true });
+          
+        if (destinosError) throw destinosError;
+        
+        // Fetch images for this tour
+        const { data: fotosData, error: fotosError } = await supabase
+          .from('fotos')
           .select('*')
-          .eq('tour_id', tourData.id);
-
-        if (actividadesError) throw actividadesError;
-
-        // Fetch attachments
-        const { data: adjuntosData, error: adjuntosError } = await supabase
-          .from('adjuntos')
-          .select('*')
-          .eq('tour_id', tourData.id);
-
-        if (adjuntosError) throw adjuntosError;
-
-        // Process and transform the data
-        const transformedTour: Tour = {
-          ...tourData,
-          destinos: tourData.tour_destinos?.map((td: any) => ({
-            ...td,
-            destino: td.destinos
-          })) || []
-        };
-
-        setTour(transformedTour);
-        setActividades(actividadesData || []);
-        setAdjuntos(adjuntosData || []);
-      } catch (err) {
-        console.error('Error fetching tour:', err);
-        setError('Failed to fetch tour details');
+          .eq('tour_id', tourData.id)
+          .order('orden', { ascending: true });
+          
+        if (fotosError) throw fotosError;
+        
+        // Fetch departures and prices for this tour
+        const { data: salidasData, error: salidasError } = await supabase
+          .from('salidas')
+          .select(`
+            id, 
+            fecha_salida,
+            dias_duracion,
+            cupos_disponibles,
+            precios:precios(id, tipo_habitacion, forma_pago, precio)
+          `)
+          .eq('tour_id', tourData.id)
+          .order('fecha_salida', { ascending: true });
+          
+        if (salidasError) throw salidasError;
+        
+        // Convert salidas to conform to the Salida type
+        const formattedSalidas: Salida[] = salidasData.map(salida => ({
+          id: salida.id,
+          tour_id: tourData.id,
+          fecha_salida: salida.fecha_salida,
+          dias_duracion: salida.dias_duracion,
+          cupos_disponibles: salida.cupos_disponibles,
+          precios: salida.precios || []
+        }));
+        
+        // Format destinations
+        const destinos = destinosData.map(item => item.destinos);
+        
+        // Set final tour object
+        setTour({
+          id: tourData.id,
+          titulo: tourData.titulo,
+          descripcion: tourData.descripcion,
+          dias_duracion: tourData.dias_duracion,
+          fecha_publicacion: tourData.fecha_publicacion,
+          fecha_caducidad: tourData.fecha_caducidad,
+          terminos_condiciones: tourData.terminos_condiciones,
+          politicas_cancelacion: tourData.politicas_cancelacion,
+          incluye_boleto_aereo: tourData.incluye_boleto_aereo,
+          pdf_detalles_url: tourData.pdf_detalles_url,
+          coortesias: tourData.coortesias,
+          slug: tourData.slug,
+          destinos: destinos,
+          fotos: fotosData || [],
+          salidas: formattedSalidas
+        });
+        
+      } catch (error) {
+        console.error('Error fetching tour:', error);
+        toast({
+          variant: "destructive",
+          title: "Error loading tour",
+          description: "Please try again later.",
+        });
       } finally {
         setLoading(false);
       }
-    };
-
-    fetchTour();
-  }, [slug]);
-
-  return { tour, actividades, adjuntos, loading, error };
-};
+    }
+    
+    if (slug) {
+      fetchTour();
+    }
+  }, [slug, toast]);
+  
+  return { tour, loading };
+}
