@@ -50,7 +50,7 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
                  (typeof post.title === 'object' ? JSON.stringify(post.title) : 'Untitled Post'));
   
   const content = post.isLegacy 
-  ? (language === 'en' ? post.content_en : post.content)
+  ? (language === 'en' ? post.content_en : post.content_es)
   : post.content || post.newContent;
   
   const formattedDate =  new Date(post.date).toLocaleDateString() || '';
@@ -86,7 +86,7 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
         </div>
         
         {/* Sidebar - takes up 1/3 of the space on large screens */}
-        <div className="space-y-8">
+        <div className="space-y-8 ">
           {/* Recent Posts Section */}
           <Card>
             <CardContent className="p-6">

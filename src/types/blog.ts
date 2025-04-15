@@ -15,6 +15,7 @@ export interface BlogPost {
   isLegacy?: boolean;
   // New content from EditorJS
   newContent?: any;
+  content?: any;
   tags?: Tag[];
 }
 
