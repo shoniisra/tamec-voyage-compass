@@ -4,6 +4,12 @@ import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 import List from "@editorjs/list";
 import Image from "@editorjs/image";
+import Paragraph from "@editorjs/paragraph";
+import Link from "@editorjs/link";
+import Underline from "@editorjs/underline";
+import InlineCode from "@editorjs/inline-code";
+import Marker from "@editorjs/marker";
+import Quote from "@editorjs/quote";
 import { supabaseExtended } from "@/integrations/supabase/client-extended";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -116,15 +122,54 @@ const BlogEditor = ({
           tools: {
             header: {
               class: Header,
+              shortcut: 'CMD+SHIFT+H',
               inlineToolbar: true,
               config: {
-                levels: [2, 3, 4],
-                defaultLevel: 2
+                levels: [1, 2, 3, 4],
+                defaultLevel: 1
               }
             },
             list: {
               class: List as any,
               inlineToolbar: true
+            },
+            paragraph: {
+              class: Paragraph,
+              // inlineToolbar: ['link', 'bold', 'italic', 'underline', 'marker'],
+              inlineToolbar: true,
+              config: {
+                preserveBlank: true,
+                placeholder: 'Write your content here...',
+                textAlignment: {
+                  default: 'left',
+                  alignments: ['left', 'center', 'right', 'justify']
+                }
+              }
+            },
+            link: {
+              class: Link,
+              inlineToolbar: true,
+              config: {
+                endpoint: 'http://localhost:8008/fetchUrl'
+              }
+            },
+            underline: Underline,
+            marker: {
+              class: Marker,
+              shortcut: 'CMD+SHIFT+M'
+            },
+            inlineCode: {
+              class: InlineCode,
+              shortcut: 'CMD+SHIFT+C'
+            },
+            quote: {
+              class: Quote,
+              inlineToolbar: true,
+              shortcut: 'CMD+SHIFT+O',
+              config: {
+                quotePlaceholder: 'Enter a quote',
+                captionPlaceholder: 'Quote\'s author'
+              }
             },
             image: {
               class: Image,
@@ -225,13 +270,50 @@ const BlogEditor = ({
               class: Header,
               inlineToolbar: true,
               config: {
-                levels: [2, 3, 4],
-                defaultLevel: 2
+                levels: [1, 2, 3],
+                defaultLevel: 1
               }
             },
             list: {
               class: List as any,
               inlineToolbar: true
+            },
+            paragraph: {
+              class: Paragraph,
+              inlineToolbar: ['link', 'bold', 'italic', 'underline', 'marker'],
+              config: {
+                preserveBlank: true,
+                placeholder: 'Write your content here...',
+                textAlignment: {
+                  default: 'left',
+                  alignments: ['left', 'center', 'right', 'justify']
+                }
+              }
+            },
+            link: {
+              class: Link,
+              inlineToolbar: true,
+              config: {
+                endpoint: 'http://localhost:8008/fetchUrl'
+              }
+            },
+            underline: Underline,
+            marker: {
+              class: Marker,
+              shortcut: 'CMD+SHIFT+M'
+            },
+            inlineCode: {
+              class: InlineCode,
+              shortcut: 'CMD+SHIFT+C'
+            },
+            quote: {
+              class: Quote,
+              inlineToolbar: true,
+              shortcut: 'CMD+SHIFT+O',
+              config: {
+                quotePlaceholder: 'Enter a quote',
+                captionPlaceholder: 'Quote\'s author'
+              }
             },
             image: {
               class: Image,
