@@ -87,19 +87,19 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
         
         {/* Sidebar - takes up 1/3 of the space on large screens */}
         <div className="space-y-8 ">
-          {/* Recent Posts Section */}
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="text-xl font-bold mb-4">
-                {language === 'en' ? 'Recent Posts' : 'Publicaciones Recientes'}
+        <Card className="p-6">
+        <h3 className="text-xl font-bold mb-4">
+                {language === 'en' ? 'Written By' : 'Escrito por'}
               </h3>
-              <Separator className="mb-4" />
-              <RecentPosts currentPostId={post.id} limit={4} />
-            </CardContent>
-          </Card>
-          
-          {/* Tags Section */}
-          <Card>
+        <p className="">Lcda. Michelle Herrera - Tamec Viajes</p>
+
+        </Card>
+
+          {/* Contact Information */}
+          <ContactInfo />
+
+   {/* Tags Section */}
+   <Card>
             <CardContent className="p-6">
               <h3 className="text-xl font-bold mb-4">
                 {language === 'en' ? 'Tags' : 'Etiquetas'}
@@ -111,20 +111,20 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
               />
             </CardContent>
           </Card>
-          
-          {/* Contact Information */}
+
+           
+
+          {/* Recent Posts Section */}
           <Card>
             <CardContent className="p-6">
-              <h3 className="text-xl font-bold mb-4">
-                {language === 'en' ? 'Contact Us' : 'Contáctanos'}
-              </h3>
               <Separator className="mb-4" />
-              <div className="scale-90 origin-top-left">
-                <ContactInfo />
-              </div>
+              <RecentPosts currentPostId={post.id} limit={4} />
             </CardContent>
           </Card>
-        </div>
+          
+                 
+       
+         </div>
       </div>
     </div>
   );

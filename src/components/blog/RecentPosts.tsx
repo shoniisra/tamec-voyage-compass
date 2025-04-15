@@ -39,7 +39,9 @@ const RecentPosts = ({ currentPostId, limit = 3 }: RecentPostsProps) => {
 
   return (
     <div className="mt-8">
-      <h3 className="text-xl font-bold mb-4">Recent Posts</h3>
+      <h3 className="text-lg font-bold mb-4">
+      {language === 'en' ? 'Recent Posts' : 'Publicaciones Recientes'}
+        </h3>
       <div className="space-y-4">
         {posts.map((post) => (
           <Link to={`/blog/${post.slug}`} key={post.id}>

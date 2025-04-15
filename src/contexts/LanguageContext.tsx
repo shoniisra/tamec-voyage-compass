@@ -375,7 +375,7 @@ export const LanguageProvider: React.FC<{children: React.ReactNode}> = ({ childr
 
   const t = (key: string): string => {
     const keys = key.split('.');
-    let value: any = translations[language];
+    let value = translations[language];
     
     for (const k of keys) {
       if (value && value[k] !== undefined) {

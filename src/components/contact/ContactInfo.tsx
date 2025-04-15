@@ -8,7 +8,7 @@ const ContactInfo = () => {
   const { t, language } = useLanguage();
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 md:p-8 dark:bg-gray-800">
-      <h3 className="text-2xl font-bold mb-6">
+      <h3 className="text-xl font-bold mb-6">
       {language === 'en' 
                     ? 'Contact Information'
                     : 'Información de Contacto'}
