@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -5,18 +6,35 @@ import { useLanguage } from '@/contexts/LanguageContext';
 interface BlogEditorProps {
   data?: string;
   onChange: (content: string) => void;
+  initialTitle?: string;
+  initialContent?: any;
+  initialCoverImage?: string;
+  initialSlug?: string;
+  initialTags?: any[];
+  blogId?: string;
+  isEdit?: boolean;
 }
 
-const BlogEditor: React.FC<BlogEditorProps> = ({ data, onChange }) => {
+const BlogEditor: React.FC<BlogEditorProps> = ({ 
+  data, 
+  onChange,
+  initialTitle,
+  initialContent,
+  initialCoverImage,
+  initialSlug,
+  initialTags,
+  blogId,
+  isEdit 
+}) => {
   const { language } = useLanguage();
-  const [content, setContent] = useState(data || '');
+  const [content, setContent] = useState(data || initialContent || '');
   const editorRef = useRef<any>(null);
 
-  console.log('Editor props:', data, onChange);
+  console.log('Editor props:', data, onChange, initialContent);
 
   useEffect(() => {
-    setContent(data || '');
-  }, [data]);
+    setContent(data || initialContent || '');
+  }, [data, initialContent]);
 
   const handleEditorChange = (newContent: string) => {
     setContent(newContent);

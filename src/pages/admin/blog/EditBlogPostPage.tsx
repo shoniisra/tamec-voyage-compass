@@ -26,6 +26,7 @@ const EditBlogPostPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [content, setContent] = useState('');
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -56,6 +57,10 @@ const EditBlogPostPage = () => {
 
     fetchBlog();
   }, [id]);
+
+  const handleContentChange = (newContent: string) => {
+    setContent(newContent);
+  };
 
   const handleDeleteBlog = async () => {
     if (!id) return;
@@ -130,13 +135,15 @@ const EditBlogPostPage = () => {
               </div>
             ) : blog ? (
               <BlogEditor 
+                data={blog.content} 
+                onChange={handleContentChange}
                 initialTitle={blog.title}
                 initialContent={blog.content}
                 initialCoverImage={blog.cover_image}
                 initialSlug={blog.slug || ''}
-                initialTags={[]}  // We'll load these separately via the hook
-                blogId={blog.id} 
-                isEdit={true} 
+                initialTags={[]}
+                blogId={blog.id}
+                isEdit={true}
               />
             ) : (
               <div>Blog post not found</div>
