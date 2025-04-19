@@ -11,13 +11,8 @@ import AdminLayout from '@/components/admin/layout/AdminLayout';
 const CreateBlogPostPage = () => {
   const { isAdmin } = useAuth();
   const { t } = useLanguage();
-  const [content, setContent] = useState('');
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  const handleContentChange = (newContent: string) => {
-    setContent(newContent);
-  };
 
   if (!isAdmin) {
     return (
@@ -33,8 +28,7 @@ const CreateBlogPostPage = () => {
         <h1 className="text-3xl font-bold">Create Blog Post</h1>
       </div>
       <BlogEditor 
-        onChange={handleContentChange} 
-        data=""
+        initialContent=""
       />
     </AdminLayout>
   );

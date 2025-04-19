@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Tour } from '@/types/tour';
+import { Tour, TourDestino } from '@/types/tour';
 import { useToast } from '@/components/ui/use-toast';
 
 export function useTour(slug: string) {
@@ -49,23 +49,43 @@ export function useTour(slug: string) {
           
         if (tourError) throw tourError;
         
-        // Calculate lowest price from all departures
-        const precio_desde = tourData.salidas?.reduce((lowest, salida) => {
-          const salidaLowestPrice = salida.precios?.reduce((min, precio) => 
-            precio.precio < min ? precio.precio : min
-          , Infinity) || Infinity;
-          return salidaLowestPrice < lowest ? salidaLowestPrice : lowest;
-        }, Infinity) || undefined;
+        // Calculate lowest price from all departures safely
+        let precio_desde;
+        if (tourData.salidas && Array.isArray(tourData.salidas)) {
+          precio_desde = tourData.salidas.reduce((lowest, salida) => {
+            if (salida.precios && Array.isArray(salida.precios)) {
+              const salidaLowestPrice = salida.precios.reduce((min, precio) => 
+                precio.precio < min ? precio.precio : min
+              , Infinity) || Infinity;
+              return salidaLowestPrice < lowest ? salidaLowestPrice : lowest;
+            }
+            return lowest;
+          }, Infinity);
+          
+          if (precio_desde === Infinity) {
+            precio_desde = undefined;
+          }
+        }
 
         // Format gifts array
-        const regalos = tourData.regalos?.map(item => item.regalo).filter(Boolean) || undefined;
+        const regalos = tourData.regalos?.map(item => item.regalo).filter(Boolean) || [];
         
         // Format includes array
-        const incluye = tourData.incluye?.map(item => item.incluye).filter(Boolean) || undefined;
+        const incluye = tourData.incluye?.map(item => item.incluye).filter(Boolean) || [];
+        
+        // Format destinos to match TourDestino type
+        const destinos: TourDestino[] = tourData.destinos?.map(item => ({
+          id: item.id,
+          tour_id: tourData.id,
+          destino_id: item.destino.id,
+          orden: item.orden,
+          destino: item.destino
+        })) || [];
         
         // Set final tour object with all relations
         setTour({
           ...tourData,
+          destinos,
           precio_desde,
           regalos,
           incluye

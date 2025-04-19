@@ -1,4 +1,3 @@
-
 export type Tour = {
   id: number;
   titulo: string;
@@ -113,6 +112,12 @@ export type Foto = {
   url_imagen: string;
   descripcion: string | null;
   orden: number | null;
+};
+
+export type TerminosCondiciones = {
+  id: number;
+  titulo: string | null;
+  contenido: string;
 };
 
 export type TourFilterParams = {
