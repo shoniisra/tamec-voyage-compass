@@ -27,13 +27,8 @@ export function useTour(slug: string) {
               destino:destino_id(*)
             ),
             fotos(*),
-            salidas(
-              id,
-              fecha_salida,
-              dias_duracion,
-              cupos_disponibles,
-              precios(*)
-            ),
+            salidas(*),
+            precios(*),
             regalos:tour_regalos(
               regalo:regalo_id(*)
             ),
@@ -49,32 +44,24 @@ export function useTour(slug: string) {
           
         if (tourError) throw tourError;
         
-        // Calculate lowest price from all departures safely
+        // Calculate lowest price from all prices directly related to tour
         let precio_desde;
-        if (tourData.salidas && Array.isArray(tourData.salidas)) {
-          precio_desde = tourData.salidas.reduce((lowest, salida) => {
-            if (salida.precios && Array.isArray(salida.precios)) {
-              const salidaLowestPrice = salida.precios.reduce((min, precio) => 
-                precio.precio < min ? precio.precio : min
-              , Infinity) || Infinity;
-              return salidaLowestPrice < lowest ? salidaLowestPrice : lowest;
-            }
-            return lowest;
-          }, Infinity);
+        if (tourData.precios && Array.isArray(tourData.precios)) {
+          const lowestPrice = tourData.precios.reduce((min, precio) => 
+            precio.precio < min ? precio.precio : min
+          , Infinity);
           
-          if (precio_desde === Infinity) {
-            precio_desde = undefined;
-          }
+          precio_desde = lowestPrice !== Infinity ? lowestPrice : undefined;
         }
 
         // Format gifts array
-        const regalos = tourData.regalos?.map(item => item.regalo).filter(Boolean) || [];
+        const regalos = tourData.regalos?.map((item: any) => item.regalo).filter(Boolean) || [];
         
         // Format includes array
-        const incluye = tourData.incluye?.map(item => item.incluye).filter(Boolean) || [];
+        const incluye = tourData.incluye?.map((item: any) => item.incluye).filter(Boolean) || [];
         
         // Format destinos to match TourDestino type
-        const destinos: TourDestino[] = tourData.destinos?.map(item => ({
+        const destinos: TourDestino[] = tourData.destinos?.map((item: any) => ({
           id: item.id,
           tour_id: tourData.id,
           destino_id: item.destino.id,

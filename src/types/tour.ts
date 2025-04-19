@@ -1,3 +1,4 @@
+
 export type Tour = {
   id: number;
   titulo: string;
@@ -15,6 +16,7 @@ export type Tour = {
   terminos_condiciones_id: number | null;
   destinos?: TourDestino[];
   salidas?: Salida[];
+  precios?: Precio[];
   fotos?: Foto[];
   precio_desde?: number;
   aerolinea?: Aerolinea;
@@ -45,7 +47,6 @@ export type Salida = {
   fecha_salida: string | null;
   dias_duracion: number;
   cupos_disponibles: number | null;
-  precios?: Precio[];
 };
 
 export type Precio = {
