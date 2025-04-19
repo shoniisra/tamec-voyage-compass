@@ -1,789 +1,658 @@
-import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import { createEditor, Editor, Transforms, Element as SlateElement } from 'slate';
-import { Slate, Editable, withReact } from 'slate-react';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { Button } from '@/components/ui/button';
-import { AlignCenter, AlignLeft, AlignRight, Bold, Code, Heading1, Heading2, Heading3, Image, Italic, Link as LinkIcon, List, ListOrdered, Quote, Underline, Undo, Redo } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { v4 as uuidv4 } from 'uuid';
-import { useAuth } from '@/contexts/AuthContext';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-} from "@/components/ui/command"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { cn } from "@/lib/utils"
-import { format } from "date-fns"
-import { enUS, es } from 'date-fns/locale';
-import { CalendarIcon } from "@radix-ui/react-icons"
-import { addDays } from 'date-fns';
-import { DateRange } from "react-day-picker"
-import { isURL } from '@/lib/utils';
+import React, { useEffect, useRef, useState } from "react";
+import EditorJS from "@editorjs/editorjs";
+import Header from "@editorjs/header";
+import List from "@editorjs/list";
+import Image from "@editorjs/image";
+import Paragraph from "@editorjs/paragraph";
+import Link from "@editorjs/link";
+import Underline from "@editorjs/underline";
+import InlineCode from "@editorjs/inline-code";
+import Marker from "@editorjs/marker";
+import Quote from "@editorjs/quote";
+import Table from "@editorjs/table";
+import Warning from "@editorjs/warning";
+import Delimiter from "@editorjs/delimiter";
+import Raw from "@editorjs/raw";
+import AlignmentTuneTool from "editorjs-text-alignment-blocktune";
+import { supabaseExtended } from "@/integrations/supabase/client-extended";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+import { Image as ImageIcon, Save } from "lucide-react";
+import { toKebabCase } from "@/utils/stringUtils";
+import { useForm } from "react-hook-form";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useTags } from "@/hooks/use-tags";
+import { useBlogTags } from "@/hooks/use-blog-tags";
+import { MultiSelect } from "@/components/ui/multi-select";
+import { useBlogPostManagement } from "@/hooks/use-blog-post-management";
 
-const initialValue = [
-  {
-    type: 'paragraph',
-    children: [{ text: 'A line of text in a paragraph.' }],
-  },
-];
+interface FormValues {
+  title: string;
+  slug: string;
+  coverImage: string;
+  tags: string[];
+}
 
-const BlogEditor = ({ initialContent }: { initialContent: any }) => {
-  const { t, language } = useLanguage();
-  const [editor] = useState(() => withReact(createEditor()));
-  const [value, setValue] = useState(initialContent ? JSON.parse(initialContent) : initialValue);
-  const [title, setTitle] = useState('');
-  const [titleEn, setTitleEn] = useState('');
-  const [slug, setSlug] = useState('');
-  const [coverImage, setCoverImage] = useState<File | null>(null);
-  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
-	const [open, setOpen] = React.useState(false)
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: new Date(),
-    to: addDays(new Date(), 7),
-  })
-  const [isSaving, setIsSaving] = useState(false);
-  const navigate = useNavigate();
+interface BlogEditorProps {
+  initialTitle?: string;
+  initialContent?: any;
+  initialCoverImage?: string;
+  initialSlug?: string;
+  initialTags?: string[];
+  blogId?: string;
+  isEdit?: boolean;
+}
+
+const BlogEditor = ({
+  initialTitle = "",
+  initialContent = {},
+  initialCoverImage = "",
+  initialSlug = "",
+  initialTags = [],
+  blogId,
+  isEdit = false
+}: BlogEditorProps) => {
   const { toast } = useToast();
-  const { user } = useAuth();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+  const { t } = useLanguage();
+  const { tags: allTags, loading: tagsLoading } = useTags();
+  const { getBlogTags, updateBlogTags } = useBlogTags();
+  const { createEditorJSBlogPost, updateEditorJSBlogPost } = useBlogPostManagement();
 
+  // Format tags for MultiSelect component
+  const tagOptions = allTags.map(tag => ({
+    value: tag.id,
+    label: tag.name,
+    color: tag.color || '#CBD5E1' // Provide a default color if none exists
+  }));
+
+  // Create ref for editor
+  const editorRef = useRef<EditorJS | null>(null);
+  const editorInitializedRef = useRef<boolean>(false);
+
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormValues>({
+    defaultValues: {
+      title: initialTitle,
+      slug: initialSlug,
+      coverImage: initialCoverImage,
+      tags: initialTags
+    }
+  });
+
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
+
+  const coverImage = watch('coverImage');
+
+  // Load blog tags if in edit mode
   useEffect(() => {
-    if (initialContent) {
-      setValue(JSON.parse(initialContent));
+    if (isEdit && blogId) {
+      const loadBlogTags = async () => {
+        try {
+          const blogTags = await getBlogTags(blogId);
+          const tagIds = blogTags.map(tag => tag.id);
+          setValue('tags', tagIds);
+        } catch (error) {
+          console.error('Error loading blog tags:', error);
+        }
+      };
+      
+      loadBlogTags();
     }
-  }, [initialContent]);
+  }, [blogId, isEdit, getBlogTags, setValue]);
 
-  const renderElement = useCallback(props => <Element {...props} />, []);
-  const renderLeaf = useCallback(props => <Leaf {...props} />, []);
+  // Initialize editor
+  useEffect(() => {
+    // Cleanup function for editor instance
+    const cleanupEditor = () => {
+      if (editorRef.current) {
+        try {
+          editorRef.current.destroy();
+          editorRef.current = null;
+          editorInitializedRef.current = false;
+          console.log("Editor destroyed successfully");
+        } catch (e) {
+          console.error("Error destroying editor", e);
+        }
+      }
+    };
 
-  const handleChangeCoverImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setCoverImage(file);
-      setCoverImageUrl(URL.createObjectURL(file));
-    }
-  };
-
-  const handleUploadCoverImage = async () => {
-    if (!coverImage) {
-      toast({
-        title: t('Please select a cover image'),
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    try {
-      setIsSaving(true);
-      const fileExt = coverImage.name.split('.').pop();
-      const fileName = `${uuidv4()}.${fileExt}`;
-      const filePath = `blog/${fileName}`;
-
-      const { data, error } = await supabase
-        .storage
-        .from('images')
-        .upload(filePath, coverImage, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (error) {
-        throw error;
+    // Initialize new editor
+    const initEditor = async () => {
+      // Check if editor is already initialized to prevent multiple instances
+      if (editorInitializedRef.current) {
+        console.log("Editor already initialized, skipping initialization");
+        return;
       }
 
-      const imageUrl = `https://hnjvqihlstlgpywbqgno.supabase.co/storage/v1/object/public/${data.Key}`;
-      setCoverImageUrl(imageUrl);
+      // Clean up any existing editor first
+      cleanupEditor();
+
+      const editorElement = document.getElementById('editor');
+      if (!editorElement) {
+        console.error("Editor element not found");
+        return;
+      }
+
+      // Create new editor instance with proper error handling
+      try {
+        console.log("Initializing editor with data:", initialContent);
+        
+        const editor = new EditorJS({
+          holder: "editor",
+          tools: {
+            header: {
+              class: Header,
+              shortcut: 'CMD+SHIFT+H',
+              inlineToolbar: true,
+              tunes: ['alignmentTune'],
+              config: {
+                levels: [1, 2, 3, 4],
+                defaultLevel: 1
+              }
+            },
+            list: {
+              class: List as any,
+              inlineToolbar: true,
+              tunes: ['alignmentTune']
+            },
+            paragraph: {
+              class: Paragraph,
+              inlineToolbar: ['link', 'bold', 'italic', 'underline', 'marker', 'inlineCode'],
+              tunes: ['alignmentTune'],
+              config: {
+                preserveBlank: true,
+                placeholder: 'Escribe tu contenido aquí...'
+              }
+            },
+            alignmentTune: {
+              class: AlignmentTuneTool,
+              config: {
+                default: 'left',
+                blocks: {
+                  header: 'center',
+                  list: 'left'
+                }
+              }
+            },
+            link: {
+              class: Link,
+              inlineToolbar: true
+            },
+            underline: Underline,
+            marker: {
+              class: Marker,
+              shortcut: 'CMD+SHIFT+M'
+            },
+            inlineCode: {
+              class: InlineCode,
+              shortcut: 'CMD+SHIFT+C'
+            },
+            quote: {
+              class: Quote,
+              inlineToolbar: true,
+              shortcut: 'CMD+SHIFT+O',
+              config: {
+                quotePlaceholder: 'Ingresa una cita',
+                captionPlaceholder: 'Autor de la cita'
+              }
+            },
+            table: {
+              class: Table as any,
+              inlineToolbar: true,
+              tunes: ['alignmentTune'],
+              config: {
+                rows: 2,
+                cols: 3,
+                withHeadings: true,
+              }
+            },
+            warning: {
+              class: Warning,
+              inlineToolbar: true,
+              shortcut: 'CMD+SHIFT+W',
+              config: {
+                titlePlaceholder: 'Título',
+                messagePlaceholder: 'Mensaje'
+              }
+            },
+            delimiter: Delimiter,
+            raw: Raw,
+            image: {
+              class: Image,
+              config: {
+                uploader: {
+                  async uploadByFile(file: File) {
+                    try {
+                      const fileExt = file.name.split('.').pop();
+                      const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+                      const filePath = `blog-images/${fileName}`;
+
+                      const { error: uploadError } = await supabaseExtended.storage
+                        .from('blog-content')
+                        .upload(filePath, file);
+
+                      if (uploadError) {
+                        throw uploadError;
+                      }
+
+                      const { data } = supabaseExtended.storage
+                        .from('blog-content')
+                        .getPublicUrl(filePath);
+
+                      return {
+                        success: 1,
+                        file: {
+                          url: data.publicUrl
+                        }
+                      };
+                    } catch (error) {
+                      console.error('Error uploading image:', error);
+                      return {
+                        success: 0,
+                        file: {
+                          url: null
+                        }
+                      };
+                    }
+                  },
+                  async uploadByUrl(url: string) {
+                    return {
+                      success: 1,
+                      file: {
+                        url
+                      }
+                    };
+                  }
+                }
+              }
+            }
+          },
+          data: Object.keys(initialContent).length > 0 ? initialContent : undefined,
+          onReady: () => {
+            console.log('Editor is ready to work');
+            editorInitializedRef.current = true;
+          },
+          onChange: () => {
+            console.log('Editor content changed');
+          },
+          autofocus: true,
+          // Enable paste handling with configuration
+          minHeight: 300,
+          logLevel: 'VERBOSE',
+          
+          // Fix paste functionality
+          paste: {
+            // Enable plain text paste handling
+            plainText: true,
+            // Enable HTML paste handling
+            htmlText: true,
+            // Optional handlers for specific types of pasted content
+            imageTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp'],
+            patterns: {
+              image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png|webp|bmp)$/i,
+              video: /https?:\/\/\S+\.(mp4|webm|ogv|mov|avi)$/i,
+            }
+          }
+        });
+
+        editorRef.current = editor;
+        console.log("Editor initialized successfully");
+      } catch (error) {
+        console.error('Error initializing editor:', error);
+        editorRef.current = null;
+        editorInitializedRef.current = false;
+      }
+    };
+
+    // Initialize editor with error handling
+    initEditor().catch(error => {
+      console.error('Editor initialization failed:', error);
+    });
+
+    // Cleanup on component unmount
+    return cleanupEditor;
+  }, [initialContent]);
+
+  const handleGenerateSlug = () => {
+    const sourceTitle = watch('title');
+    setValue('slug', toKebabCase(sourceTitle));
+  };
+
+  const handleCoverImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `cover-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+      const filePath = `blog-covers/${fileName}`;
+
+      const { error: uploadError } = await supabaseExtended.storage
+        .from('blog-content')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data } = supabaseExtended.storage
+        .from('blog-content')
+        .getPublicUrl(filePath);
+
+      setValue('coverImage', data.publicUrl);
+
       toast({
-        title: t('Cover image uploaded successfully'),
+        title: "Success",
+        description: "Cover image uploaded successfully",
       });
     } catch (error: any) {
       console.error('Error uploading cover image:', error);
       toast({
-        title: t('Failed to upload cover image'),
-        description: error.message,
-        variant: 'destructive'
+        title: "Error",
+        description: error.message || "Failed to upload cover image",
+        variant: "destructive"
       });
     } finally {
-      setIsSaving(false);
+      setIsUploading(false);
     }
   };
 
-  const handleCreatePost = async () => {
-    if (!title || !slug || !value || !coverImageUrl) {
-      toast({
-        title: t('Please fill all required fields'),
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    setIsSaving(true);
-
+  // Function to translate content using an API
+  const translateContent = async (title: string, content: any) => {
     try {
-      const { data, error } = await supabase
-        .from('blogs')
-        .insert([
-          {
-            title: title,
-            title_en: titleEn,
-            slug: slug,
-            content: value,
-            cover_image: coverImageUrl,
-          },
-        ]);
+      setIsTranslating(true);
+      
+      // Convert EditorJS data to a simplified format for translation
+      const blocks = content.blocks || [];
+      const textBlocks = blocks.map((block: any) => {
+        if (block.type === 'paragraph' || block.type === 'header') {
+          return block.data.text;
+        }
+        return null;
+      }).filter(Boolean);
+      
+      // Combine all text for title translation
+      const textsToTranslate = [title, ...textBlocks];
+      
+      // Call translation API (using a mock for now - would be replaced with actual API)
+      const translatedTexts = await Promise.all(
+        textsToTranslate.map(async (text) => {
+          // This is where you would call your actual translation API
+          // For now, we'll just append " (Translated)" to simulate translation
+          // In a real implementation, replace this with your API call
+          await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
+          return text ? `${text} (Translated)` : '';
+        })
+      );
+      
+      // Extract translated title and content
+      const translatedTitle = translatedTexts[0];
+      
+      // Create translated content by updating the original blocks
+      const translatedBlocks = [...blocks];
+      let translatedTextIndex = 1; // Start after the title
+      
+      for (let i = 0; i < translatedBlocks.length; i++) {
+        if (translatedBlocks[i].type === 'paragraph' || translatedBlocks[i].type === 'header') {
+          if (translatedTextIndex < translatedTexts.length) {
+            translatedBlocks[i] = {
+              ...translatedBlocks[i],
+              data: {
+                ...translatedBlocks[i].data,
+                text: translatedTexts[translatedTextIndex]
+              }
+            };
+            translatedTextIndex++;
+          }
+        }
+      }
+      
+      const translatedContent = {
+        ...content,
+        blocks: translatedBlocks
+      };
+      
+      return {
+        title_en: translatedTitle,
+        content_en: translatedContent
+      };
+    } catch (error) {
+      console.error('Translation error:', error);
+      throw new Error('Failed to translate content');
+    } finally {
+      setIsTranslating(false);
+    }
+  };
 
-      if (error) {
-        throw error;
+  const onSubmit = async (formData: FormValues) => {
+    try {
+      setIsSaving(true);
+
+      if (!editorRef.current) {
+        throw new Error("Editor not initialized");
       }
 
-      toast({
-        title: t('Blog post created successfully'),
-      });
-      navigate('/admin/blog');
+      // Save content
+      const outputData = await editorRef.current.save();
+      
+      // Translate content to English automatically
+      const { title_en, content_en } = await translateContent(formData.title, outputData);
+
+      if (isEdit && blogId) {
+        // Use the hook for updating
+        await updateEditorJSBlogPost(blogId, {
+          title: formData.title,
+          title_en,
+          content: outputData,
+          content_en,
+          cover_image: formData.coverImage,
+          slug: formData.slug,
+        });
+        
+        // Update blog tags
+        await updateBlogTags(blogId, formData.tags);
+
+        toast({
+          title: "Success",
+          description: "Blog post updated successfully",
+        });
+      } else {
+        // Use the hook for creating
+        const data = await createEditorJSBlogPost({
+          title: formData.title,
+          title_en,
+          content: outputData,
+          content_en,
+          cover_image: formData.coverImage,
+          slug: formData.slug,
+        });
+        
+        // If tags are selected, add them to the blog post
+        if (data && formData.tags.length > 0) {
+          await updateBlogTags(data.id, formData.tags);
+        }
+
+        toast({
+          title: "Success",
+          description: "Blog post saved successfully",
+        });
+      }
+
+      navigate('/admin/blog/posts');
     } catch (error: any) {
-      console.error('Error creating blog post:', error);
+      console.error('Error saving blog:', error);
       toast({
-        title: t('Failed to create blog post'),
-        description: error.message,
-        variant: 'destructive'
+        title: "Error",
+        description: error.message || "Failed to save blog post",
+        variant: "destructive"
       });
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleUndo = () => {
-    editor.undo();
-  };
-
-  const handleRedo = () => {
-    editor.redo();
-  };
-
   return (
-    <div>
-      <div className="mb-4">
-        <Label htmlFor="title">{t('Title')}</Label>
-        <Input
-          type="text"
-          id="title"
-          placeholder={t('Enter title')}
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-        />
-      </div>
-      <div className="mb-4">
-        <Label htmlFor="titleEn">{t('Title in English')}</Label>
-        <Input
-          type="text"
-          id="titleEn"
-          placeholder={t('Enter title in English')}
-          value={titleEn}
-          onChange={e => setTitleEn(e.target.value)}
-        />
-      </div>
-      <div className="mb-4">
-        <Label htmlFor="slug">{t('Slug')}</Label>
-        <Input
-          type="text"
-          id="slug"
-          placeholder={t('Enter slug')}
-          value={slug}
-          onChange={e => setSlug(e.target.value)}
-        />
-      </div>
-      <div className="mb-4">
-        <Label htmlFor="coverImage">{t('Cover Image')}</Label>
-        <div className="flex items-center space-x-4">
-          <Input
-            type="file"
-            id="coverImage"
-            accept="image/*"
-            className="hidden"
-            onChange={handleChangeCoverImage}
-            ref={fileInputRef}
-          />
-          <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
-            {t('Select Image')}
-          </Button>
-          {coverImageUrl && (
-            <img
-              src={coverImageUrl}
-              alt="Cover"
-              className="w-20 h-20 object-cover rounded"
-            />
-          )}
-          <Button onClick={handleUploadCoverImage} disabled={isSaving}>
-            {isSaving ? t('Uploading...') : t('Upload')}
+    <div className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold">
+            {isEdit ? "Editar Post" : "Crear Nuevo Post"}
+          </h1>
+          <Button
+            type="submit"
+            disabled={isSaving || isTranslating}
+            className="bg-tamec-600 hover:bg-tamec-700 text-white flex items-center gap-2"
+          >
+            <Save className="h-4 w-4" />
+            {isSaving 
+              ? "Guardando..." 
+              : isTranslating 
+                ? "Traduciendo..." 
+                : "Guardar Post"}
           </Button>
         </div>
-      </div>
 
-      <div className="mb-4">
-        <Toolbar editor={editor} language={language} />
-        <Slate editor={editor} value={value} onChange={value => setValue(value)}>
-          <Editable
-            renderElement={renderElement}
-            renderLeaf={renderLeaf}
-            placeholder={t('Enter some rich text…')}
-            spellCheck
-            autoFocus
-          />
-        </Slate>
-      </div>
+        <div className="space-y-4 mt-4">
+          {/* URL Slug - Common */}
+          <div>
+            <label htmlFor="blog-slug" className="block text-sm font-medium mb-1">
+              URL Slug
+            </label>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-500">/blog/</span>
+              <div className="flex-1 flex gap-2">
+                <Input
+                  id="blog-slug"
+                  placeholder="url-amigable"
+                  className="flex-1"
+                  {...register('slug', { required: 'El URL slug es requerido' })}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleGenerateSlug}
+                  className="whitespace-nowrap"
+                >
+                  Generar desde Título
+                </Button>
+              </div>
+            </div>
+            {errors.slug && (
+              <p className="text-red-500 text-sm mt-1">{errors.slug.message}</p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">
+              Esto se usará en la URL. Utiliza solo letras minúsculas, números y guiones.
+            </p>
+          </div>
 
-      <div className="flex justify-end">
-        <Button onClick={handleCreatePost} disabled={isSaving}>
-          {isSaving ? t('Saving...') : t('Create Post')}
-        </Button>
-      </div>
-    </div>
-  );
-};
+          {/* Cover Image - Common */}
+          <div>
+            <label htmlFor="cover-image" className="block text-sm font-medium mb-1">
+              Imagen de Portada
+            </label>
+            <div className="space-y-3">
+              {coverImage && (
+                <div className="relative rounded-md overflow-hidden border h-60 w-full bg-gray-100">
+                  <img
+                    src={coverImage}
+                    alt="Cover"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
 
-const Toolbar = ({ editor, language }: { editor: any, language: string }) => {
-  return (
-    <div className="flex flex-wrap items-center gap-2 mb-4">
-      <FormatButton editor={editor} format="bold" icon={<Bold className="h-4 w-4" />} />
-      <FormatButton editor={editor} format="italic" icon={<Italic className="h-4 w-4" />} />
-      <FormatButton editor={editor} format="underline" icon={<Underline className="h-4 w-4" />} />
-      <FormatButton editor={editor} format="code" icon={<Code className="h-4 w-4" />} />
-      <BlockButton editor={editor} format="heading-one" icon={<Heading1 className="h-4 w-4" />} />
-      <BlockButton editor={editor} format="heading-two" icon={<Heading2 className="h-4 w-4" />} />
-      <BlockButton editor={editor} format="heading-three" icon={<Heading3 className="h-4 w-4" />} />
-      <BlockButton editor={editor} format="block-quote" icon={<Quote className="h-4 w-4" />} />
-      <BlockButton editor={editor} format="numbered-list" icon={<ListOrdered className="h-4 w-4" />} />
-      <BlockButton editor={editor} format="bulleted-list" icon={<List className="h-4 w-4" />} />
-      <AlignButton editor={editor} format="align-left" icon={<AlignLeft className="h-4 w-4" />} />
-      <AlignButton editor={editor} format="align-center" icon={<AlignCenter className="h-4 w-4" />} />
-      <AlignButton editor={editor} format="align-right" icon={<AlignRight className="h-4 w-4" />} />
-      <LinkButton editor={editor} icon={<LinkIcon className="h-4 w-4" />} language={language} />
-      <ImageButton editor={editor} icon={<Image className="h-4 w-4" />} language={language} />
-      <UndoRedoButtons editor={editor} />
-    </div>
-  );
-};
+              <div className="flex gap-2">
+                <label htmlFor="cover-image-upload" className="cursor-pointer">
+                  <div className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md inline-flex items-center transition-colors">
+                    <ImageIcon className="h-4 w-4 mr-2" />
+                    {coverImage ? "Cambiar Imagen" : "Subir Imagen"}
+                  </div>
+                  <input
+                    id="cover-image-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleCoverImageUpload}
+                    className="hidden"
+                    disabled={isUploading}
+                  />
+                </label>
 
-const UndoRedoButtons = ({ editor }: { editor: any }) => {
-  return (
-    <div className="flex items-center space-x-2">
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={() => editor.undo()}
-        disabled={editor.history.undos.length === 0}
-      >
-        <Undo className="h-4 w-4" />
-      </Button>
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={() => editor.redo()}
-        disabled={editor.history.redos.length === 0}
-      >
-        <Redo className="h-4 w-4" />
-      </Button>
-    </div>
-  );
-};
+                {coverImage && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setValue('coverImage', '')}
+                    disabled={isUploading}
+                  >
+                    Eliminar
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
 
-const LinkButton = ({ editor, icon, language }: { editor: any, icon: any, language: string }) => {
-  const { t } = useLanguage();
-  const [isOpen, setIsOpen] = useState(false);
-  const [url, setUrl] = useState('');
+          {/* Tags - Common */}
+          <div>
+            <label htmlFor="blog-tags" className="block text-sm font-medium mb-1">
+              Etiquetas
+            </label>
+            <MultiSelect
+              options={tagOptions}
+              selected={watch('tags')}
+              onChange={(selectedValues) => setValue('tags', selectedValues)}
+              placeholder="Selecciona etiquetas para este post"
+              emptyIndicator={
+                <p className="text-center text-sm text-muted-foreground">
+                  No hay etiquetas disponibles.
+                </p>
+              }
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Agrega etiquetas para categorizar tu contenido. Puedes crear nuevas etiquetas en la sección de Etiquetas del admin.
+            </p>
+          </div>
 
-  const handleConfirm = () => {
-    if (isURL(url)) {
-      insertLink(editor, url);
-      setIsOpen(false);
-      setUrl('');
-    } else {
-      alert(t('Please enter a valid URL.'));
-    }
-  };
-
-  return (
-    <>
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={() => setIsOpen(true)}
-      >
-        {icon}
-      </Button>
-
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>{t('Insert Link')}</DialogTitle>
-            <DialogDescription>
-              {t('Enter the URL to link to.')}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="url" className="text-right">
-                {t('URL')}
-              </Label>
+          {/* Spanish Content */}
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="blog-title" className="block text-sm font-medium mb-1">
+                Título del Blog
+              </label>
               <Input
-                type="url"
-                id="url"
-                placeholder="https://example.com"
-                className="col-span-3"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
+                id="blog-title"
+                placeholder="Ingresa el título del blog"
+                className="w-full"
+                {...register('title', { required: 'El título es requerido' })}
+              />
+              
+              {errors.title && (
+                <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                El contenido en inglés se generará automáticamente mediante traducción al guardar.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Contenido del Blog
+              </label>
+              <div
+                id="editor"
+                className="border rounded-md min-h-[400px] p-4"
               />
             </div>
           </div>
-          <div className="flex justify-end">
-            <Button onClick={handleConfirm}>{t('Confirm')}</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
+        </div>
+      </form>
+    </div>
   );
 };
-
-const ImageButton = ({ editor, icon, language }: { editor: any, icon: any, language: string }) => {
-  const { t } = useLanguage();
-  const [isOpen, setIsOpen] = useState(false);
-  const [url, setUrl] = useState('');
-  const [alt, setAlt] = useState('');
-
-  const handleConfirm = () => {
-    if (isURL(url)) {
-      insertImage(editor, url, alt);
-      setIsOpen(false);
-      setUrl('');
-      setAlt('');
-    } else {
-      alert(t('Please enter a valid URL.'));
-    }
-  };
-
-  return (
-    <>
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={() => setIsOpen(true)}
-      >
-        {icon}
-      </Button>
-
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>{t('Insert Image')}</DialogTitle>
-            <DialogDescription>
-              {t('Enter the URL of the image and alt text.')}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="url" className="text-right">
-                {t('URL')}
-              </Label>
-              <Input
-                type="url"
-                id="url"
-                placeholder="https://example.com/image.jpg"
-                className="col-span-3"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="alt" className="text-right">
-                {t('Alt Text')}
-              </Label>
-              <Input
-                type="text"
-                id="alt"
-                placeholder={t('Image description')}
-                className="col-span-3"
-                value={alt}
-                onChange={(e) => setAlt(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="flex justify-end">
-            <Button onClick={handleConfirm}>{t('Confirm')}</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-};
-
-const FormatButton = ({ editor, format, icon }: { editor: any, format: any, icon: any }) => {
-  const isActive = isMarkActive(editor, format);
-  return (
-    <Button
-      variant="outline"
-      size="icon"
-      active={isActive}
-      onClick={() => toggleMark(editor, format)}
-    >
-      {icon}
-    </Button>
-  );
-};
-
-const BlockButton = ({ editor, format, icon }: { editor: any, format: any, icon: any }) => {
-  const isActive = isBlockActive(editor, format);
-  return (
-    <Button
-      variant="outline"
-      size="icon"
-      active={isActive}
-      onClick={() => toggleBlock(editor, format)}
-    >
-      {icon}
-    </Button>
-  );
-};
-
-const AlignButton = ({ editor, format, icon }: { editor: any, format: any, icon: any }) => {
-  const isActive = isAlignActive(editor, format);
-  return (
-    <Button
-      variant="outline"
-      size="icon"
-      active={isActive}
-      onClick={() => toggleAlign(editor, format)}
-    >
-      {icon}
-    </Button>
-  );
-};
-
-const Element = ({ attributes, children, element }: any) => {
-  switch (element.type) {
-    case 'block-quote':
-      return <blockquote {...attributes}>{children}</blockquote>;
-    case 'bulleted-list':
-      return <ul {...attributes}>{children}</ul>;
-    case 'heading-one':
-      return <h1 {...attributes}>{children}</h1>;
-    case 'heading-two':
-      return <h2 {...attributes}>{children}</h2>;
-    case 'heading-three':
-      return <h3 {...attributes}>{children}</h3>;
-    case 'list-item':
-      return <li {...attributes}>{children}</li>;
-    case 'numbered-list':
-      return <ol {...attributes}>{children}</ol>;
-    case 'align-left':
-      return <div style={{ textAlign: 'left' }} {...attributes}>{children}</div>;
-    case 'align-center':
-      return <div style={{ textAlign: 'center' }} {...attributes}>{children}</div>;
-    case 'align-right':
-      return <div style={{ textAlign: 'right' }} {...attributes}>{children}</div>;
-    case 'link':
-      return (
-        <a href={element.url} {...attributes}>
-          {children}
-        </a>
-      );
-    case 'image':
-      return (
-        <img
-          src={element.url}
-          alt={element.alt}
-          style={{ maxWidth: '100%', height: 'auto' }}
-          {...attributes}
-        />
-      );
-    default:
-      return <p {...attributes}>{children}</p>;
-  }
-};
-
-const Leaf = ({ attributes, children, leaf }: any) => {
-  if (leaf.bold) {
-    children = <strong>{children}</strong>;
-  }
-
-  if (leaf.italic) {
-    children = <em>{children}</em>;
-  }
-
-  if (leaf.underline) {
-    children = <u>{children}</u>;
-  }
-
-  if (leaf.code) {
-    children = <code>{children}</code>;
-  }
-
-  return <span {...attributes}>{children}</span>;
-};
-
-const isMarkActive = (editor: any, format: any) => {
-  const marks = Editor.marks(editor);
-  return marks ? marks[format] === true : false;
-};
-
-const isBlockActive = (editor: any, format: any) => {
-  const { selection } = editor;
-  if (!selection) return false;
-
-  const [block] = Editor.nodes(editor, {
-    at: Editor.unhangRange(editor, selection),
-    match: n =>
-      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === format,
-  });
-
-  return !!block;
-};
-
-const isAlignActive = (editor: any, format: any) => {
-  const { selection } = editor;
-  if (!selection) return false;
-
-  const [block] = Editor.nodes(editor, {
-    at: Editor.unhangRange(editor, selection),
-    match: n =>
-      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === format,
-  });
-
-  return !!block;
-};
-
-const toggleMark = (editor: any, format: any) => {
-  if (isMarkActive(editor, format)) {
-    Editor.removeMark(editor, format);
-  } else {
-    Editor.addMark(editor, format, true);
-  }
-};
-
-const toggleBlock = (editor: any, format: any) => {
-  const isActive = isBlockActive(editor, format);
-  const isList = ['numbered-list', 'bulleted-list'].includes(format);
-
-  Transforms.unwrapNodes(editor, {
-    match: n =>
-      !Editor.isEditor(n) &&
-      SlateElement.isElement(n) &&
-      ['numbered-list', 'bulleted-list', 'block-quote', 'heading-one', 'heading-two', 'heading-three'].includes(n.type as string),
-    split: true,
-  });
-
-  let newProperties: Partial<SlateElement> = {
-    type: isActive ? 'paragraph' : isList ? 'list-item' : format,
-  };
-
-  Transforms.setNodes(editor, newProperties);
-
-  if (!isActive && isList) {
-    const block = { type: format, children: [] }
-    Transforms.wrapNodes(editor, block);
-  }
-};
-
-const toggleAlign = (editor: any, format: any) => {
-  const isActive = isAlignActive(editor, format);
-
-  Transforms.unwrapNodes(editor, {
-    match: n =>
-      !Editor.isEditor(n) &&
-      SlateElement.isElement(n) &&
-      ['align-left', 'align-center', 'align-right'].includes(n.type as string),
-    split: true,
-  });
-
-  if (!isActive) {
-    const block = { type: format, children: [] }
-    Transforms.wrapNodes(editor, block);
-  }
-};
-
-const insertLink = (editor: any, url: string) => {
-  if (editor.selection) {
-    wrapLink(editor, url);
-  }
-};
-
-const wrapLink = (editor: any, url: string) => {
-  if (isLinkActive(editor)) {
-    unwrapLink(editor);
-  }
-
-  const { selection } = editor;
-  const isCollapsed = selection && Range.isCollapsed(selection);
-  const link: Link = {
-    type: 'link',
-    url,
-    children: isCollapsed ? [{ text: url }] : [],
-  };
-
-  if (isCollapsed) {
-    Transforms.insertNodes(editor, link);
-  } else {
-    Transforms.wrapNodes(editor, link, { split: true });
-    Transforms.collapse(editor, { edge: 'end' });
-  }
-};
-
-const insertImage = (editor: any, url: string, alt: string) => {
-  const image: ImageElement = {
-    type: 'image',
-    url,
-    alt,
-    children: [{ text: '' }],
-  };
-  Transforms.insertNodes(editor, image);
-};
-
-const unwrapLink = (editor: any) => {
-  Transforms.unwrapNodes(editor, {
-    match: n =>
-      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === 'link',
-    split: true,
-  });
-};
-
-const isLinkActive = (editor: any) => {
-  const { selection } = editor;
-  if (!selection) return false;
-
-  const [link] = Editor.nodes(editor, {
-    at: Editor.unhangRange(editor, selection),
-    match: n =>
-      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === 'link',
-  });
-
-  return !!link;
-};
-
-export type BlockQuote = {
-  type: 'block-quote'
-  children: CustomText[]
-}
-
-export type BulletedList = {
-  type: 'bulleted-list'
-  children: CustomText[]
-}
-
-export type HeadingOne = {
-  type: 'heading-one'
-  children: CustomText[]
-}
-
-export type HeadingTwo = {
-  type: 'heading-two'
-  children: CustomText[]
-}
-
-export type HeadingThree = {
-  type: 'heading-three'
-  children: CustomText[]
-}
-
-export type ListItem = {
-  type: 'list-item'
-  children: CustomText[]
-}
-
-export type NumberedList = {
-  type: 'numbered-list'
-  children: CustomText[]
-}
-
-export type AlignLeft = {
-  type: 'align-left'
-  children: CustomText[]
-}
-
-export type AlignCenter = {
-  type: 'align-center'
-  children: CustomText[]
-}
-
-export type AlignRight = {
-  type: 'align-right'
-  children: CustomText[]
-}
-
-export type Link = {
-  type: 'link'
-  url: string
-  children: CustomText[]
-}
-
-export type ImageElement = {
-  type: 'image'
-  url: string
-  alt: string
-  children: CustomText[]
-}
-
-export type Paragraph = {
-  type: 'paragraph'
-  children: CustomText[]
-}
-
-export type CustomElement =
-  | BlockQuote
-  | BulletedList
-  | HeadingOne
-  | HeadingTwo
-  | HeadingThree
-  | ListItem
-  | NumberedList
-  | AlignLeft
-  | AlignCenter
-  | AlignRight
-  | Link
-  | ImageElement
-  | Paragraph
-
-export type CustomText = {
-  text: string
-  bold?: boolean
-  italic?: boolean
-  underline?: boolean
-  code?: boolean
-}
-
-declare module 'slate' {
-  interface CustomTypes {
-    Editor: BaseEditor & ReactEditor
-    Element: CustomElement
-    Text: CustomText
-  }
-}
-
-import { BaseEditor, Range } from 'slate';
-import { ReactEditor } from 'slate-react';
 
 export default BlogEditor;
