@@ -21,6 +21,13 @@ import ToursPage from "@/pages/admin/tours/ToursPage";
 import CreateTourPage from "@/pages/admin/tours/CreateTourPage";
 import EditTourPage from "@/pages/admin/tours/EditTourPage";
 
+// New admin settings pages
+import AerolineasPage from "@/pages/admin/settings/AerolineasPage";
+import DestinosPage from "@/pages/admin/settings/DestinosPage";
+import ItemsPage from "@/pages/admin/settings/ItemsPage";
+import RegalosPage from "@/pages/admin/settings/RegalosPage";
+import TerminosPage from "@/pages/admin/settings/TerminosPage";
+
 import "./App.css";
 import { ThemeProvider } from "./providers/ThemeProvider";
 
@@ -104,6 +111,48 @@ function App() {
             element={
               <ProtectedRoute>
                 <EditTourPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* New Admin Settings Routes */}
+          <Route
+            path="/admin/settings/aerolineas"
+            element={
+              <ProtectedRoute>
+                <AerolineasPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/settings/destinos"
+            element={
+              <ProtectedRoute>
+                <DestinosPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/settings/items"
+            element={
+              <ProtectedRoute>
+                <ItemsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/settings/regalos"
+            element={
+              <ProtectedRoute>
+                <RegalosPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/settings/terminos"
+            element={
+              <ProtectedRoute>
+                <TerminosPage />
               </ProtectedRoute>
             }
           />

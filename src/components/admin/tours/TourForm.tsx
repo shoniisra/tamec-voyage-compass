@@ -225,12 +225,14 @@ const TourForm = ({ tour }: TourFormProps) => {
     }
   }, [tour, form]);
   
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const handleSubmit = async (data: any) => {
+    setIsSubmitting(true);
+    
     try {
       const tourData = {
-        ...values,
-        fecha_publicacion: values.fecha_publicacion ? values.fecha_publicacion.toISOString().split('T')[0] : null,
-        fecha_caducidad: values.fecha_caducidad ? values.fecha_caducidad.toISOString().split('T')[0] : null,
+        ...data,
+        aerolinea_id: data.aerolinea_id ? parseInt(data.aerolinea_id) : null,
+        terminos_condiciones_id: data.terminos_condiciones_id ? parseInt(data.terminos_condiciones_id) : null,
       };
       
       const destinos = selectedDestinos.map((destino, index) => ({
@@ -260,7 +262,7 @@ const TourForm = ({ tour }: TourFormProps) => {
         });
         navigate(`/admin/tours/edit/${newTourId}`);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error saving tour:', error);
       toast({
         variant: "destructive",

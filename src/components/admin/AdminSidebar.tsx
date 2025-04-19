@@ -1,155 +1,234 @@
-import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import {
-  LayoutDashboard,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Home,
   FileText,
   Tag,
-  Plane
+  Map,
+  Settings,
+  Plane,
+  Globe,
+  CheckSquare,
+  Gift,
+  BookText,
+  ChevronDown,
+  ChevronRight
 } from 'lucide-react';
 
-interface NavItemProps {
-  name: string;
-  icon: React.ReactNode;
-  href?: string;
-  submenu?: { name: string; href: string; current: boolean }[];
-  current?: boolean;
-  open?: boolean;
-}
-
-const NavItem: React.FC<NavItemProps> = ({ name, icon, href, submenu, current, open }) => {
-  const [isSubmenuOpen, setIsSubmenuOpen] = React.useState(open || false);
-  
-  const toggleSubmenu = () => {
-    setIsSubmenuOpen(!isSubmenuOpen);
-  };
-  
-  if (submenu) {
-    return (
-      <li className="mb-1">
-        <button
-          className={cn(
-            "flex items-center w-full p-3 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
-            isSubmenuOpen ? "bg-accent text-accent-foreground" : "text-muted-foreground"
-          )}
-          onClick={toggleSubmenu}
-        >
-          {icon}
-          <span className="ml-3 flex-1">{name}</span>
-          <svg
-            className={cn(
-              "ml-2 h-4 w-4 shrink-0 transition-transform duration-200",
-              isSubmenuOpen ? "rotate-90" : ""
-            )}
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </button>
-        {isSubmenuOpen && (
-          <ul className="ml-6 mt-2 space-y-1">
-            {submenu.map(sub => (
-              <li key={sub.name}>
-                <NavLink
-                  to={sub.href}
-                  className={({ isActive }) =>
-                    cn(
-                      "block p-3 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
-                      isActive ? "bg-accent text-accent-foreground" : "text-muted-foreground"
-                    )
-                  }
-                >
-                  {sub.name}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-        )}
-      </li>
-    );
-  } else {
-    return (
-      <li>
-        <NavLink
-          to={href || '#'}
-          className={({ isActive }) =>
-            cn(
-              "flex items-center p-3 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
-              isActive ? "bg-accent text-accent-foreground" : "text-muted-foreground"
-            )
-          }
-        >
-          {icon}
-          <span className="ml-3">{name}</span>
-        </NavLink>
-      </li>
-    );
-  }
-};
-
-const AdminSidebar: React.FC = () => {
+const AdminSidebar = () => {
   const { language } = useLanguage();
   const location = useLocation();
-  
-  const navItems = [
-    { 
-      name: language === 'en' ? 'Dashboard' : 'Panel', 
-      icon: <LayoutDashboard className="w-5 h-5" />, 
-      href: '/admin/dashboard',
-      current: location.pathname === '/admin/dashboard'
-    },
-    { 
-      name: 'Blog', 
-      icon: <FileText className="w-5 h-5" />,
-      submenu: [
-        { 
-          name: language === 'en' ? 'Posts' : 'Publicaciones', 
-          href: '/admin/blog/posts',
-          current: location.pathname === '/admin/blog/posts'
-        },
-        { 
-          name: language === 'en' ? 'Tags' : 'Etiquetas', 
-          href: '/admin/blog/tags',
-          current: location.pathname === '/admin/blog/tags'
-        }
-      ],
-      open: location.pathname.includes('/admin/blog')
-    },
-    { 
-      name: language === 'en' ? 'Tours' : 'Tours', 
-      icon: <Plane className="w-5 h-5" />,
-      submenu: [
-        { 
-          name: language === 'en' ? 'All Tours' : 'Todos los Tours', 
-          href: '/admin/tours',
-          current: location.pathname === '/admin/tours'
-        },
-        { 
-          name: language === 'en' ? 'Destinations' : 'Destinos', 
-          href: '/admin/destinations',
-          current: location.pathname === '/admin/destinations'
-        }
-      ],
-      open: location.pathname.includes('/admin/tours') || location.pathname.includes('/admin/destinations')
+  const [expanded, setExpanded] = useState<string[]>([]);
+
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+
+  // Determine which accordions should be open based on current path
+  React.useEffect(() => {
+    const newExpanded = [];
+    
+    if (location.pathname.includes('/admin/blog')) {
+      newExpanded.push('blog');
     }
-  ];
+    
+    if (location.pathname.includes('/admin/tours')) {
+      newExpanded.push('tours');
+    }
+    
+    if (location.pathname.includes('/admin/settings')) {
+      newExpanded.push('settings');
+    }
+    
+    setExpanded(newExpanded);
+  }, [location.pathname]);
 
   return (
-    <div className="w-full h-full bg-gray-50 dark:bg-gray-900 border rounded-md p-4 max-w-xs">
-      <nav className="flex flex-col space-y-1">
-        <ul>
-          {navItems.map(item => (
-            <NavItem key={item.name} {...item} />
-          ))}
-        </ul>
-      </nav>
+    <div className="w-full h-full bg-card border rounded-lg p-4 flex flex-col">
+      <h2 className="text-xl font-bold mb-4">
+        {language === 'en' ? 'Admin Panel' : 'Panel de Administración'}
+      </h2>
+      
+      <div className="space-y-2 flex-1">
+        <Button 
+          variant={isActive('/admin/dashboard') ? "default" : "ghost"} 
+          className="w-full justify-start" 
+          asChild
+        >
+          <Link to="/admin/dashboard">
+            <Home className="h-4 w-4 mr-2" />
+            {language === 'en' ? 'Dashboard' : 'Tablero'}
+          </Link>
+        </Button>
+        
+        <Accordion 
+          type="multiple" 
+          value={expanded} 
+          onValueChange={setExpanded} 
+          className="w-full"
+        >
+          <AccordionItem value="blog" className="border-0">
+            <AccordionTrigger className="py-2 px-3 hover:bg-muted hover:no-underline rounded-md">
+              <div className="flex items-center">
+                <FileText className="h-4 w-4 mr-2" />
+                <span className="text-sm font-medium">
+                  {language === 'en' ? 'Blog' : 'Blog'}
+                </span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="pt-1 pb-0 px-1">
+              <div className="flex flex-col space-y-1 ml-6">
+                <Button 
+                  variant={isActive('/admin/blog/posts') ? "default" : "ghost"} 
+                  size="sm" 
+                  className="justify-start" 
+                  asChild
+                >
+                  <Link to="/admin/blog/posts">
+                    {language === 'en' ? 'All Posts' : 'Todos los Posts'}
+                  </Link>
+                </Button>
+                <Button 
+                  variant={isActive('/admin/blog/posts/create') ? "default" : "ghost"} 
+                  size="sm" 
+                  className="justify-start" 
+                  asChild
+                >
+                  <Link to="/admin/blog/posts/create">
+                    {language === 'en' ? 'Create Post' : 'Crear Post'}
+                  </Link>
+                </Button>
+                <Button 
+                  variant={isActive('/admin/blog/tags') ? "default" : "ghost"} 
+                  size="sm" 
+                  className="justify-start" 
+                  asChild
+                >
+                  <Link to="/admin/blog/tags">
+                    <Tag className="h-3 w-3 mr-2" />
+                    {language === 'en' ? 'Tags' : 'Etiquetas'}
+                  </Link>
+                </Button>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          
+          <AccordionItem value="tours" className="border-0">
+            <AccordionTrigger className="py-2 px-3 hover:bg-muted hover:no-underline rounded-md">
+              <div className="flex items-center">
+                <Map className="h-4 w-4 mr-2" />
+                <span className="text-sm font-medium">
+                  {language === 'en' ? 'Tours' : 'Tours'}
+                </span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="pt-1 pb-0 px-1">
+              <div className="flex flex-col space-y-1 ml-6">
+                <Button 
+                  variant={isActive('/admin/tours') ? "default" : "ghost"} 
+                  size="sm" 
+                  className="justify-start" 
+                  asChild
+                >
+                  <Link to="/admin/tours">
+                    {language === 'en' ? 'All Tours' : 'Todos los Tours'}
+                  </Link>
+                </Button>
+                <Button 
+                  variant={isActive('/admin/tours/create') ? "default" : "ghost"} 
+                  size="sm" 
+                  className="justify-start" 
+                  asChild
+                >
+                  <Link to="/admin/tours/create">
+                    {language === 'en' ? 'Create Tour' : 'Crear Tour'}
+                  </Link>
+                </Button>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          
+          <AccordionItem value="settings" className="border-0">
+            <AccordionTrigger className="py-2 px-3 hover:bg-muted hover:no-underline rounded-md">
+              <div className="flex items-center">
+                <Settings className="h-4 w-4 mr-2" />
+                <span className="text-sm font-medium">
+                  {language === 'en' ? 'Settings' : 'Configuración'}
+                </span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="pt-1 pb-0 px-1">
+              <div className="flex flex-col space-y-1 ml-6">
+                <Button 
+                  variant={isActive('/admin/settings/aerolineas') ? "default" : "ghost"} 
+                  size="sm" 
+                  className="justify-start" 
+                  asChild
+                >
+                  <Link to="/admin/settings/aerolineas">
+                    <Plane className="h-3 w-3 mr-2" />
+                    {language === 'en' ? 'Airlines' : 'Aerolíneas'}
+                  </Link>
+                </Button>
+                <Button 
+                  variant={isActive('/admin/settings/destinos') ? "default" : "ghost"} 
+                  size="sm" 
+                  className="justify-start" 
+                  asChild
+                >
+                  <Link to="/admin/settings/destinos">
+                    <Globe className="h-3 w-3 mr-2" />
+                    {language === 'en' ? 'Destinations' : 'Destinos'}
+                  </Link>
+                </Button>
+                <Button 
+                  variant={isActive('/admin/settings/items') ? "default" : "ghost"} 
+                  size="sm" 
+                  className="justify-start" 
+                  asChild
+                >
+                  <Link to="/admin/settings/items">
+                    <CheckSquare className="h-3 w-3 mr-2" />
+                    {language === 'en' ? 'Included Items' : 'Items Incluidos'}
+                  </Link>
+                </Button>
+                <Button 
+                  variant={isActive('/admin/settings/regalos') ? "default" : "ghost"} 
+                  size="sm" 
+                  className="justify-start" 
+                  asChild
+                >
+                  <Link to="/admin/settings/regalos">
+                    <Gift className="h-3 w-3 mr-2" />
+                    {language === 'en' ? 'Gifts' : 'Regalos'}
+                  </Link>
+                </Button>
+                <Button 
+                  variant={isActive('/admin/settings/terminos') ? "default" : "ghost"} 
+                  size="sm" 
+                  className="justify-start" 
+                  asChild
+                >
+                  <Link to="/admin/settings/terminos">
+                    <BookText className="h-3 w-3 mr-2" />
+                    {language === 'en' ? 'Terms & Conditions' : 'Términos y Condiciones'}
+                  </Link>
+                </Button>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
     </div>
   );
 };
