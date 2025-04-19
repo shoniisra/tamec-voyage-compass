@@ -80,18 +80,21 @@ export type Database = {
         Row: {
           codigo: string | null
           id: number
+          logo_url: string | null
           nombre: string
           pais_origen: string | null
         }
         Insert: {
           codigo?: string | null
           id?: number
+          logo_url?: string | null
           nombre: string
           pais_origen?: string | null
         }
         Update: {
           codigo?: string | null
           id?: number
+          logo_url?: string | null
           nombre?: string
           pais_origen?: string | null
         }

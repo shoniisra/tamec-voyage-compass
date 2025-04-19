@@ -1,12 +1,10 @@
 
 import React from 'react';
-import Layout from '@/components/layout/Layout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import AdminSidebar from '@/components/admin/AdminSidebar';
+import AdminLayout from '@/components/admin/layout/AdminLayout';
 import AdminDashboardContent from '@/components/admin/AdminDashboardContent';
 
 const AdminDashboardPage = () => {
@@ -23,19 +21,9 @@ const AdminDashboardPage = () => {
   }
 
   return (
-    <Layout fullWidth  className="bg-gray-50 dark:bg-gray-900 min-h-screen p-0">
-      <SidebarProvider>
-        <div className="flex min-h-screen w-full ">
-          <div className="lg:w-max-md">
-          <AdminSidebar/>
-
-          </div>
-          <div className="flex-1 w-full">
-            <AdminDashboardContent />
-          </div>
-        </div>
-      </SidebarProvider>
-    </Layout>
+    <AdminLayout>
+      <AdminDashboardContent />
+    </AdminLayout>
   );
 };
 
