@@ -21,13 +21,9 @@ export type Tour = {
   aerolinea?: Aerolinea;
   regalos?: Regalo[];
   incluye?: Incluye[];
+  actividades?: Actividad[];
   componentes?: ComponentesIncluidos;
-};
-
-export type Destino = {
-  id: number;
-  pais: string;
-  ciudad: string | null;
+  adjuntos?: Adjunto[];
 };
 
 export type TourDestino = {
@@ -36,6 +32,12 @@ export type TourDestino = {
   destino_id: number | null;
   orden: number | null;
   destino?: Destino;
+};
+
+export type Destino = {
+  id: number;
+  pais: string;
+  ciudad: string | null;
 };
 
 export type Salida = {
@@ -56,6 +58,23 @@ export type Precio = {
   precio: number;
 };
 
+export type Actividad = {
+  id: number;
+  nombre: string;
+  descripcion: string | null;
+  incluida: boolean | null;
+  costo_adicional: number | null;
+  tour_id: number | null;
+};
+
+export type Adjunto = {
+  id: number;
+  descripcion: string | null;
+  tipo_archivo: string | null;
+  url_archivo: string;
+  tour_id: number | null;
+};
+
 export type Aerolinea = {
   id: number;
   nombre: string;
@@ -69,24 +88,10 @@ export type Regalo = {
   descripcion: string | null;
 };
 
-export type TourRegalo = {
-  id: number;
-  tour_id: number | null;
-  regalo_id: number | null;
-  regalo?: Regalo;
-};
-
 export type Incluye = {
   id: number;
   nombre: string;
   descripcion: string | null;
-};
-
-export type TourIncluye = {
-  id: number;
-  tour_id: number | null;
-  incluye_id: number | null;
-  incluye?: Incluye;
 };
 
 export type ComponentesIncluidos = {
@@ -108,12 +113,6 @@ export type Foto = {
   url_imagen: string;
   descripcion: string | null;
   orden: number | null;
-};
-
-export type TerminosCondiciones = {
-  id: number;
-  titulo: string | null;
-  contenido: string;
 };
 
 export type TourFilterParams = {
