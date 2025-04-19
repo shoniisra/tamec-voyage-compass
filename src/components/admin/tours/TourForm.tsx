@@ -93,6 +93,7 @@ const TourForm = ({ tour }: TourFormProps) => {
     incluye_maleta_10kg: false,
     incluye_articulo_personal: false,
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -262,13 +263,15 @@ const TourForm = ({ tour }: TourFormProps) => {
         });
         navigate(`/admin/tours/edit/${newTourId}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving tour:', error);
       toast({
         variant: "destructive",
         title: language === 'en' ? "Error Saving Tour" : "Error al Guardar el Tour",
         description: error.message || (language === 'en' ? "An error occurred while saving the tour." : "Ocurrió un error al guardar el tour."),
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
@@ -363,7 +366,7 @@ const TourForm = ({ tour }: TourFormProps) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <Tabs defaultValue="basic">
           <TabsList className="grid grid-cols-5 mb-4">
             <TabsTrigger value="basic">
@@ -1229,12 +1232,12 @@ const TourForm = ({ tour }: TourFormProps) => {
             type="button"
             variant="outline"
             onClick={() => navigate('/admin/tours')}
-            disabled={isLoading}
+            disabled={isLoading || isSubmitting}
           >
             {language === 'en' ? 'Cancel' : 'Cancelar'}
           </Button>
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? (
+          <Button type="submit" disabled={isLoading || isSubmitting}>
+            {isLoading || isSubmitting ? (
               <>
                 <div className="animate-spin mr-2 h-4 w-4 border-2 border-background border-t-transparent rounded-full" />
                 {language === 'en' ? 'Saving...' : 'Guardando...'}
