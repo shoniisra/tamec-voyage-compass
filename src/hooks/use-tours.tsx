@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tour, TourFilterParams } from '@/types/tour';
@@ -18,19 +17,28 @@ export const useTours = (filters?: TourFilterParams) => {
           .from('tours')
           .select(`
             *,
+            aerolinea:aerolinea_id(*),
             tour_destinos(
               id,
+              destino_id,
               orden,
-              destinos(id, pais, ciudad)
+              destino:destino_id(*)
             ),
             salidas(
               id,
               fecha_salida,
               dias_duracion,
-              cupos_disponibles,
-              precios(id, tipo_habitacion, forma_pago, precio)
+              cupos_disponibles
             ),
-            fotos(id, url_imagen, descripcion, orden)
+            fotos(id, url_imagen, descripcion, orden),
+            precios(
+              id,
+              ciudad_salida,
+              tipo_habitacion,
+              forma_pago,
+              precio
+            ),
+            componentes_incluidos(*)
           `)
           .order('id', { ascending: false });
 
@@ -62,17 +70,13 @@ export const useTours = (filters?: TourFilterParams) => {
         if (data) {
           // Process and transform the data
           const transformedTours: Tour[] = data.map((tour: any) => {
-            // Calculate the minimum price across all salidas and precios
+            // Calculate the minimum price across all prices
             let precioDesde = Infinity;
             
-            if (tour.salidas && tour.salidas.length > 0) {
-              tour.salidas.forEach((salida: any) => {
-                if (salida.precios && salida.precios.length > 0) {
-                  salida.precios.forEach((precio: any) => {
-                    if (precio.precio < precioDesde) {
-                      precioDesde = precio.precio;
-                    }
-                  });
+            if (tour.precios && tour.precios.length > 0) {
+              tour.precios.forEach((precio: any) => {
+                if (precio.precio < precioDesde) {
+                  precioDesde = precio.precio;
                 }
               });
             }
@@ -81,7 +85,7 @@ export const useTours = (filters?: TourFilterParams) => {
               ...tour,
               destinos: tour.tour_destinos?.map((td: any) => ({
                 ...td,
-                destino: td.destinos 
+                destino: td.destino
               })) || [],
               precio_desde: precioDesde !== Infinity ? precioDesde : null
             };
