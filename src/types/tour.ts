@@ -101,6 +101,14 @@ export type ComponentesIncluidos = {
   incluye_articulo_personal: boolean;
 };
 
+export type Foto = {
+  id: number;
+  tour_id: number | null;
+  url_imagen: string;
+  descripcion: string | null;
+  orden: number | null;
+};
+
 export type TerminosCondiciones = {
   id: number;
   titulo: string | null;

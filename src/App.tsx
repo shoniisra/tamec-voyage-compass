@@ -1,3 +1,4 @@
+
 import { Suspense, lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
@@ -17,6 +18,8 @@ import CreateBlogPostPage from "@/pages/admin/blog/CreateBlogPostPage";
 import EditBlogPostPage from "@/pages/admin/blog/EditBlogPostPage";
 import TagsPage from "@/pages/admin/blog/TagsPage";
 import ToursPage from "@/pages/admin/tours/ToursPage";
+import CreateTourPage from "@/pages/admin/tours/CreateTourPage";
+import EditTourPage from "@/pages/admin/tours/EditTourPage";
 
 import "./App.css";
 import { ThemeProvider } from "./providers/ThemeProvider";
@@ -85,6 +88,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <ToursPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/tours/create"
+            element={
+              <ProtectedRoute>
+                <CreateTourPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/tours/edit/:id"
+            element={
+              <ProtectedRoute>
+                <EditTourPage />
               </ProtectedRoute>
             }
           />

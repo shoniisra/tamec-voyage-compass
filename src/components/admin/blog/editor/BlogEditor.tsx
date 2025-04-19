@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
@@ -142,7 +141,7 @@ const BlogEditor = ({
       try {
         console.log("Initializing editor with data:", initialContent);
         
-        const editor = new EditorJS({
+        const editorConfig = {
           holder: "editor",
           tools: {
             header: {
@@ -283,7 +282,7 @@ const BlogEditor = ({
           autofocus: true,
           // Enable paste handling with configuration
           minHeight: 300,
-          logLevel: 'VERBOSE',
+          logLevel: 'ERROR' as LogLevels,
           
           // Fix paste functionality
           paste: {
@@ -298,7 +297,9 @@ const BlogEditor = ({
               video: /https?:\/\/\S+\.(mp4|webm|ogv|mov|avi)$/i,
             }
           }
-        });
+        };
+
+        const editor = new EditorJS(editorConfig);
 
         editorRef.current = editor;
         console.log("Editor initialized successfully");

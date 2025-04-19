@@ -110,24 +110,38 @@ export function useTour(slug: string) {
         if (incluyeError) throw incluyeError;
         
         // Map salidas with their corresponding prices
-        const formattedSalidas = salidasData.map(salida => ({
-          ...salida,
-          precios: preciosData.filter(precio => precio.tour_id === tourData.id)
-        }));
+        const formattedSalidas = salidasData.map(salida => {
+          const salidaPrecios = preciosData.filter(precio => precio.tour_id === tourData.id);
+          
+          return {
+            ...salida,
+            precios: salidaPrecios.map(precio => ({
+              ...precio,
+              tipo_habitacion: precio.tipo_habitacion as 'doble' | 'triple' | 'individual' | 'child',
+              forma_pago: precio.forma_pago as 'efectivo' | 'tarjeta'
+            }))
+          };
+        });
 
         // Format gifts and included items
         const regalos = regalosData?.map(item => item.regalo) || [];
         const incluye = incluyeData?.map(item => item.incluye) || [];
+        
+        // Format componentes_incluidos
+        const componentes = componentesData ? {
+          ...componentesData,
+          incluye_maleta_10kg: componentesData.incluye_maleta_10 || false
+        } : null;
         
         // Set final tour object
         setTour({
           ...tourData,
           destinos: destinosData,
           fotos: fotosData,
-          salidas: formattedSalidas,
+          salidas: formattedSalidas as Salida[],
           regalos,
           incluye,
-          componentes: componentesData || null
+          componentes: componentes as ComponentesIncluidos
         });
         
       } catch (error) {
