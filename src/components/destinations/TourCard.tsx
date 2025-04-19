@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Tour } from '@/types/tour';
@@ -43,8 +44,28 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
     }
   };
 
-  const getIconColor = (isIncluded: boolean | undefined) => 
-    isIncluded ? "text-yellow-500" : "text-gray-300";
+  // Check if service is included by looking at the componentes property
+  const isServiceIncluded = (serviceType: 'vuelo' | 'transporte' | 'hotel' | 'comida' | 'actividades'): boolean => {
+    if (!tour.componentes) return false;
+    
+    switch (serviceType) {
+      case 'vuelo':
+        return !!tour.componentes.incluye_vuelo;
+      case 'transporte':
+        return !!tour.componentes.incluye_transporte;
+      case 'hotel':
+        return !!tour.componentes.incluye_hotel;
+      case 'comida':
+        return !!tour.componentes.incluye_comida;
+      case 'actividades':
+        return !!tour.componentes.incluye_actividades;
+      default:
+        return false;
+    }
+  };
+  
+  const getIconColor = (serviceType: 'vuelo' | 'transporte' | 'hotel' | 'comida' | 'actividades') => 
+    isServiceIncluded(serviceType) ? "text-yellow-500 fill-yellow-500" : "text-gray-300";
   
   return (
     <Link to={`/destinations/${tour.slug}`} className="block h-full">
@@ -96,27 +117,27 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
             <div className="flex justify-between items-center px-2">
               <div className="tooltip" data-tip={language === 'en' ? 'Flight included' : 'Vuelo incluido'}>
                 <Plane 
-                  className={`h-5 w-5 ${getIconColor(tour.componentes?.incluye_vuelo)}`}
+                  className={`h-5 w-5 ${getIconColor('vuelo')}`}
                 />
               </div>
               <div className="tooltip" data-tip={language === 'en' ? 'Transportation' : 'Transporte'}>
                 <Bus 
-                  className={`h-5 w-5 ${getIconColor(tour.componentes?.incluye_transporte)}`}
+                  className={`h-5 w-5 ${getIconColor('transporte')}`}
                 />
               </div>
               <div className="tooltip" data-tip={language === 'en' ? 'Accommodation' : 'Hospedaje'}>
                 <Bed 
-                  className={`h-5 w-5 ${getIconColor(tour.componentes?.incluye_hotel)}`}
+                  className={`h-5 w-5 ${getIconColor('hotel')}`}
                 />
               </div>
               <div className="tooltip" data-tip={language === 'en' ? 'Meals included' : 'Comidas incluidas'}>
                 <Utensils 
-                  className={`h-5 w-5 ${getIconColor(tour.componentes?.incluye_comida)}`}
+                  className={`h-5 w-5 ${getIconColor('comida')}`}
                 />
               </div>
               <div className="tooltip" data-tip={language === 'en' ? 'Activities included' : 'Actividades incluidas'}>
                 <Camera 
-                  className={`h-5 w-5 ${getIconColor(tour.componentes?.incluye_actividades)}`}
+                  className={`h-5 w-5 ${getIconColor('actividades')}`}
                 />
               </div>
             </div>
