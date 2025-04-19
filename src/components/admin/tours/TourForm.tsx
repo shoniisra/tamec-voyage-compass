@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -38,7 +37,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { es } from 'date-fns/locale';
 
-// Define the form schema with Zod
 const formSchema = z.object({
   titulo: z.string().min(3, {
     message: 'Title must be at least 3 characters.',
@@ -96,7 +94,6 @@ const TourForm = ({ tour }: TourFormProps) => {
     incluye_articulo_personal: false,
   });
   
-  // Initialize form with react-hook-form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -116,11 +113,9 @@ const TourForm = ({ tour }: TourFormProps) => {
     },
   });
   
-  // Fetch reference data
   useEffect(() => {
     const fetchReferenceData = async () => {
       try {
-        // Fetch airlines
         const { data: aerolineasData, error: aerolineasError } = await supabase
           .from('aerolineas')
           .select('*')
@@ -129,7 +124,6 @@ const TourForm = ({ tour }: TourFormProps) => {
         if (aerolineasError) throw aerolineasError;
         setAerolineas(aerolineasData || []);
         
-        // Fetch generic gifts
         const { data: regalosData, error: regalosError } = await supabase
           .from('regalos_genericos')
           .select('*')
@@ -138,7 +132,6 @@ const TourForm = ({ tour }: TourFormProps) => {
         if (regalosError) throw regalosError;
         setRegalosGenericos(regalosData || []);
         
-        // Fetch generic included items
         const { data: incluyeData, error: incluyeError } = await supabase
           .from('incluye_generico')
           .select('*')
@@ -147,7 +140,6 @@ const TourForm = ({ tour }: TourFormProps) => {
         if (incluyeError) throw incluyeError;
         setIncluyeGenericos(incluyeData || []);
         
-        // Fetch terms and conditions templates
         const { data: terminosData, error: terminosError } = await supabase
           .from('terminos_condiciones')
           .select('*')
@@ -169,7 +161,6 @@ const TourForm = ({ tour }: TourFormProps) => {
     fetchReferenceData();
   }, [toast]);
   
-  // Populate form if editing an existing tour
   useEffect(() => {
     if (tour) {
       form.reset({
@@ -188,7 +179,6 @@ const TourForm = ({ tour }: TourFormProps) => {
         terminos_condiciones_id: tour.terminos_condiciones_id,
       });
       
-      // Set selected destinos
       if (tour.destinos && tour.destinos.length > 0) {
         const destinos = tour.destinos
           .filter(td => td.destino)
@@ -196,17 +186,14 @@ const TourForm = ({ tour }: TourFormProps) => {
         setSelectedDestinos(destinos);
       }
       
-      // Set selected regalos
       if (tour.regalos && tour.regalos.length > 0) {
         setSelectedRegalos(tour.regalos);
       }
       
-      // Set selected incluye
       if (tour.incluye && tour.incluye.length > 0) {
         setSelectedIncluye(tour.incluye);
       }
       
-      // Set salidas
       if (tour.salidas && tour.salidas.length > 0) {
         setSalidas(tour.salidas.map(salida => ({
           fecha_salida: salida.fecha_salida,
@@ -215,7 +202,6 @@ const TourForm = ({ tour }: TourFormProps) => {
         })));
       }
       
-      // Set precios
       if (tour.salidas && tour.salidas.length > 0 && tour.salidas[0].precios) {
         setPrecios(tour.salidas[0].precios.map(precio => ({
           ciudad_salida: precio.ciudad_salida,
@@ -225,7 +211,6 @@ const TourForm = ({ tour }: TourFormProps) => {
         })));
       }
       
-      // Set componentes
       if (tour.componentes) {
         setComponentes({
           incluye_vuelo: tour.componentes.incluye_vuelo,
@@ -240,7 +225,6 @@ const TourForm = ({ tour }: TourFormProps) => {
     }
   }, [tour, form]);
   
-  // Handle form submission
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const tourData = {
@@ -263,14 +247,12 @@ const TourForm = ({ tour }: TourFormProps) => {
       }));
       
       if (tour) {
-        // Update existing tour
         await updateTour(tour.id, tourData, destinos, salidas, precios, componentes, regalos, incluye);
         toast({
           title: language === 'en' ? "Tour Updated" : "Tour Actualizado",
           description: language === 'en' ? "The tour has been updated successfully." : "El tour ha sido actualizado con éxito.",
         });
       } else {
-        // Create new tour
         const newTourId = await createTour(tourData, destinos, salidas, precios, componentes, regalos, incluye);
         toast({
           title: language === 'en' ? "Tour Created" : "Tour Creado",
@@ -288,7 +270,6 @@ const TourForm = ({ tour }: TourFormProps) => {
     }
   };
   
-  // Add a new destination
   const addDestino = (destinoId: number) => {
     const destino = destinos.find(d => d.id === destinoId);
     if (destino && !selectedDestinos.some(d => d.id === destinoId)) {
@@ -296,12 +277,10 @@ const TourForm = ({ tour }: TourFormProps) => {
     }
   };
   
-  // Remove a destination
   const removeDestino = (destinoId: number) => {
     setSelectedDestinos(selectedDestinos.filter(d => d.id !== destinoId));
   };
   
-  // Add a new gift
   const addRegalo = (regaloId: number) => {
     const regalo = regalosGenericos.find(r => r.id === regaloId);
     if (regalo && !selectedRegalos.some(r => r.id === regaloId)) {
@@ -309,12 +288,10 @@ const TourForm = ({ tour }: TourFormProps) => {
     }
   };
   
-  // Remove a gift
   const removeRegalo = (regaloId: number) => {
     setSelectedRegalos(selectedRegalos.filter(r => r.id !== regaloId));
   };
   
-  // Add a new included item
   const addIncluye = (incluyeId: number) => {
     const incluye = incluyeGenericos.find(i => i.id === incluyeId);
     if (incluye && !selectedIncluye.some(i => i.id === incluyeId)) {
@@ -322,12 +299,10 @@ const TourForm = ({ tour }: TourFormProps) => {
     }
   };
   
-  // Remove an included item
   const removeIncluye = (incluyeId: number) => {
     setSelectedIncluye(selectedIncluye.filter(i => i.id !== incluyeId));
   };
   
-  // Add a new departure
   const addSalida = () => {
     setSalidas([
       ...salidas,
@@ -339,7 +314,6 @@ const TourForm = ({ tour }: TourFormProps) => {
     ]);
   };
   
-  // Update a departure
   const updateSalida = (index: number, field: string, value: any) => {
     const updatedSalidas = [...salidas];
     updatedSalidas[index] = {
@@ -349,12 +323,10 @@ const TourForm = ({ tour }: TourFormProps) => {
     setSalidas(updatedSalidas);
   };
   
-  // Remove a departure
   const removeSalida = (index: number) => {
     setSalidas(salidas.filter((_, i) => i !== index));
   };
   
-  // Add a new price
   const addPrecio = () => {
     setPrecios([
       ...precios,
@@ -367,7 +339,6 @@ const TourForm = ({ tour }: TourFormProps) => {
     ]);
   };
   
-  // Update a price
   const updatePrecio = (index: number, field: string, value: any) => {
     const updatedPrecios = [...precios];
     updatedPrecios[index] = {
@@ -377,12 +348,10 @@ const TourForm = ({ tour }: TourFormProps) => {
     setPrecios(updatedPrecios);
   };
   
-  // Remove a price
   const removePrecio = (index: number) => {
     setPrecios(precios.filter((_, i) => i !== index));
   };
   
-  // Update componentes
   const updateComponente = (field: string, value: boolean) => {
     setComponentes({
       ...componentes,
@@ -412,7 +381,6 @@ const TourForm = ({ tour }: TourFormProps) => {
             </TabsTrigger>
           </TabsList>
           
-          {/* Basic Info Tab */}
           <TabsContent value="basic" className="space-y-4">
             <Card>
               <CardHeader>
@@ -610,7 +578,7 @@ const TourForm = ({ tour }: TourFormProps) => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">
+                          <SelectItem value="0">
                             {language === 'en' ? '-- No airline --' : '-- Sin aerolínea --'}
                           </SelectItem>
                           {aerolineas.map((aerolinea) => (
@@ -674,7 +642,6 @@ const TourForm = ({ tour }: TourFormProps) => {
             </Card>
           </TabsContent>
           
-          {/* Destinations Tab */}
           <TabsContent value="destinations" className="space-y-4">
             <Card>
               <CardHeader>
@@ -733,7 +700,6 @@ const TourForm = ({ tour }: TourFormProps) => {
             </Card>
           </TabsContent>
           
-          {/* Details & Inclusions Tab */}
           <TabsContent value="details" className="space-y-4">
             <Card>
               <CardHeader>
@@ -980,7 +946,7 @@ const TourForm = ({ tour }: TourFormProps) => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">
+                          <SelectItem value="0">
                             {language === 'en' ? '-- Custom terms --' : '-- Términos personalizados --'}
                           </SelectItem>
                           {terminosCondiciones.map((termino) => (
@@ -1039,7 +1005,6 @@ const TourForm = ({ tour }: TourFormProps) => {
             </Card>
           </TabsContent>
           
-          {/* Departures Tab */}
           <TabsContent value="departures" className="space-y-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -1136,7 +1101,6 @@ const TourForm = ({ tour }: TourFormProps) => {
             </Card>
           </TabsContent>
           
-          {/* Prices Tab */}
           <TabsContent value="prices" className="space-y-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

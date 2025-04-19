@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -333,7 +332,7 @@ const ToursPage: React.FC = () => {
                       <TableCell>{formatDate(tour.fecha_publicacion)}</TableCell>
                       <TableCell>
                         {status === 'active' && (
-                          <Badge variant="success" className="flex items-center gap-1 w-fit">
+                          <Badge variant="secondary" className="flex items-center gap-1 w-fit bg-green-100 text-green-800 hover:bg-green-200">
                             <CheckCircle className="h-3 w-3" />
                             {language === 'en' ? 'Active' : 'Activo'}
                           </Badge>
