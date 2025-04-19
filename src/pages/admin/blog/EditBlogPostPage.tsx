@@ -1,11 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Layout from '@/components/layout/Layout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import AdminSidebar from '@/components/admin/AdminSidebar';
 import BlogEditor from '@/components/admin/blog/editor/BlogEditor';
 import { supabaseExtended } from '@/integrations/supabase/client-extended';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,6 +10,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Trash2 } from 'lucide-react';
+import AdminLayout from '@/components/admin/layout/AdminLayout';
 
 const EditBlogPostPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -41,7 +38,6 @@ const EditBlogPostPage = () => {
           
         if (error) throw error;
         
-        // If slug is not present, generate one from the title
         if (!data.slug && data.title) {
           data.slug = `${data.id}-${toKebabCase(data.title)}`;
         }
@@ -96,61 +92,52 @@ const EditBlogPostPage = () => {
 
   if (!isAdmin) {
     return (
-      <Layout>
-        <div className="container mx-auto py-10">
-          <p>You don't have permission to access this page.</p>
-        </div>
-      </Layout>
+      <div className="container mx-auto py-10">
+        <p>You don't have permission to access this page.</p>
+      </div>
     );
   }
 
   return (
-    <Layout fullWidth className="bg-gray-50 dark:bg-gray-900 min-h-screen p-0">
-      <SidebarProvider>
-        <div className="flex min-h-screen w-full">
-          <AdminSidebar />
-          <div className="flex-1 p-8">
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-3xl font-bold">Edit Blog Post</h1>
-              
-              <Button 
-                variant="destructive"
-                onClick={() => setIsDeleteDialogOpen(true)}
-                className="flex items-center gap-2"
-              >
-                <Trash2 className="h-4 w-4" />
-                Delete Post
-              </Button>
-            </div>
+    <AdminLayout>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Edit Blog Post</h1>
+        
+        <Button 
+          variant="destructive"
+          onClick={() => setIsDeleteDialogOpen(true)}
+          className="flex items-center gap-2"
+        >
+          <Trash2 className="h-4 w-4" />
+          Delete Post
+        </Button>
+      </div>
 
-            {loading ? (
-              <div className="space-y-4">
-                <Skeleton className="h-10 w-3/4" />
-                <Skeleton className="h-8 w-1/2" />
-                <Skeleton className="h-80 w-full" />
-              </div>
-            ) : error ? (
-              <div className="text-red-500">
-                Error: {error}
-              </div>
-            ) : blog ? (
-              <BlogEditor 
-                data={blog.content} 
-                onChange={handleContentChange}
-                initialTitle={blog.title}
-                initialContent={blog.content}
-                initialCoverImage={blog.cover_image}
-                initialSlug={blog.slug || ''}
-                initialTags={[]}
-                blogId={blog.id}
-                isEdit={true}
-              />
-            ) : (
-              <div>Blog post not found</div>
-            )}
-          </div>
+      {loading ? (
+        <div className="space-y-4">
+          <Skeleton className="h-10 w-3/4" />
+          <Skeleton className="h-8 w-1/2" />
+          <Skeleton className="h-80 w-full" />
         </div>
-      </SidebarProvider>
+      ) : error ? (
+        <div className="text-red-500">
+          Error: {error}
+        </div>
+      ) : blog ? (
+        <BlogEditor 
+          data={blog.content} 
+          onChange={handleContentChange}
+          initialTitle={blog.title}
+          initialContent={blog.content}
+          initialCoverImage={blog.cover_image}
+          initialSlug={blog.slug || ''}
+          initialTags={[]}
+          blogId={blog.id}
+          isEdit={true}
+        />
+      ) : (
+        <div>Blog post not found</div>
+      )}
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
@@ -173,7 +160,7 @@ const EditBlogPostPage = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </Layout>
+    </AdminLayout>
   );
 };
 
