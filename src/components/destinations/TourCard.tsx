@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Tour } from '@/types/tour';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, MapPinned, PlaneIcon, Star, Users, Sparkles, Timer } from 'lucide-react';
+import { Calendar, MapPinned, Star, Users, Sparkles, Plane, Bus, Bed, Utensils, Camera, Timer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -43,6 +42,9 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
       return dateString;
     }
   };
+
+  const getIconColor = (isIncluded: boolean | undefined) => 
+    isIncluded ? "text-yellow-500" : "text-gray-300";
   
   return (
     <Link to={`/destinations/${tour.slug}`} className="block h-full">
@@ -90,20 +92,41 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
           
           {/* Card Content */}
           <div className="p-4 space-y-4">
+            {/* Services Icons */}
+            <div className="flex justify-between items-center px-2">
+              <div className="tooltip" data-tip={language === 'en' ? 'Flight included' : 'Vuelo incluido'}>
+                <Plane 
+                  className={`h-5 w-5 ${getIconColor(tour.componentes?.incluye_vuelo)}`}
+                />
+              </div>
+              <div className="tooltip" data-tip={language === 'en' ? 'Transportation' : 'Transporte'}>
+                <Bus 
+                  className={`h-5 w-5 ${getIconColor(tour.componentes?.incluye_transporte)}`}
+                />
+              </div>
+              <div className="tooltip" data-tip={language === 'en' ? 'Accommodation' : 'Hospedaje'}>
+                <Bed 
+                  className={`h-5 w-5 ${getIconColor(tour.componentes?.incluye_hotel)}`}
+                />
+              </div>
+              <div className="tooltip" data-tip={language === 'en' ? 'Meals included' : 'Comidas incluidas'}>
+                <Utensils 
+                  className={`h-5 w-5 ${getIconColor(tour.componentes?.incluye_comida)}`}
+                />
+              </div>
+              <div className="tooltip" data-tip={language === 'en' ? 'Activities included' : 'Actividades incluidas'}>
+                <Camera 
+                  className={`h-5 w-5 ${getIconColor(tour.componentes?.incluye_actividades)}`}
+                />
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 gap-3">
               {/* Duration */}
               {tour.dias_duracion && (
                 <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                   <Timer className="h-4 w-4 mr-2 text-tamec-600" />
                   <span>{tour.dias_duracion} {language === 'en' ? 'days' : 'días'}</span>
-                </div>
-              )}
-              
-              {/* Flight Included */}
-              {tour.incluye_boleto_aereo && (
-                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                  <PlaneIcon className="h-4 w-4 mr-2 text-tamec-600" />
-                  <span>{language === 'en' ? 'Flight included' : 'Vuelo incluido'}</span>
                 </div>
               )}
               
