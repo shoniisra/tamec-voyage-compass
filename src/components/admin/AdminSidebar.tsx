@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -20,9 +19,7 @@ import {
   Globe,
   CheckSquare,
   Gift,
-  BookText,
-  ChevronDown,
-  ChevronRight
+  BookText
 } from 'lucide-react';
 
 const AdminSidebar = () => {
@@ -34,7 +31,6 @@ const AdminSidebar = () => {
     return location.pathname === path;
   };
 
-  // Determine which accordions should be open based on current path
   React.useEffect(() => {
     const newExpanded = [];
     
@@ -54,7 +50,7 @@ const AdminSidebar = () => {
   }, [location.pathname]);
 
   return (
-    <div className="w-full h-full bg-card border rounded-lg p-4 flex flex-col lg:w-max-md">
+    <div className="h-full bg-card border rounded-lg p-4 flex flex-col w-full">
       <h2 className="text-xl font-bold mb-4">
         {language === 'en' ? 'Admin Panel' : 'Panel de Administración'}
       </h2>

@@ -13,10 +13,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     <Layout fullWidth className="bg-gray-50 dark:bg-gray-900 min-h-screen p-0">
       <SidebarProvider>
         <div className="flex min-h-screen w-full">
-          <div className="lg:w-max-md">
+          <div className="w-64 max-w-xs flex-shrink-0">
             <AdminSidebar />
           </div>
-          <div className="flex-1 w-full p-6">
+          <div className="flex-1 p-6 overflow-auto">
             {children}
           </div>
         </div>

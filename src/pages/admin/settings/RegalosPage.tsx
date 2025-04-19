@@ -1,7 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import Layout from '@/components/layout/Layout';
-import AdminSidebar from '@/components/admin/AdminSidebar';
+import AdminLayout from '@/components/admin/layout/AdminLayout';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -96,7 +94,6 @@ const RegalosPage = () => {
     setIsSubmitting(true);
     
     try {
-      // Get the next available ID for a new gift
       let nextId = 1;
       if (!selectedRegalo) {
         const { data: maxIdData } = await supabase
@@ -112,7 +109,6 @@ const RegalosPage = () => {
       }
       
       if (selectedRegalo) {
-        // Update existing gift
         const { error } = await supabase
           .from('regalos_genericos')
           .update({
@@ -128,7 +124,6 @@ const RegalosPage = () => {
           description: language === 'en' ? 'The gift has been updated successfully' : 'El regalo ha sido actualizado exitosamente',
         });
       } else {
-        // Create new gift
         const { error } = await supabase
           .from('regalos_genericos')
           .insert({
@@ -165,7 +160,6 @@ const RegalosPage = () => {
     setIsSubmitting(true);
     
     try {
-      // Check if the gift is being used in any tours
       const { data: toursData, error: toursError } = await supabase
         .from('tour_regalos')
         .select('id')
@@ -214,112 +208,107 @@ const RegalosPage = () => {
   );
   
   return (
-    <Layout>
-      <div className="container mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-[250px_1fr] gap-8">
-        <AdminSidebar />
-        
-        <div>
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">
-              {language === 'en' ? 'Manage Gifts' : 'Administrar Regalos'}
-            </h1>
-            
-            <Button onClick={openCreateDialog}>
-              <Plus className="mr-2 h-4 w-4" />
-              {language === 'en' ? 'Add New Gift' : 'Agregar Nuevo Regalo'}
-            </Button>
-          </div>
+    <AdminLayout>
+      <div>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">
+            {language === 'en' ? 'Manage Gifts' : 'Administrar Regalos'}
+          </h1>
           
-          <div className="mb-6">
-            <div className="flex flex-col md:flex-row gap-4 mb-4">
-              <div className="relative w-full md:w-64">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder={language === 'en' ? 'Search gifts...' : 'Buscar regalos...'}
-                  className="pl-9"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-          
-          {loading ? (
-            <div className="p-6 text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-              <p className="mt-4 text-muted-foreground">
-                {language === 'en' ? 'Loading gifts...' : 'Cargando regalos...'}
-              </p>
-            </div>
-          ) : error ? (
-            <div className="p-6 text-center text-destructive">
-              <p>
-                {language === 'en' ? 'Error loading gifts: ' : 'Error al cargar regalos: '}
-                {error}
-              </p>
-            </div>
-          ) : (
-            <Table>
-              <TableCaption>
-                {language === 'en' 
-                  ? `Total of ${filteredRegalos.length} gifts` 
-                  : `Total de ${filteredRegalos.length} regalos`}
-              </TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{language === 'en' ? 'Name' : 'Nombre'}</TableHead>
-                  <TableHead>{language === 'en' ? 'Description' : 'Descripción'}</TableHead>
-                  <TableHead className="text-right">{language === 'en' ? 'Actions' : 'Acciones'}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredRegalos.map(regalo => (
-                  <TableRow key={regalo.id}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center">
-                        <Gift className="h-4 w-4 mr-2 text-muted-foreground" />
-                        {regalo.nombre}
-                      </div>
-                    </TableCell>
-                    <TableCell className="max-w-xs truncate">
-                      {regalo.descripcion || '-'}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => openEditDialog(regalo)}
-                        >
-                          <FileEdit className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-destructive"
-                          onClick={() => confirmDelete(regalo)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                
-                {filteredRegalos.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
-                      {language === 'en' ? 'No gifts found' : 'No se encontraron regalos'}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          )}
+          <Button onClick={openCreateDialog}>
+            <Plus className="mr-2 h-4 w-4" />
+            {language === 'en' ? 'Add New Gift' : 'Agregar Nuevo Regalo'}
+          </Button>
         </div>
+        
+        <div className="mb-6">
+          <div className="flex flex-col md:flex-row gap-4 mb-4">
+            <div className="relative w-full md:w-64">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder={language === 'en' ? 'Search gifts...' : 'Buscar regalos...'}
+                className="pl-9"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+        
+        {loading ? (
+          <div className="p-6 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-muted-foreground">
+              {language === 'en' ? 'Loading gifts...' : 'Cargando regalos...'}
+            </p>
+          </div>
+        ) : error ? (
+          <div className="p-6 text-center text-destructive">
+            <p>
+              {language === 'en' ? 'Error loading gifts: ' : 'Error al cargar regalos: '}
+              {error}
+            </p>
+          </div>
+        ) : (
+          <Table>
+            <TableCaption>
+              {language === 'en' 
+                ? `Total of ${filteredRegalos.length} gifts` 
+                : `Total de ${filteredRegalos.length} regalos`}
+            </TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{language === 'en' ? 'Name' : 'Nombre'}</TableHead>
+                <TableHead>{language === 'en' ? 'Description' : 'Descripción'}</TableHead>
+                <TableHead className="text-right">{language === 'en' ? 'Actions' : 'Acciones'}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredRegalos.map(regalo => (
+                <TableRow key={regalo.id}>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center">
+                      <Gift className="h-4 w-4 mr-2 text-muted-foreground" />
+                      {regalo.nombre}
+                    </div>
+                  </TableCell>
+                  <TableCell className="max-w-xs truncate">
+                    {regalo.descripcion || '-'}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => openEditDialog(regalo)}
+                      >
+                        <FileEdit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-destructive"
+                        onClick={() => confirmDelete(regalo)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+              
+              {filteredRegalos.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
+                    {language === 'en' ? 'No gifts found' : 'No se encontraron regalos'}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        )}
       </div>
       
-      {/* Create/Edit Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent>
           <DialogHeader>
@@ -382,7 +371,6 @@ const RegalosPage = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -420,7 +408,7 @@ const RegalosPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </Layout>
+    </AdminLayout>
   );
 };
 
