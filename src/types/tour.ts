@@ -97,7 +97,8 @@ export type ComponentesIncluidos = {
   incluye_transporte: boolean;
   incluye_comida: boolean;
   incluye_actividades: boolean;
-  incluye_maleta_10kg: boolean;
+  incluye_maleta_10: boolean;
+  incluye_maleta_23: boolean;
   incluye_articulo_personal: boolean;
 };
 

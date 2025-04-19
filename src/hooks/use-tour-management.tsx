@@ -26,7 +26,8 @@ export function useTourManagement() {
       incluye_transporte: boolean;
       incluye_comida: boolean;
       incluye_actividades: boolean;
-      incluye_maleta_10kg: boolean;
+      incluye_maleta_10: boolean;
+      incluye_maleta_23: boolean;
       incluye_articulo_personal: boolean;
     },
     regalos: Array<{ regalo_id: number }>,
@@ -120,7 +121,8 @@ export function useTourManagement() {
           incluye_transporte: componentes.incluye_transporte,
           incluye_comida: componentes.incluye_comida,
           incluye_actividades: componentes.incluye_actividades,
-          incluye_maleta_10kg: componentes.incluye_maleta_10kg,
+          incluye_maleta_10: componentes.incluye_maleta_10,
+          incluye_maleta_23: componentes.incluye_maleta_23,
           incluye_articulo_personal: componentes.incluye_articulo_personal,
         }]);
       
@@ -186,7 +188,8 @@ export function useTourManagement() {
       incluye_transporte: boolean;
       incluye_comida: boolean;
       incluye_actividades: boolean;
-      incluye_maleta_10kg: boolean;
+      incluye_maleta_10: boolean;
+      incluye_maleta_23: boolean;
       incluye_articulo_personal: boolean;
     },
     regalos: Array<{ regalo_id: number }>,
@@ -303,7 +306,8 @@ export function useTourManagement() {
           incluye_transporte: componentes.incluye_transporte,
           incluye_comida: componentes.incluye_comida,
           incluye_actividades: componentes.incluye_actividades,
-          incluye_maleta_10kg: componentes.incluye_maleta_10kg,
+          incluye_maleta_10: componentes.incluye_maleta_10,
+          incluye_maleta_23: componentes.incluye_maleta_23,
           incluye_articulo_personal: componentes.incluye_articulo_personal,
         }]);
       

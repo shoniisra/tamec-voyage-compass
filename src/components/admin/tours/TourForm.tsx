@@ -90,7 +90,8 @@ const TourForm = ({ tour }: TourFormProps) => {
     incluye_transporte: false,
     incluye_comida: false,
     incluye_actividades: false,
-    incluye_maleta_10kg: false,
+    incluye_maleta_10: false,
+    incluye_maleta_23: false,
     incluye_articulo_personal: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -219,7 +220,8 @@ const TourForm = ({ tour }: TourFormProps) => {
           incluye_transporte: tour.componentes.incluye_transporte,
           incluye_comida: tour.componentes.incluye_comida,
           incluye_actividades: tour.componentes.incluye_actividades,
-          incluye_maleta_10kg: tour.componentes.incluye_maleta_10kg,
+          incluye_maleta_10: tour.componentes.incluye_maleta_10,
+          incluye_maleta_23: tour.componentes.incluye_maleta_23,
           incluye_articulo_personal: tour.componentes.incluye_articulo_personal,
         });
       }
@@ -769,8 +771,17 @@ const TourForm = ({ tour }: TourFormProps) => {
                       <FormLabel>{language === 'en' ? 'Includes 10kg Baggage' : 'Incluye Maleta 10kg'}</FormLabel>
                     </div>
                     <Switch
-                      checked={componentes.incluye_maleta_10kg}
-                      onCheckedChange={(checked) => updateComponente('incluye_maleta_10kg', checked)}
+                      checked={componentes.incluye_maleta_10}
+                      onCheckedChange={(checked) => updateComponente('incluye_maleta_10', checked)}
+                    />
+                  </div>
+                  <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                    <div className="space-y-0.5">
+                      <FormLabel>{language === 'en' ? 'Includes 23kg Baggage' : 'Incluye Maleta 23kg'}</FormLabel>
+                    </div>
+                    <Switch
+                      checked={componentes.incluye_maleta_23}
+                      onCheckedChange={(checked) => updateComponente('incluye_maleta_23', checked)}
                     />
                   </div>
                   

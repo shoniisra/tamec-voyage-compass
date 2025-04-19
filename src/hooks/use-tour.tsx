@@ -130,7 +130,8 @@ export function useTour(slug: string) {
         // Format componentes_incluidos
         const componentes = componentesData ? {
           ...componentesData,
-          incluye_maleta_10kg: componentesData.incluye_maleta_10 || false
+          incluye_maleta_10: componentesData.incluye_maleta_10 || false,
+          incluye_maleta_23: componentesData.incluye_maleta_23 || false
         } : null;
         
         // Set final tour object
