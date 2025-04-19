@@ -54,7 +54,7 @@ const AdminSidebar = () => {
   }, [location.pathname]);
 
   return (
-    <div className="w-full h-full bg-card border rounded-lg p-4 flex flex-col">
+    <div className="w-full h-full bg-card border rounded-lg p-4 flex flex-col lg:w-max-md">
       <h2 className="text-xl font-bold mb-4">
         {language === 'en' ? 'Admin Panel' : 'Panel de Administración'}
       </h2>
