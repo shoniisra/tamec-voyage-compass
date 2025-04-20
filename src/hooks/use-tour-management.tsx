@@ -30,8 +30,7 @@ export function useTourManagement() {
       incluye_maleta_23: boolean;
       incluye_articulo_personal: boolean;
     },
-    regalos: Array<{ regalo_id: number }>,
-    incluye: Array<{ incluye_id: number }>
+    regalos: Array<{ regalo_id: number }>
   ) => {
     try {
       setIsLoading(true);
@@ -44,7 +43,6 @@ export function useTourManagement() {
             titulo: tourData.titulo,
             descripcion: tourData.descripcion,
             dias_duracion: tourData.dias_duracion,
-            incluye_boleto_aereo: tourData.incluye_boleto_aereo,
             pdf_detalles_url: tourData.pdf_detalles_url,
             fecha_publicacion: tourData.fecha_publicacion,
             fecha_caducidad: tourData.fecha_caducidad,
@@ -54,6 +52,11 @@ export function useTourManagement() {
             slug: tourData.slug,
             aerolinea_id: tourData.aerolinea_id,
             terminos_condiciones_id: tourData.terminos_condiciones_id,
+            incluye_vuelo: tourData.incluye_vuelo || false,
+            incluye_transporte: tourData.incluye_transporte || false,
+            incluye_hospedaje: tourData.incluye_hospedaje || false,
+            incluye_comida: tourData.incluye_comida || false,
+            incluye_actividades: tourData.incluye_actividades || false,
           },
         ])
         .select()
@@ -142,20 +145,6 @@ export function useTourManagement() {
         if (regalosError) throw regalosError;
       }
       
-      // Insert included items
-      if (incluye.length > 0) {
-        const incluyeData = incluye.map(i => ({
-          tour_id: tourId,
-          incluye_id: i.incluye_id,
-        }));
-        
-        const { error: incluyeError } = await supabase
-          .from('tour_incluye')
-          .insert(incluyeData);
-        
-        if (incluyeError) throw incluyeError;
-      }
-      
       return tourId;
     } catch (error: any) {
       console.error('Error creating tour:', error);
@@ -192,8 +181,7 @@ export function useTourManagement() {
       incluye_maleta_23: boolean;
       incluye_articulo_personal: boolean;
     },
-    regalos: Array<{ regalo_id: number }>,
-    incluye: Array<{ incluye_id: number }>
+    regalos: Array<{ regalo_id: number }>
   ) => {
     try {
       setIsLoading(true);
@@ -205,7 +193,6 @@ export function useTourManagement() {
           titulo: tourData.titulo,
           descripcion: tourData.descripcion,
           dias_duracion: tourData.dias_duracion,
-          incluye_boleto_aereo: tourData.incluye_boleto_aereo,
           pdf_detalles_url: tourData.pdf_detalles_url,
           fecha_publicacion: tourData.fecha_publicacion,
           fecha_caducidad: tourData.fecha_caducidad,
@@ -215,6 +202,11 @@ export function useTourManagement() {
           slug: tourData.slug,
           aerolinea_id: tourData.aerolinea_id,
           terminos_condiciones_id: tourData.terminos_condiciones_id,
+          incluye_vuelo: tourData.incluye_vuelo || false,
+          incluye_transporte: tourData.incluye_transporte || false,
+          incluye_hospedaje: tourData.incluye_hospedaje || false,
+          incluye_comida: tourData.incluye_comida || false,
+          incluye_actividades: tourData.incluye_actividades || false,
         })
         .eq('id', tourId);
       
@@ -332,27 +324,6 @@ export function useTourManagement() {
           .insert(regalosData);
         
         if (regalosError) throw regalosError;
-      }
-      
-      // Update included items (delete all and re-insert)
-      const { error: deleteIncluyeError } = await supabase
-        .from('tour_incluye')
-        .delete()
-        .eq('tour_id', tourId);
-      
-      if (deleteIncluyeError) throw deleteIncluyeError;
-      
-      if (incluye.length > 0) {
-        const incluyeData = incluye.map(i => ({
-          tour_id: tourId,
-          incluye_id: i.incluye_id,
-        }));
-        
-        const { error: incluyeError } = await supabase
-          .from('tour_incluye')
-          .insert(incluyeData);
-        
-        if (incluyeError) throw incluyeError;
       }
       
       return tourId;

@@ -1,3 +1,4 @@
+
 export type Tour = {
   id: number;
   titulo: string;
@@ -26,6 +27,7 @@ export type Tour = {
   regalos?: Regalo[];
   actividades?: Actividad[];
   adjuntos?: Adjunto[];
+  componentes?: ComponentesIncluidos;
 };
 
 export type TourDestino = {
@@ -84,12 +86,6 @@ export type Aerolinea = {
 };
 
 export type Regalo = {
-  id: number;
-  nombre: string;
-  descripcion: string | null;
-};
-
-export type Incluye = {
   id: number;
   nombre: string;
   descripcion: string | null;

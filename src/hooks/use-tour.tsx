@@ -32,9 +32,6 @@ export function useTour(slug: string) {
             regalos:tour_regalos(
               regalo:regalo_id(*)
             ),
-            incluye:tour_incluye(
-              incluye:incluye_id(*)
-            ),
             actividades(*),
             adjuntos(*),
             componentes:componentes_incluidos!componentes_incluidos_tour_id_fkey(*)
@@ -57,9 +54,6 @@ export function useTour(slug: string) {
         // Format gifts array
         const regalos = tourData.regalos?.map((item: any) => item.regalo).filter(Boolean) || [];
         
-        // Format includes array
-        const incluye = tourData.incluye?.map((item: any) => item.incluye).filter(Boolean) || [];
-        
         // Format destinos to match TourDestino type
         const destinos: TourDestino[] = tourData.destinos?.map((item: any) => ({
           id: item.id,
@@ -74,8 +68,7 @@ export function useTour(slug: string) {
           ...tourData,
           destinos,
           precio_desde,
-          regalos,
-          incluye
+          regalos
         });
         
       } catch (error) {
