@@ -1,9 +1,10 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Tour } from '@/types/tour';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, MapPinned, Star, Users, Sparkles, Plane, Bus, Bed, Utensils, Camera } from 'lucide-react';
+import { Calendar, MapPinned, Star, Users, Sparkles, Plane, Bus, Bed, Utensils, Camera, Clock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -125,7 +126,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
             <div className="grid grid-cols-2 gap-3">
               {tour.dias_duracion && (
                 <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                  <Timer className="h-4 w-4 mr-2 text-tamec-600" />
+                  <Clock className="h-4 w-4 mr-2 text-tamec-600" />
                   <span>{tour.dias_duracion} {language === 'en' ? 'days' : 'días'}</span>
                 </div>
               )}
