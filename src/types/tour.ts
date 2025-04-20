@@ -1,10 +1,8 @@
-
 export type Tour = {
   id: number;
   titulo: string;
   descripcion: string | null;
   dias_duracion: number | null;
-  incluye_boleto_aereo: boolean | null;
   pdf_detalles_url: string | null;
   fecha_publicacion: string | null;
   fecha_caducidad: string | null;
@@ -14,6 +12,11 @@ export type Tour = {
   slug: string | null;
   aerolinea_id: number | null;
   terminos_condiciones_id: number | null;
+  incluye_vuelo: boolean;
+  incluye_transporte: boolean;
+  incluye_hospedaje: boolean;
+  incluye_comida: boolean;
+  incluye_actividades: boolean;
   destinos?: TourDestino[];
   salidas?: Salida[];
   precios?: Precio[];
@@ -21,9 +24,7 @@ export type Tour = {
   precio_desde?: number;
   aerolinea?: Aerolinea;
   regalos?: Regalo[];
-  incluye?: Incluye[];
   actividades?: Actividad[];
-  componentes?: ComponentesIncluidos;
   adjuntos?: Adjunto[];
 };
 

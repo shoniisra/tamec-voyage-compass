@@ -298,24 +298,6 @@ export type Database = {
           },
         ]
       }
-      incluye_generico: {
-        Row: {
-          descripcion: string | null
-          id: number
-          nombre: string
-        }
-        Insert: {
-          descripcion?: string | null
-          id?: number
-          nombre: string
-        }
-        Update: {
-          descripcion?: string | null
-          id?: number
-          nombre?: string
-        }
-        Relationships: []
-      }
       leads: {
         Row: {
           created_at: string | null
@@ -559,39 +541,6 @@ export type Database = {
           },
         ]
       }
-      tour_incluye: {
-        Row: {
-          id: number
-          incluye_id: number | null
-          tour_id: number | null
-        }
-        Insert: {
-          id?: number
-          incluye_id?: number | null
-          tour_id?: number | null
-        }
-        Update: {
-          id?: number
-          incluye_id?: number | null
-          tour_id?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "tour_incluye_incluye_id_fkey"
-            columns: ["incluye_id"]
-            isOneToOne: false
-            referencedRelation: "incluye_generico"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tour_incluye_tour_id_fkey"
-            columns: ["tour_id"]
-            isOneToOne: false
-            referencedRelation: "tours"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       tour_regalos: {
         Row: {
           id: number
@@ -634,7 +583,12 @@ export type Database = {
           fecha_caducidad: string | null
           fecha_publicacion: string | null
           id: number
+          incluye_actividades: boolean | null
           incluye_boleto_aereo: boolean | null
+          incluye_comida: boolean | null
+          incluye_hospedaje: boolean | null
+          incluye_transporte: boolean | null
+          incluye_vuelo: boolean | null
           pdf_detalles_url: string | null
           politicas_cancelacion: string | null
           slug: string | null
@@ -650,7 +604,12 @@ export type Database = {
           fecha_caducidad?: string | null
           fecha_publicacion?: string | null
           id?: number
+          incluye_actividades?: boolean | null
           incluye_boleto_aereo?: boolean | null
+          incluye_comida?: boolean | null
+          incluye_hospedaje?: boolean | null
+          incluye_transporte?: boolean | null
+          incluye_vuelo?: boolean | null
           pdf_detalles_url?: string | null
           politicas_cancelacion?: string | null
           slug?: string | null
@@ -666,7 +625,12 @@ export type Database = {
           fecha_caducidad?: string | null
           fecha_publicacion?: string | null
           id?: number
+          incluye_actividades?: boolean | null
           incluye_boleto_aereo?: boolean | null
+          incluye_comida?: boolean | null
+          incluye_hospedaje?: boolean | null
+          incluye_transporte?: boolean | null
+          incluye_vuelo?: boolean | null
           pdf_detalles_url?: string | null
           politicas_cancelacion?: string | null
           slug?: string | null

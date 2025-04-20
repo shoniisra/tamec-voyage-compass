@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Tour } from '@/types/tour';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, MapPinned, Star, Users, Sparkles, Plane, Bus, Bed, Utensils, Camera, Timer } from 'lucide-react';
+import { Calendar, MapPinned, Star, Users, Sparkles, Plane, Bus, Bed, Utensils, Camera } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -44,34 +43,30 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
     }
   };
 
-  // Check if service is included by looking at the componentes property
-  const isServiceIncluded = (serviceType: 'vuelo' | 'transporte' | 'hotel' | 'comida' | 'actividades'): boolean => {
-    if (!tour.componentes) return false;
-    
+  const isServiceIncluded = (serviceType: 'vuelo' | 'transporte' | 'hospedaje' | 'comida' | 'actividades'): boolean => {
     switch (serviceType) {
       case 'vuelo':
-        return !!tour.componentes.incluye_vuelo;
+        return !!tour.incluye_vuelo;
       case 'transporte':
-        return !!tour.componentes.incluye_transporte;
-      case 'hotel':
-        return !!tour.componentes.incluye_hotel;
+        return !!tour.incluye_transporte;
+      case 'hospedaje':
+        return !!tour.incluye_hospedaje;
       case 'comida':
-        return !!tour.componentes.incluye_comida;
+        return !!tour.incluye_comida;
       case 'actividades':
-        return !!tour.componentes.incluye_actividades;
+        return !!tour.incluye_actividades;
       default:
         return false;
     }
   };
   
-  const getIconColor = (serviceType: 'vuelo' | 'transporte' | 'hotel' | 'comida' | 'actividades') => 
+  const getIconColor = (serviceType: 'vuelo' | 'transporte' | 'hospedaje' | 'comida' | 'actividades') => 
     isServiceIncluded(serviceType) ? "text-yellow-500 fill-yellow-500" : "text-gray-300";
   
   return (
     <Link to={`/destinations/${tour.slug}`} className="block h-full">
       <Card className="group overflow-hidden h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 rounded-2xl bg-white dark:bg-gray-800">
         <div className="relative">
-          {/* Featured Image with Zoom Effect */}
           <div className="relative h-64 overflow-hidden rounded-t-2xl">
             <div className="absolute inset-0 bg-gradient-to-b from-black/0 to-black/60 z-10" />
             <img 
@@ -80,14 +75,12 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             />
             
-            {/* Price Badge */}
             <div className="absolute top-4 right-4 z-20">
               <Badge className="bg-white/95 hover:bg-white text-gray-900 px-3 py-1.5 text-sm font-semibold shadow-lg backdrop-blur-sm">
                 ${tour.precio_desde?.toLocaleString()}
               </Badge>
             </div>
             
-            {/* Featured Badge */}
             {tour.id % 3 === 0 && (
               <div className="absolute top-4 left-4 z-20">
                 <Badge className="bg-yellow-500/95 hover:bg-yellow-500 text-yellow-950 px-3 py-1.5 font-semibold shadow-lg backdrop-blur-sm flex items-center gap-1">
@@ -97,7 +90,6 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
               </div>
             )}
 
-            {/* Title and Destination Overlay */}
             <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
               <h3 className="text-xl font-bold text-white mb-1 line-clamp-1">
                 {tour.titulo}
@@ -111,39 +103,26 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
             </div>
           </div>
           
-          {/* Card Content */}
           <div className="p-4 space-y-4">
-            {/* Services Icons */}
             <div className="flex justify-between items-center px-2">
               <div className="tooltip" data-tip={language === 'en' ? 'Flight included' : 'Vuelo incluido'}>
-                <Plane 
-                  className={`h-5 w-5 ${getIconColor('vuelo')}`}
-                />
+                <Plane className={`h-5 w-5 ${getIconColor('vuelo')}`} />
               </div>
               <div className="tooltip" data-tip={language === 'en' ? 'Transportation' : 'Transporte'}>
-                <Bus 
-                  className={`h-5 w-5 ${getIconColor('transporte')}`}
-                />
+                <Bus className={`h-5 w-5 ${getIconColor('transporte')}`} />
               </div>
               <div className="tooltip" data-tip={language === 'en' ? 'Accommodation' : 'Hospedaje'}>
-                <Bed 
-                  className={`h-5 w-5 ${getIconColor('hotel')}`}
-                />
+                <Bed className={`h-5 w-5 ${getIconColor('hospedaje')}`} />
               </div>
               <div className="tooltip" data-tip={language === 'en' ? 'Meals included' : 'Comidas incluidas'}>
-                <Utensils 
-                  className={`h-5 w-5 ${getIconColor('comida')}`}
-                />
+                <Utensils className={`h-5 w-5 ${getIconColor('comida')}`} />
               </div>
               <div className="tooltip" data-tip={language === 'en' ? 'Activities included' : 'Actividades incluidas'}>
-                <Camera 
-                  className={`h-5 w-5 ${getIconColor('actividades')}`}
-                />
+                <Camera className={`h-5 w-5 ${getIconColor('actividades')}`} />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              {/* Duration */}
               {tour.dias_duracion && (
                 <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                   <Timer className="h-4 w-4 mr-2 text-tamec-600" />
@@ -151,7 +130,6 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
                 </div>
               )}
               
-              {/* Next Departure */}
               {nextDeparture?.fecha_salida && (
                 <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                   <Calendar className="h-4 w-4 mr-2 text-tamec-600" />
@@ -159,7 +137,6 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
                 </div>
               )}
               
-              {/* Available spots */}
               {nextDeparture?.cupos_disponibles && (
                 <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                   <Users className="h-4 w-4 mr-2 text-tamec-600" />
@@ -178,7 +155,6 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
               )}
             </div>
             
-            {/* Rating */}
             <div className="flex items-center">
               <div className="flex items-center gap-0.5">
                 {[1, 2, 3, 4, 5].map((star) => (
