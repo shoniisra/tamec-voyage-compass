@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTags, Tag, TagCategory } from '@/hooks/use-tags';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import {
   Table,
   TableBody,

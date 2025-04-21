@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBlogPosts } from '@/hooks/use-blog-posts';
 import { useBlogPostManagement } from '@/hooks/use-blog-post-management';
-import BlogPostsTable from '@/components/admin/blog/BlogPostsTable';
+import BlogPostsTable from '@/modules/blog/components/BlogPostsTable';
 import AdminLayout from '@/components/admin/layout/AdminLayout';
 
 const BlogPostsPage = () => {

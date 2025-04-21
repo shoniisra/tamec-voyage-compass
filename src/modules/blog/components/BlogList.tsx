@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import BlogCard from './BlogCard';
+import { BlogCard } from '@/modules/blog/components/BlogCard';
 import { useBlogPosts } from '@/hooks/use-blog-posts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Search, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import TagsFilter from './TagsFilter';
+import { TagsFilter } from '@/modules/blog/components/TagsFilter';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 const BlogList = () => {
@@ -21,6 +21,7 @@ const BlogList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
+  // Extract tag from URL parameters on component mount
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const tagParam = queryParams.get('tag');
@@ -29,8 +30,11 @@ const BlogList = () => {
     }
   }, [location.search]);
   
+  // Filter posts based on search query and tags
   const filteredPosts = posts.filter(post => {
+    // First, check if there are any selected tags
     if (selectedTags.length > 0) {
+      // Check if this post has any of the selected tags
       const postHasSelectedTag = post.tags?.some(tag => 
         selectedTags.includes(tag.id)
       );
@@ -38,6 +42,7 @@ const BlogList = () => {
       if (!postHasSelectedTag) return false;
     }
     
+    // Then check search query
     const title = typeof post.title === 'string' ? post.title.toLowerCase() : 
       (language === 'en' && post.title_en ? post.title_en.toLowerCase() : 'untitled').toLowerCase();
       
@@ -54,6 +59,7 @@ const BlogList = () => {
     return title.includes(query) || excerpt.includes(query) || category.includes(query);
   });
   
+  // Display loading skeletons when data is being fetched
   if (loading) {
     return (
       <section className="container mx-auto px-4">
@@ -131,6 +137,7 @@ const BlogList = () => {
                       variant="outline" 
                       onClick={() => {
                         setSelectedTags([]);
+                        // Clear the URL parameter
                         navigate('/blog');
                       }}
                       className="w-full"
@@ -158,6 +165,7 @@ const BlogList = () => {
       {filteredPosts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredPosts.map((post) => {
+            // Ensure title is a string, not an object
             const title = typeof post.title === 'string' ? post.title :
                         language === 'en' && post.title_en ? post.title_en : 
                         'Untitled Post';
@@ -170,6 +178,7 @@ const BlogList = () => {
               ? post.category_en || '' 
               : post.category_es || '';
             
+            // Use slug if available, otherwise fall back to ID
             const postSlug = post.slug || post.id;
               
             return (
@@ -201,6 +210,7 @@ const BlogList = () => {
               variant="outline" 
               onClick={() => {
                 setSelectedTags([]);
+                // Clear the URL parameter
                 navigate('/blog');
               }}
               className="mt-4"
@@ -211,6 +221,7 @@ const BlogList = () => {
         </div>
       )}
       
+      {/* Simple pagination for future expansion */}
       {filteredPosts.length > 0 && (
         <Pagination className="mt-16">
           <PaginationContent>

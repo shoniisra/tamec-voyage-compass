@@ -1,7 +1,6 @@
-
 import React from 'react';
 import Layout from '@/components/layout/Layout';
-import BlogDetail from '@/components/blog/BlogDetail';
+import BlogDetail from '@/modules/blog/components/BlogDetail';
 import { useParams } from 'react-router-dom';
 
 const BlogDetailPage = () => {

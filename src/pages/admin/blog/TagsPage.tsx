@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import TagsTable from '@/components/admin/blog/TagsTable';
+import TagsTable from '@/modules/blog/components/TagsTable';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AdminLayout from '@/components/admin/layout/AdminLayout';
 

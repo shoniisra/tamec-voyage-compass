@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import BlogEditor from '@/components/admin/blog/editor/BlogEditor';
+import BlogEditor from '@/modules/blog/components/editor/BlogEditor';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
