@@ -64,12 +64,14 @@ export function useTour(slug: string) {
         })) || [];
         
         // Set final tour object with all relations
-        setTour({
+        const finalTour: Tour = {
           ...tourData,
           destinos,
           precio_desde,
           regalos
-        });
+        };
+        
+        setTour(finalTour);
         
       } catch (error) {
         console.error('Error fetching tour:', error);

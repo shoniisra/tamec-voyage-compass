@@ -10,7 +10,7 @@ import ContactPage from "@/pages/ContactPage";
 import DestinationsPage from "@/pages/DestinationsPage";
 import TourDetailPage from "@/pages/TourDetailPage";
 import AdminDashboardPage from "@/pages/AdminDashboardPage";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { ProtectedRoute } from "@/app/routing";
 import NotFound from "@/pages/NotFound";
 
 import BlogPostsPage from "@/pages/admin/blog/BlogPostsPage";
@@ -29,7 +29,7 @@ import RegalosPage from "@/pages/admin/settings/RegalosPage";
 import TerminosPage from "@/pages/admin/settings/TerminosPage";
 
 import "./App.css";
-import { ThemeProvider } from "./providers/ThemeProvider";
+import { ThemeProvider } from "@/app/providers";
 
 function App() {
   return (
