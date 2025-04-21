@@ -7,5 +7,5 @@ export { default as RecentPosts } from './RecentPosts';
 export { default as TagsFilter } from './TagsFilter';
 export { default as BlogPostsTable } from './BlogPostsTable';
 export { default as TagsTable } from './TagsTable';
-export * as BlogEditor from './editor/BlogEditor';
-export * as BlogRenderer from './editor/BlogRenderer';
+export { default as BlogEditor } from './editor/BlogEditor';
+export { default as BlogRenderer } from './editor/BlogRenderer';
