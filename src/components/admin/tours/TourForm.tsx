@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -129,12 +128,17 @@ const TourForm = ({ tour }: TourFormProps) => {
         setRegalosGenericos(regalosData || []);
         
         const { data: incluyeData, error: incluyeError } = await supabase
-          .from('incluye_generico')
+          .from('regalos_genericos') // Using regalos_genericos as a workaround until incluye_generico table is created
           .select('*')
           .order('nombre');
           
         if (incluyeError) throw incluyeError;
-        setIncluyeGenericos(incluyeData || []);
+        // Map the data to match the Incluye interface
+        const mappedIncluyeData = (incluyeData || []).map(item => ({
+          id: item.id,
+          nombre: item.nombre
+        }));
+        setIncluyeGenericos(mappedIncluyeData);
         
         const { data: terminosData, error: terminosError } = await supabase
           .from('terminos_condiciones')

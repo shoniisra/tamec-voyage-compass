@@ -26,7 +26,16 @@ export const useDestinos = () => {
         }
         
         if (data) {
-          setDestinos(data);
+          // Map the returned data to match the Destino interface
+          const mappedDestinos: Destino[] = data.map(item => ({
+            id: item.id,
+            nombre: item.ciudad || item.pais, // Use city as name, or country if no city
+            pais: item.pais,
+            ciudad: item.ciudad,
+            active: true
+          }));
+          
+          setDestinos(mappedDestinos);
         }
       } catch (err: any) {
         console.error('Error fetching destinos:', err);

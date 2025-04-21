@@ -1,5 +1,4 @@
 
-// File moved from src/pages/DestinationsPage.tsx
 import React, { useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import { DestinationsFilter, DestinationsList } from '../components';

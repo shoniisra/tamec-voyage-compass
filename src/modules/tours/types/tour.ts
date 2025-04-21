@@ -1,3 +1,4 @@
+
 export interface Aerolinea {
   id: number;
   nombre: string;
@@ -41,12 +42,35 @@ export interface Tour {
   incluye?: Incluye[];
   salidas?: Salida[];
   componentes?: ComponentesIncluidos;
+  // Add missing properties that are used in the code
+  fotos?: Foto[];
+  precio_desde?: number;
+  incluye_vuelo?: boolean;
+  incluye_transporte?: boolean;
+  incluye_hospedaje?: boolean;
+  incluye_comida?: boolean; 
+  incluye_actividades?: boolean;
+}
+
+export interface Foto {
+  id: number;
+  tour_id: number;
+  url_imagen: string;
+  descripcion?: string;
+  orden?: number;
 }
 
 export interface TourFilterParams {
   search?: string;
   destino_id?: string;
   active?: string;
+  // Add missing properties that are used in the code
+  duracion?: number[];
+  destino?: number[];
+  precio_maximo?: number;
+  incluye_vuelo?: boolean;
+  fecha_inicio?: Date;
+  fecha_fin?: Date;
 }
 
 export interface Destino {
