@@ -1,2 +1,3 @@
 
-export { useTours } from '@/hooks/use-tours';
+// Export the hook directly from its implementation file
+export * from './use-tours.tsx';

@@ -1,2 +1,3 @@
 
-export { useDestinos } from '@/hooks/use-destinos';
+// Export the hook directly from its implementation file
+export * from './use-destinos.tsx';

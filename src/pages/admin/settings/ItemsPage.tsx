@@ -1,426 +1,352 @@
 
 import React, { useState, useEffect } from 'react';
-import Layout from '@/components/layout/Layout';
-import AdminSidebar from '@/components/admin/AdminSidebar';
+import AdminLayout from '@/components/admin/layout/AdminLayout';
+import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { 
-  Table, TableBody, TableCaption, TableCell, TableHead, 
-  TableHeader, TableRow 
-} from '@/components/ui/table';
-import { 
-  Dialog, DialogContent, DialogDescription, DialogFooter, 
-  DialogHeader, DialogTitle 
-} from '@/components/ui/dialog';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { FileEdit, Trash2, Plus, Search, CheckSquare } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { useToast } from '@/components/ui/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-const ItemsPage = () => {
+interface ItemGenerico {
+  id: number;
+  nombre: string;
+  descripcion: string | null;
+}
+
+const ItemsPage: React.FC = () => {
   const { language } = useLanguage();
   const { toast } = useToast();
-  const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
-  
-  // Dialog states
-  const [isOpen, setIsOpen] = useState(false);
+  const [items, setItems] = useState<ItemGenerico[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<any>(null);
-  const [nombre, setNombre] = useState('');
-  const [descripcion, setDescripcion] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentItem, setCurrentItem] = useState<ItemGenerico | null>(null);
+  const [newItemName, setNewItemName] = useState('');
+  const [newItemDescription, setNewItemDescription] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState('itemsGenericos');
   
   useEffect(() => {
     fetchItems();
-  }, []);
+  }, [activeTab]);
   
   const fetchItems = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      setError(null);
+      let data;
       
-      const { data, error } = await supabase
-        .from('incluye_generico')
-        .select('*')
-        .order('nombre', { ascending: true });
-      
-      if (error) throw error;
+      if (activeTab === 'itemsGenericos') {
+        const { data: itemsData, error } = await supabase
+          .from('regalos_genericos')
+          .select('*')
+          .order('id', { ascending: true });
+          
+        if (error) throw error;
+        data = itemsData;
+      } else {
+        // Handle other tabs if needed in the future
+        data = [];
+      }
       
       setItems(data || []);
     } catch (error: any) {
       console.error('Error fetching items:', error);
-      setError(error.message || 'Error fetching items');
       toast({
         variant: "destructive",
-        title: language === 'en' ? 'Error' : 'Error',
-        description: error.message || 'There was an error fetching included items',
+        title: language === 'en' ? "Error loading items" : "Error al cargar los items",
+        description: error.message,
       });
     } finally {
       setLoading(false);
     }
   };
   
-  const openCreateDialog = () => {
-    setSelectedItem(null);
-    setNombre('');
-    setDescripcion('');
-    setIsOpen(true);
-  };
-  
-  const openEditDialog = (item: any) => {
-    setSelectedItem(item);
-    setNombre(item.nombre);
-    setDescripcion(item.descripcion || '');
-    setIsOpen(true);
-  };
-  
-  const confirmDelete = (item: any) => {
-    setSelectedItem(item);
-    setIsDeleteDialogOpen(true);
-  };
-  
-  const handleSubmit = async () => {
-    if (!nombre.trim()) {
-      toast({
-        variant: "destructive",
-        title: language === 'en' ? 'Missing information' : 'Información incompleta',
-        description: language === 'en' ? 'Item name is required' : 'El nombre del item es obligatorio',
-      });
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
+  const handleCreateItem = async () => {
     try {
-      // Get the next available ID for a new item
-      let nextId = 1;
-      if (!selectedItem) {
-        const { data: maxIdData } = await supabase
-          .from('incluye_generico')
-          .select('id')
-          .order('id', { ascending: false })
-          .limit(1)
-          .single();
-        
-        if (maxIdData) {
-          nextId = maxIdData.id + 1;
-        }
+      if (!newItemName.trim()) {
+        toast({
+          variant: "destructive",
+          title: language === 'en' ? "Error" : "Error",
+          description: language === 'en' ? "Name is required" : "El nombre es requerido",
+        });
+        return;
       }
       
-      if (selectedItem) {
-        // Update existing item
-        const { error } = await supabase
-          .from('incluye_generico')
-          .update({
-            nombre,
-            descripcion: descripcion || null,
-          })
-          .eq('id', selectedItem.id);
-        
-        if (error) throw error;
-        
-        toast({
-          title: language === 'en' ? 'Item updated' : 'Item actualizado',
-          description: language === 'en' ? 'The item has been updated successfully' : 'El item ha sido actualizado exitosamente',
-        });
-      } else {
-        // Create new item
-        const { error } = await supabase
-          .from('incluye_generico')
-          .insert({
-            id: nextId,
-            nombre,
-            descripcion: descripcion || null,
-          });
-        
-        if (error) throw error;
-        
-        toast({
-          title: language === 'en' ? 'Item created' : 'Item creado',
-          description: language === 'en' ? 'The item has been created successfully' : 'El item ha sido creado exitosamente',
-        });
-      }
+      let tableName = 'regalos_genericos';
       
-      setIsOpen(false);
+      const { data, error } = await supabase
+        .from(tableName)
+        .insert([
+          {
+            nombre: newItemName.trim(),
+            descripcion: newItemDescription.trim() || null,
+          }
+        ])
+        .select()
+        .single();
+        
+      if (error) throw error;
+      
+      toast({
+        title: language === 'en' ? "Item created" : "Item creado",
+        description: language === 'en' ? "The item has been created successfully" : "El item ha sido creado exitosamente",
+      });
+      
+      setNewItemName('');
+      setNewItemDescription('');
+      setIsDialogOpen(false);
       fetchItems();
     } catch (error: any) {
-      console.error('Error saving item:', error);
+      console.error('Error creating item:', error);
       toast({
         variant: "destructive",
-        title: language === 'en' ? 'Error' : 'Error',
-        description: error.message || 'There was an error saving the item',
+        title: language === 'en' ? "Error creating item" : "Error al crear el item",
+        description: error.message,
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
   
-  const handleDelete = async () => {
-    if (!selectedItem) return;
-    
-    setIsSubmitting(true);
-    
+  const handleUpdateItem = async () => {
     try {
-      // Check if the item is being used in any tours
-      const { data: toursData, error: toursError } = await supabase
-        .from('tour_incluye')
-        .select('id')
-        .eq('incluye_id', selectedItem.id);
+      if (!currentItem) return;
       
-      if (toursError) throw toursError;
-      
-      if (toursData && toursData.length > 0) {
-        throw new Error(
-          language === 'en' 
-            ? 'This item cannot be deleted because it is being used in tours' 
-            : 'Este item no puede ser eliminado porque está siendo utilizado en tours'
-        );
+      if (!newItemName.trim()) {
+        toast({
+          variant: "destructive",
+          title: language === 'en' ? "Error" : "Error",
+          description: language === 'en' ? "Name is required" : "El nombre es requerido",
+        });
+        return;
       }
       
-      const { error } = await supabase
-        .from('incluye_generico')
-        .delete()
-        .eq('id', selectedItem.id);
+      let tableName = 'regalos_genericos';
+      
+      const { data, error } = await supabase
+        .from(tableName)
+        .update({
+          nombre: newItemName.trim(),
+          descripcion: newItemDescription.trim() || null,
+        })
+        .eq('id', currentItem.id)
+        .select()
+        .single();
       
       if (error) throw error;
       
       toast({
-        title: language === 'en' ? 'Item deleted' : 'Item eliminado',
-        description: language === 'en' ? 'The item has been deleted successfully' : 'El item ha sido eliminado exitosamente',
+        title: language === 'en' ? "Item updated" : "Item actualizado",
+        description: language === 'en' ? "The item has been updated successfully" : "El item ha sido actualizado exitosamente",
       });
       
+      setCurrentItem(null);
+      setNewItemName('');
+      setNewItemDescription('');
+      setIsDialogOpen(false);
+      setIsEditing(false);
+      fetchItems();
+    } catch (error: any) {
+      console.error('Error updating item:', error);
+      toast({
+        variant: "destructive",
+        title: language === 'en' ? "Error updating item" : "Error al actualizar el item",
+        description: error.message,
+      });
+    }
+  };
+  
+  const handleDeleteItem = async () => {
+    try {
+      if (!currentItem) return;
+      
+      let tableName = 'regalos_genericos';
+      
+      const { error } = await supabase
+        .from(tableName)
+        .delete()
+        .eq('id', currentItem.id);
+      
+      if (error) throw error;
+      
+      toast({
+        title: language === 'en' ? "Item deleted" : "Item eliminado",
+        description: language === 'en' ? "The item has been deleted successfully" : "El item ha sido eliminado exitosamente",
+      });
+      
+      setCurrentItem(null);
       setIsDeleteDialogOpen(false);
       fetchItems();
     } catch (error: any) {
       console.error('Error deleting item:', error);
       toast({
         variant: "destructive",
-        title: language === 'en' ? 'Error' : 'Error',
-        description: error.message || 'There was an error deleting the item',
+        title: language === 'en' ? "Error deleting item" : "Error al eliminar el item",
+        description: error.message,
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
   
-  const filteredItems = items.filter(item => 
-    search === '' || 
-    item.nombre.toLowerCase().includes(search.toLowerCase()) ||
-    (item.descripcion && item.descripcion.toLowerCase().includes(search.toLowerCase()))
-  );
+  const handleAddClick = () => {
+    setCurrentItem(null);
+    setNewItemName('');
+    setNewItemDescription('');
+    setIsEditing(false);
+    setIsDialogOpen(true);
+  };
+  
+  const handleEditClick = (item: ItemGenerico) => {
+    setCurrentItem(item);
+    setNewItemName(item.nombre);
+    setNewItemDescription(item.descripcion || '');
+    setIsEditing(true);
+    setIsDialogOpen(true);
+  };
+  
+  const handleDeleteClick = (item: ItemGenerico) => {
+    setCurrentItem(item);
+    setIsDeleteDialogOpen(true);
+  };
   
   return (
-    <Layout>
-      <div className="container mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-[250px_1fr] gap-8">
-        <AdminSidebar />
-        
-        <div>
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">
-              {language === 'en' ? 'Manage Included Items' : 'Administrar Items Incluidos'}
-            </h1>
-            
-            <Button onClick={openCreateDialog}>
-              <Plus className="mr-2 h-4 w-4" />
-              {language === 'en' ? 'Add New Item' : 'Agregar Nuevo Item'}
-            </Button>
-          </div>
+    <AdminLayout>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold">
+            {language === 'en' ? 'Manage Generic Items' : 'Administrar Ítems Genéricos'}
+          </h1>
           
-          <div className="mb-6">
-            <div className="flex flex-col md:flex-row gap-4 mb-4">
-              <div className="relative w-full md:w-64">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Button onClick={handleAddClick}>
+            <Plus className="w-4 h-4 mr-2" />
+            {language === 'en' ? 'Add Item' : 'Agregar Ítem'}
+          </Button>
+        </div>
+        
+        <Tabs defaultValue="itemsGenericos" onValueChange={setActiveTab} value={activeTab}>
+          <TabsList className="grid w-full max-w-md grid-cols-1">
+            <TabsTrigger value="itemsGenericos">
+              {language === 'en' ? 'Generic Gifts' : 'Regalos Genéricos'}
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="itemsGenericos" className="space-y-4 mt-4">
+            {loading ? (
+              <div>
+                {language === 'en' ? 'Loading...' : 'Cargando...'}
+              </div>
+            ) : items.length === 0 ? (
+              <div className="text-center py-8 bg-muted rounded-lg">
+                <p className="text-muted-foreground">
+                  {language === 'en' ? 'No items found' : 'No se encontraron ítems'}
+                </p>
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {items.map(item => (
+                  <div key={item.id} className="flex items-center justify-between p-4 bg-card rounded-lg border">
+                    <div>
+                      <h3 className="font-medium">{item.nombre}</h3>
+                      {item.descripcion && (
+                        <p className="text-sm text-muted-foreground mt-1">{item.descripcion}</p>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" onClick={() => handleEditClick(item)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="destructive" onClick={() => handleDeleteClick(item)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+        
+        {/* Create/Edit Dialog */}
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {isEditing 
+                  ? (language === 'en' ? 'Edit Item' : 'Editar Ítem')
+                  : (language === 'en' ? 'Add New Item' : 'Agregar Nuevo Ítem')
+                }
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <label htmlFor="item-name" className="text-sm font-medium">
+                  {language === 'en' ? 'Name' : 'Nombre'}
+                </label>
                 <Input
-                  placeholder={language === 'en' ? 'Search items...' : 'Buscar items...'}
-                  className="pl-9"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  id="item-name"
+                  value={newItemName}
+                  onChange={(e) => setNewItemName(e.target.value)}
+                  placeholder={language === 'en' ? 'Enter item name' : 'Ingrese nombre del ítem'}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label htmlFor="item-description" className="text-sm font-medium">
+                  {language === 'en' ? 'Description' : 'Descripción'}
+                </label>
+                <Textarea
+                  id="item-description"
+                  value={newItemDescription}
+                  onChange={(e) => setNewItemDescription(e.target.value)}
+                  placeholder={language === 'en' ? 'Enter item description (optional)' : 'Ingrese descripción del ítem (opcional)'}
+                  rows={3}
                 />
               </div>
             </div>
-          </div>
-          
-          {loading ? (
-            <div className="p-6 text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-              <p className="mt-4 text-muted-foreground">
-                {language === 'en' ? 'Loading items...' : 'Cargando items...'}
-              </p>
-            </div>
-          ) : error ? (
-            <div className="p-6 text-center text-destructive">
-              <p>
-                {language === 'en' ? 'Error loading items: ' : 'Error al cargar items: '}
-                {error}
-              </p>
-            </div>
-          ) : (
-            <Table>
-              <TableCaption>
-                {language === 'en' 
-                  ? `Total of ${filteredItems.length} items` 
-                  : `Total de ${filteredItems.length} items`}
-              </TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{language === 'en' ? 'Name' : 'Nombre'}</TableHead>
-                  <TableHead>{language === 'en' ? 'Description' : 'Descripción'}</TableHead>
-                  <TableHead className="text-right">{language === 'en' ? 'Actions' : 'Acciones'}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredItems.map(item => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center">
-                        <CheckSquare className="h-4 w-4 mr-2 text-muted-foreground" />
-                        {item.nombre}
-                      </div>
-                    </TableCell>
-                    <TableCell className="max-w-xs truncate">
-                      {item.descripcion || '-'}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => openEditDialog(item)}
-                        >
-                          <FileEdit className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-destructive"
-                          onClick={() => confirmDelete(item)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                
-                {filteredItems.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
-                      {language === 'en' ? 'No items found' : 'No se encontraron items'}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          )}
-        </div>
-      </div>
-      
-      {/* Create/Edit Dialog */}
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {selectedItem 
-                ? (language === 'en' ? 'Edit Item' : 'Editar Item')
-                : (language === 'en' ? 'Add New Item' : 'Agregar Nuevo Item')}
-            </DialogTitle>
-          </DialogHeader>
-          
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="nombre" className="text-right">
-                {language === 'en' ? 'Name' : 'Nombre'}*
-              </label>
-              <Input
-                id="nombre"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                className="col-span-3"
-                required
-              />
-            </div>
             
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="descripcion" className="text-right">
-                {language === 'en' ? 'Description' : 'Descripción'}
-              </label>
-              <Textarea
-                id="descripcion"
-                value={descripcion}
-                onChange={(e) => setDescripcion(e.target.value)}
-                className="col-span-3 min-h-[100px]"
-              />
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setIsOpen(false)}
-              disabled={isSubmitting}
-            >
-              {language === 'en' ? 'Cancel' : 'Cancelar'}
-            </Button>
-            <Button 
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <span className="flex items-center">
-                  <div className="animate-spin mr-2 h-4 w-4 border-2 border-background border-t-transparent rounded-full" />
-                  {language === 'en' ? 'Saving...' : 'Guardando...'}
-                </span>
-              ) : (
-                language === 'en' ? 'Save' : 'Guardar'
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {language === 'en' ? 'Delete Item' : 'Eliminar Item'}
-            </DialogTitle>
-            <DialogDescription>
-              {language === 'en' 
-                ? 'Are you sure you want to delete this item? This action cannot be undone.' 
-                : '¿Estás seguro de que quieres eliminar este item? Esta acción no se puede deshacer.'}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setIsDeleteDialogOpen(false)}
-              disabled={isSubmitting}
-            >
-              {language === 'en' ? 'Cancel' : 'Cancelar'}
-            </Button>
-            <Button 
-              variant="destructive" 
-              onClick={handleDelete}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <span className="flex items-center">
-                  <div className="animate-spin mr-2 h-4 w-4 border-2 border-background border-t-transparent rounded-full" />
-                  {language === 'en' ? 'Deleting...' : 'Eliminando...'}
-                </span>
-              ) : (
-                language === 'en' ? 'Delete' : 'Eliminar'
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </Layout>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                {language === 'en' ? 'Cancel' : 'Cancelar'}
+              </Button>
+              <Button onClick={isEditing ? handleUpdateItem : handleCreateItem}>
+                {isEditing 
+                  ? (language === 'en' ? 'Update' : 'Actualizar')
+                  : (language === 'en' ? 'Create' : 'Crear')
+                }
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {language === 'en' ? 'Confirm Deletion' : 'Confirmar Eliminación'}
+              </DialogTitle>
+              <DialogDescription>
+                {language === 'en' 
+                  ? 'Are you sure you want to delete this item? This action cannot be undone.'
+                  : '¿Está seguro que desea eliminar este ítem? Esta acción no se puede deshacer.'
+                }
+              </DialogDescription>
+            </DialogHeader>
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                {language === 'en' ? 'Cancel' : 'Cancelar'}
+              </Button>
+              <Button variant="destructive" onClick={handleDeleteItem}>
+                {language === 'en' ? 'Delete' : 'Eliminar'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </AdminLayout>
   );
 };
 
