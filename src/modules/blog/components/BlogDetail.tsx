@@ -9,7 +9,7 @@ import { useBlogPost } from "@/hooks/use-blog-post";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tag } from "@/modules/blog/types/blog";
-import ContactInfo from "@/modules/contact/components/ContactInfo";
+import { ContactInfo } from "@/modules/contact/components";
 import { Badge } from "@/components/ui/badge";
 import { useBlogTags } from "@/hooks/use-blog-tags";
 
@@ -62,7 +62,6 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
     );
   }
 
-  // Make sure we always have a string title
   const title =
     typeof post.title === "string"
       ? post.title
@@ -87,7 +86,6 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
   return (
     <div className="container md:px-32 mx-auto px-4 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main content area - takes up 2/3 of the space on large screens */}
         <div className="lg:col-span-2">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">{title}</h1>
           <div className="text-gray-500 mb-8">{formattedDate}</div>
@@ -101,7 +99,6 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
           )}
 
           {post.isLegacy ? (
-            // Render legacy content as HTML
             <div
               className="prose max-w-none"
               dangerouslySetInnerHTML={{
@@ -112,17 +109,14 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
               }}
             />
           ) : (
-            // Render new content with EditorJS renderer
             <BlogRenderer content={content} />
           )}
 
-          {/* Comments Section */}
           <div className="mt-12">
             <BlogComments postId={post.id} />
           </div>
         </div>
 
-        {/* Sidebar - takes up 1/3 of the space on large screens */}
         <div className="space-y-8 ">
           <Card className="p-6">
             <h3 className="text-xl font-bold mb-4">
@@ -131,10 +125,8 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
             <p className="">Lcda. Michelle Herrera - Tamec Viajes</p>
           </Card>
 
-          {/* Contact Information */}
           <ContactInfo />
 
-          {/* Tags Section */}
           {tags.length > 0 && (
             <Card>
               <CardContent className="p-6">
@@ -161,7 +153,6 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
             </Card>
           )}
 
-          {/* Recent Posts Section */}
           <Card>
             <CardContent className="p-6">
               <h3 className="text-lg font-bold mb-4">
@@ -177,17 +168,13 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
   );
 };
 
-// Helper function to determine contrasting text color (black or white)
 function getContrastColor(hexColor: string): string {
-  // Convert hex to RGB
   const r = parseInt(hexColor.slice(1, 3), 16);
   const g = parseInt(hexColor.slice(3, 5), 16);
   const b = parseInt(hexColor.slice(5, 7), 16);
 
-  // Calculate luminance
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
 
-  // Return black or white depending on luminance
   return luminance > 0.5 ? "#000000" : "#ffffff";
 }
 

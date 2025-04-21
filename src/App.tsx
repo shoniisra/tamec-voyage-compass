@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import HomePage from "@/pages/HomePage";
@@ -9,18 +10,24 @@ import AuthPage from "@/pages/AuthPage";
 import AdminDashboardPage from "@/pages/AdminDashboardPage";
 import { DestinationsPage, TourDetailPage } from "@/modules/tours";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import ToursPage from "./pages/admin/tours/ToursPage";
-import CreateTourPage from "./pages/admin/tours/CreateTourPage";
-import EditTourPage from "./pages/admin/tours/EditTourPage";
-import BlogPostsPage from "./pages/admin/blog/BlogPostsPage";
-import CreateBlogPostPage from "./pages/admin/blog/CreateBlogPostPage";
-import EditBlogPostPage from "./pages/admin/blog/EditBlogPostPage";
-import TagsPage from "./pages/admin/blog/TagsPage";
-import DestinosPage from "./pages/admin/settings/DestinosPage";
-import RegalosPage from "./pages/admin/settings/RegalosPage";
-import AerolineasPage from "./pages/admin/settings/AerolineasPage";
-import TerminosPage from "./pages/admin/settings/TerminosPage";
-import ItemsPage from "./pages/admin/settings/ItemsPage";
+
+// Admin Tour Pages
+import ToursPage from "@/pages/admin/tours/ToursPage";
+import CreateTourPage from "@/pages/admin/tours/CreateTourPage";
+import EditTourPage from "@/pages/admin/tours/EditTourPage";
+
+// Admin Blog Pages
+import BlogPostsPage from "@/pages/admin/blog/BlogPostsPage";
+import CreateBlogPostPage from "@/pages/admin/blog/CreateBlogPostPage";
+import EditBlogPostPage from "@/pages/admin/blog/EditBlogPostPage";
+import TagsPage from "@/pages/admin/blog/TagsPage";
+
+// Admin Settings Pages
+import DestinosPage from "@/pages/admin/settings/DestinosPage";
+import RegalosPage from "@/pages/admin/settings/RegalosPage";
+import AerolineasPage from "@/pages/admin/settings/AerolineasPage";
+import TerminosPage from "@/pages/admin/settings/TerminosPage";
+import ItemsPage from "@/pages/admin/settings/ItemsPage";
 
 function App() {
   return (
