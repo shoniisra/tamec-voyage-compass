@@ -128,7 +128,7 @@ const TourForm = ({ tour }: TourFormProps) => {
         setRegalosGenericos(regalosData || []);
         
         const { data: incluyeData, error: incluyeError } = await supabase
-          .from('regalos_genericos')
+          .from('incluye_generico')
           .select('*')
           .order('nombre');
           
@@ -200,8 +200,8 @@ const TourForm = ({ tour }: TourFormProps) => {
       if (tour.salidas && tour.salidas.length > 0 && tour.salidas[0].precios) {
         setPrecios(tour.salidas[0].precios.map(precio => ({
           ciudad_salida: precio.ciudad_salida,
-          tipo_habitacion: precio.tipo_habitacion,
-          forma_pago: precio.forma_pago,
+          tipo_habitacion: precio.tipo_habitacion as 'doble' | 'triple' | 'individual' | 'child',
+          forma_pago: precio.forma_pago as 'efectivo' | 'tarjeta',
           precio: precio.precio,
         })));
       }
@@ -823,5 +823,4 @@ const TourForm = ({ tour }: TourFormProps) => {
                       </SelectTrigger>
                       <SelectContent>
                         {incluyeGenericos
-                          .filter(i => !selectedIncluye.some(si => si.id === i.id))
-                          .map((incluye)
+                          .filter(i

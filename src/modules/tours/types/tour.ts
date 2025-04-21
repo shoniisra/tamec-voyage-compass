@@ -1,81 +1,87 @@
-
-export interface Tour {
-  id: number;
-  titulo: string;
-  descripcion?: string | null;
-  dias_duracion?: number | null;
-  pdf_detalles_url?: string | null;
-  fecha_publicacion?: string | null;
-  fecha_caducidad?: string | null;
-  coortesias?: string | null;
-  terminos_condiciones?: string | null;
-  politicas_cancelacion?: string | null;
-  slug?: string | null;
-  aerolinea_id?: number | null;
-  terminos_condiciones_id?: number | null;
-  destinos: TourDestino[];
-  salidas?: Salida[];
-  precios?: Precio[];
-  aerolinea?: Aerolinea;
-  regalos?: Regalo[];
-  componentes?: ComponentesIncluidos;
-  precio_desde?: number;
-  // Added properties needed by components
-  fotos?: Foto[];
-  incluye?: Incluye[];
-  incluye_boleto_aereo?: boolean;
-  incluye_vuelo?: boolean;
-  incluye_transporte?: boolean;
-  incluye_hospedaje?: boolean;
-  incluye_comida?: boolean;
-  incluye_actividades?: boolean;
-}
-
-export interface TourDestino {
-  id: number;
-  tour_id: number | null;
-  destino_id: number | null;
-  orden: number | null;
-  destino?: Destino;
-}
-
-export interface Destino {
-  id: number;
-  pais: string;
-  ciudad?: string | null;
-}
-
-export interface Salida {
-  id: number;
-  tour_id: number | null;
-  fecha_salida: string | null;
-  dias_duracion: number;
-  cupos_disponibles: number | null;
-  // Adding precios needed by components
-  precios?: Precio[];
-}
-
-export interface Precio {
-  id: number;
-  tour_id?: number;
-  ciudad_salida: string;
-  tipo_habitacion: "doble" | "triple" | "individual" | "child";
-  forma_pago: "efectivo" | "tarjeta";
-  precio: number;
-}
-
 export interface Aerolinea {
   id: number;
   nombre: string;
-  logo_url?: string;
-  pais_origen?: string;
   codigo?: string;
 }
 
 export interface Regalo {
   id: number;
   nombre: string;
+}
+
+export interface Incluye {
+  id: number;
+  nombre: string;
+}
+
+export interface TerminosCondiciones {
+  id: number;
+  titulo: string;
+}
+
+export interface Tour {
+  id: number;
+  titulo: string;
   descripcion?: string;
+  dias_duracion?: number;
+  incluye_boleto_aereo?: boolean;
+  pdf_detalles_url?: string;
+  fecha_publicacion?: string;
+  fecha_caducidad?: string;
+  coortesias?: string;
+  terminos_condiciones?: string;
+  politicas_cancelacion?: string;
+  slug?: string;
+  destino_principal?: string;
+  active?: boolean;
+  aerolinea_id?: number | null;
+  terminos_condiciones_id?: number | null;
+  destinos?: TourDestino[];
+  regalos?: Regalo[];
+  incluye?: Incluye[];
+  salidas?: Salida[];
+  componentes?: ComponentesIncluidos;
+}
+
+export interface TourFilterParams {
+  search?: string;
+  destino_id?: string;
+  active?: string;
+}
+
+export interface Destino {
+  id: number;
+  nombre: string;
+  descripcion?: string;
+  pais: string;
+  ciudad?: string;
+  active?: boolean;
+}
+
+export interface TourDestino {
+  id: number;
+  tour_id: number;
+  destino_id: number;
+  orden: number;
+  destino?: Destino;
+}
+
+export interface Salida {
+  id: number;
+  tour_id: number;
+  fecha_salida: string;
+  dias_duracion: number;
+  cupos_disponibles: number;
+  precios?: Precio[];
+}
+
+export interface Precio {
+  id: number;
+  tour_id: number;
+  ciudad_salida: string;
+  tipo_habitacion: 'doble' | 'triple' | 'individual' | 'child';
+  forma_pago: 'efectivo' | 'tarjeta';
+  precio: number;
 }
 
 export interface ComponentesIncluidos {
@@ -89,36 +95,4 @@ export interface ComponentesIncluidos {
   incluye_maleta_10: boolean;
   incluye_maleta_23: boolean;
   incluye_articulo_personal: boolean;
-}
-
-// Add Foto interface for TourCard
-export interface Foto {
-  id: number;
-  tour_id: number;
-  url_imagen: string;
-  descripcion?: string;
-  orden?: number;
-}
-
-// Add Incluye interface for TourForm
-export interface Incluye {
-  id: number;
-  nombre: string;
-  descripcion?: string;
-}
-
-// Add TerminosCondiciones interface for TourForm
-export interface TerminosCondiciones {
-  id: number;
-  titulo: string;
-  contenido: string;
-}
-
-export interface TourFilterParams {
-  duracion?: number[];
-  incluye_vuelo?: boolean;
-  precio_maximo?: number;
-  destino?: number[];
-  fecha_inicio?: Date;
-  fecha_fin?: Date;
 }
