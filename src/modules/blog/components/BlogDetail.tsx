@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { Skeleton } from '@/components/ui/skeleton';
-import BlogRenderer from '@/modules/blog/components/editor/BlogRenderer';
-import RecentPosts from '@/modules/blog/components/RecentPosts';
-import BlogComments from '@/modules/blog/components/BlogComments';
-import { useBlogPost } from '@/hooks/use-blog-post';
-import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Tag } from '@/types/blog';
-import ContactInfo from '@/modules/contact/components/ContactInfo';
-import { Badge } from '@/components/ui/badge';
-import { useBlogTags } from '@/hooks/use-blog-tags';
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Skeleton } from "@/components/ui/skeleton";
+import BlogRenderer from "@/modules/blog/components/editor/BlogRenderer";
+import RecentPosts from "@/modules/blog/components/RecentPosts";
+import BlogComments from "@/modules/blog/components/BlogComments";
+import { useBlogPost } from "@/hooks/use-blog-post";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Tag } from "@/modules/blog/types/blog";
+import ContactInfo from "@/modules/contact/components/ContactInfo";
+import { Badge } from "@/components/ui/badge";
+import { useBlogTags } from "@/hooks/use-blog-tags";
 
 interface BlogDetailProps {
   slug: string;
@@ -37,7 +37,7 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
   const handleTagClick = (tagId: string) => {
     navigate(`/blog?tag=${tagId}`);
   };
-  
+
   if (loading) {
     return (
       <div className="container md:px-32 mx-auto px-4 py-8">
@@ -63,17 +63,26 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
   }
 
   // Make sure we always have a string title
-  const title = typeof post.title === 'string' ? post.title : 
-                 (language === 'en' && post.title_en ? post.title_en : 
-                 (typeof post.title === 'object' ? JSON.stringify(post.title) : 'Untitled Post'));
-  
-  const content = post.isLegacy 
-  ? (language === 'en' ? post.content_en : post.content_es)
-  : post.content || post.newContent;
-  
-  const formattedDate = post.date ? new Date(post.date).toLocaleDateString() : (
-    post.created_at ? new Date(post.created_at).toLocaleDateString() : ''
-  );
+  const title =
+    typeof post.title === "string"
+      ? post.title
+      : language === "en" && post.title_en
+      ? post.title_en
+      : typeof post.title === "object"
+      ? JSON.stringify(post.title)
+      : "Untitled Post";
+
+  const content = post.isLegacy
+    ? language === "en"
+      ? post.content_en
+      : post.content_es
+    : post.content || post.newContent;
+
+  const formattedDate = post.date
+    ? new Date(post.date).toLocaleDateString()
+    : post.created_at
+    ? new Date(post.created_at).toLocaleDateString()
+    : "";
 
   return (
     <div className="container md:px-32 mx-auto px-4 py-8">
@@ -82,18 +91,26 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
         <div className="lg:col-span-2">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">{title}</h1>
           <div className="text-gray-500 mb-8">{formattedDate}</div>
-          
+
           {post.cover_image && (
-            <img 
-              src={post.cover_image} 
-              alt={title} 
+            <img
+              src={post.cover_image}
+              alt={title}
               className="w-full h-auto max-h-96 object-cover rounded-lg mb-8"
             />
           )}
 
           {post.isLegacy ? (
             // Render legacy content as HTML
-            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: typeof content === 'string' ? content : JSON.stringify(content) }} />
+            <div
+              className="prose max-w-none"
+              dangerouslySetInnerHTML={{
+                __html:
+                  typeof content === "string"
+                    ? content
+                    : JSON.stringify(content),
+              }}
+            />
           ) : (
             // Render new content with EditorJS renderer
             <BlogRenderer content={content} />
@@ -104,12 +121,12 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
             <BlogComments postId={post.id} />
           </div>
         </div>
-        
+
         {/* Sidebar - takes up 1/3 of the space on large screens */}
         <div className="space-y-8 ">
           <Card className="p-6">
             <h3 className="text-xl font-bold mb-4">
-              {language === 'en' ? 'Written By' : 'Escrito por'}
+              {language === "en" ? "Written By" : "Escrito por"}
             </h3>
             <p className="">Lcda. Michelle Herrera - Tamec Viajes</p>
           </Card>
@@ -122,17 +139,17 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
             <Card>
               <CardContent className="p-6">
                 <h3 className="text-xl font-bold mb-4">
-                  {language === 'en' ? 'Tags' : 'Etiquetas'}
+                  {language === "en" ? "Tags" : "Etiquetas"}
                 </h3>
                 <Separator className="mb-4" />
                 <div className="flex flex-wrap gap-2">
                   {tags.map((tag) => (
-                    <Badge 
-                      key={tag.id} 
+                    <Badge
+                      key={tag.id}
                       className="cursor-pointer"
-                      style={{ 
+                      style={{
                         backgroundColor: tag.color,
-                        color: getContrastColor(tag.color)
+                        color: getContrastColor(tag.color),
                       }}
                       onClick={() => handleTagClick(tag.id)}
                     >
@@ -148,7 +165,7 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
           <Card>
             <CardContent className="p-6">
               <h3 className="text-lg font-bold mb-4">
-                {language === 'en' ? 'Recent Posts' : 'Publicaciones Recientes'}
+                {language === "en" ? "Recent Posts" : "Publicaciones Recientes"}
               </h3>
               <Separator className="mb-4" />
               <RecentPosts currentPostId={post.id} limit={4} />
@@ -166,12 +183,12 @@ function getContrastColor(hexColor: string): string {
   const r = parseInt(hexColor.slice(1, 3), 16);
   const g = parseInt(hexColor.slice(3, 5), 16);
   const b = parseInt(hexColor.slice(5, 7), 16);
-  
+
   // Calculate luminance
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  
+
   // Return black or white depending on luminance
-  return luminance > 0.5 ? '#000000' : '#ffffff';
+  return luminance > 0.5 ? "#000000" : "#ffffff";
 }
 
 export default BlogDetail;

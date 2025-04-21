@@ -1,8 +1,7 @@
-
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Comment } from '@/types/blog';
-import { useToast } from '@/components/ui/use-toast';
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Comment } from "@/modules/blog/types/blog";
+import { useToast } from "@/components/ui/use-toast";
 
 export function useComments(postId: string) {
   const [comments, setComments] = useState<Comment[]>([]);
@@ -14,10 +13,10 @@ export function useComments(postId: string) {
       try {
         setLoading(true);
         const { data, error } = await supabase
-          .from('blog_comments')
-          .select('*')
-          .eq('blog_id', postId)
-          .order('created_at', { ascending: false });
+          .from("blog_comments")
+          .select("*")
+          .eq("blog_id", postId)
+          .order("created_at", { ascending: false });
 
         if (error) {
           throw error;
@@ -30,12 +29,12 @@ export function useComments(postId: string) {
           name: comment.name,
           email: comment.email,
           content: comment.content,
-          created_at: comment.created_at
+          created_at: comment.created_at,
         }));
 
         setComments(mappedComments as Comment[]);
       } catch (error) {
-        console.error('Error fetching comments:', error);
+        console.error("Error fetching comments:", error);
         toast({
           variant: "destructive",
           title: "Error loading comments",
@@ -54,10 +53,8 @@ export function useComments(postId: string) {
   const addComment = async (name: string, email: string, content: string) => {
     try {
       const { data, error } = await supabase
-        .from('blog_comments')
-        .insert([
-          { blog_id: postId, name, email, content }
-        ])
+        .from("blog_comments")
+        .insert([{ blog_id: postId, name, email, content }])
         .select();
 
       if (error) {
@@ -71,14 +68,14 @@ export function useComments(postId: string) {
         name: data![0].name,
         email: data![0].email,
         content: data![0].content,
-        created_at: data![0].created_at
+        created_at: data![0].created_at,
       };
 
-      setComments(prev => [newComment, ...prev]);
-      
+      setComments((prev) => [newComment, ...prev]);
+
       return { success: true };
     } catch (error) {
-      console.error('Error adding comment:', error);
+      console.error("Error adding comment:", error);
       toast({
         variant: "destructive",
         title: "Error posting comment",

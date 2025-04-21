@@ -1,4 +1,3 @@
-
 // Blog related types
 export interface BlogPost {
   id: string;
@@ -59,8 +58,8 @@ export interface EditorJSBlogData {
 export interface Precio {
   id: number;
   salida_id: number | null;
-  tipo_habitacion: 'doble' | 'triple' | 'individual' | 'niño';
-  forma_pago: 'efectivo' | 'tarjeta';
+  tipo_habitacion: "doble" | "triple" | "individual" | "niño";
+  forma_pago: "efectivo" | "tarjeta";
   precio: number;
 }
 

@@ -1,9 +1,8 @@
-
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { BlogPost } from '@/types/blog';
-import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { BlogPost } from "@/modules/blog/types/blog";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 export function useBlogPostById(id: string | undefined) {
   const [post, setPost] = useState<BlogPost | null>(null);
@@ -20,11 +19,11 @@ export function useBlogPostById(id: string | undefined) {
 
       try {
         setLoading(true);
-        
+
         const { data, error } = await supabase
-          .from('blogs')
-          .select('*')
-          .eq('id', id)
+          .from("blogs")
+          .select("*")
+          .eq("id", id)
           .maybeSingle();
 
         if (error) {
@@ -37,20 +36,20 @@ export function useBlogPostById(id: string | undefined) {
             title: "Post not found",
             description: "The requested blog post could not be found.",
           });
-          navigate('/admin/blog/posts');
+          navigate("/admin/blog/posts");
           return;
         }
 
         // Convert to BlogPost type with title field
         const blogPost: BlogPost = {
           ...data,
-          title: data.title_en || data.title || '',
-          isLegacy: false
+          title: data.title_en || data.title || "",
+          isLegacy: false,
         };
 
         setPost(blogPost);
       } catch (error) {
-        console.error('Error fetching blog post:', error);
+        console.error("Error fetching blog post:", error);
         toast({
           variant: "destructive",
           title: "Error loading blog post",

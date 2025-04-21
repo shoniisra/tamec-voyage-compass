@@ -1,2 +1,1 @@
-
-export * from '@/types/blog';
+export * from "@/modules/blog/types/blog";
