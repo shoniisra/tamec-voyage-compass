@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { BlogCard } from '@/modules/blog/components/BlogCard';
+import BlogCard from '@/modules/blog/components/BlogCard';
 import { useBlogPosts } from '@/hooks/use-blog-posts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
@@ -9,7 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Search, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { TagsFilter } from '@/modules/blog/components/TagsFilter';
+import TagsFilter from '@/modules/blog/components/TagsFilter';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 const BlogList = () => {
