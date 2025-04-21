@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/layout/AdminLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog';
@@ -48,7 +48,6 @@ const ItemsPage: React.FC = () => {
         if (error) throw error;
         data = itemsData;
       } else {
-        // Handle other tabs if needed in the future
         data = [];
       }
       
@@ -76,10 +75,8 @@ const ItemsPage: React.FC = () => {
         return;
       }
       
-      let tableName = 'regalos_genericos';
-      
       const { data, error } = await supabase
-        .from(tableName)
+        .from('regalos_genericos')
         .insert([
           {
             nombre: newItemName.trim(),
@@ -123,10 +120,8 @@ const ItemsPage: React.FC = () => {
         return;
       }
       
-      let tableName = 'regalos_genericos';
-      
       const { data, error } = await supabase
-        .from(tableName)
+        .from('regalos_genericos')
         .update({
           nombre: newItemName.trim(),
           descripcion: newItemDescription.trim() || null,
@@ -162,10 +157,8 @@ const ItemsPage: React.FC = () => {
     try {
       if (!currentItem) return;
       
-      let tableName = 'regalos_genericos';
-      
       const { error } = await supabase
-        .from(tableName)
+        .from('regalos_genericos')
         .delete()
         .eq('id', currentItem.id);
       
@@ -267,7 +260,6 @@ const ItemsPage: React.FC = () => {
           </TabsContent>
         </Tabs>
         
-        {/* Create/Edit Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent>
             <DialogHeader>
@@ -320,7 +312,6 @@ const ItemsPage: React.FC = () => {
           </DialogContent>
         </Dialog>
         
-        {/* Delete Confirmation Dialog */}
         <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <DialogContent>
             <DialogHeader>

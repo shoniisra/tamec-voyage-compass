@@ -35,7 +35,7 @@ export function useBlogPost(slug: string) {
             created_at: postBySlug.created_at || "",
             slug: postBySlug.slug || "",
             isLegacy: false,
-            newContent: postBySlug.content,
+            content: postBySlug.content,
           });
           return;
         }
@@ -60,7 +60,7 @@ export function useBlogPost(slug: string) {
             created_at: postById.created_at || "",
             slug: postById.slug || "",
             isLegacy: false,
-            newContent: postById.content,
+            content: postById.content,
           });
           return;
         }

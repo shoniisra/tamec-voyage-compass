@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Destino } from '@/types/tour';
+import { Destino } from '@/modules/tours/types/tour';
 import { useToast } from '@/components/ui/use-toast';
 
 export const useDestinos = () => {

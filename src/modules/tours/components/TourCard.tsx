@@ -20,9 +20,11 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
     .map(d => d.destino?.ciudad || d.destino?.pais)
     .join(', ');
 
-  const featuredImage = tour.fotos?.sort((a, b) => 
-    (a.orden || 0) - (b.orden || 0)
-  )[0]?.url_imagen || 'https://placehold.co/600x400?text=No+Image';
+  const featuredImage = tour.fotos && tour.fotos.length > 0
+    ? tour.fotos.sort((a, b) => 
+        ((a.orden || 0) - (b.orden || 0))
+      )[0]?.url_imagen 
+    : 'https://placehold.co/600x400?text=No+Image';
 
   const nextDeparture = tour.salidas
     ?.filter(s => s.fecha_salida && new Date(s.fecha_salida) > new Date())
@@ -46,15 +48,15 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
   const isServiceIncluded = (serviceType: 'vuelo' | 'transporte' | 'hospedaje' | 'comida' | 'actividades'): boolean => {
     switch (serviceType) {
       case 'vuelo':
-        return !!tour.incluye_vuelo;
+        return !!tour.incluye_vuelo || !!tour.componentes?.incluye_vuelo;
       case 'transporte':
-        return !!tour.incluye_transporte;
+        return !!tour.incluye_transporte || !!tour.componentes?.incluye_transporte;
       case 'hospedaje':
-        return !!tour.incluye_hospedaje;
+        return !!tour.incluye_hospedaje || !!tour.componentes?.incluye_hotel;
       case 'comida':
-        return !!tour.incluye_comida;
+        return !!tour.incluye_comida || !!tour.componentes?.incluye_comida;
       case 'actividades':
-        return !!tour.incluye_actividades;
+        return !!tour.incluye_actividades || !!tour.componentes?.incluye_actividades;
       default:
         return false;
     }

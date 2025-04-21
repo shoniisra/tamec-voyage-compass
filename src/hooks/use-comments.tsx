@@ -6,6 +6,8 @@ import { useToast } from "@/components/ui/use-toast";
 export function useComments(postId: string) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [blogId, setBlogId] = useState<string | null>(null);
+  const [addingComment, setAddingComment] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -47,33 +49,29 @@ export function useComments(postId: string) {
 
     if (postId) {
       fetchComments();
+      setBlogId(postId);
     }
   }, [postId, toast]);
 
   const addComment = async (name: string, email: string, content: string) => {
+    if (!blogId) return;
+
+    setAddingComment(true);
     try {
       const { data, error } = await supabase
-        .from("blog_comments")
-        .insert([{ blog_id: postId, name, email, content }])
+        .from('blog_comments')
+        .insert({
+          name,
+          email,
+          content,
+          blog_id: blogId
+        })
         .select();
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
-      // Map the returned comment to our Comment type
-      const newComment: Comment = {
-        id: data![0].id,
-        blog_id: data![0].blog_id,
-        name: data![0].name,
-        email: data![0].email,
-        content: data![0].content,
-        created_at: data![0].created_at,
-      };
-
-      setComments((prev) => [newComment, ...prev]);
-
-      return { success: true };
+      // Update state with the new comment
+      setComments(prev => [...prev, data[0] as Comment]);
     } catch (error) {
       console.error("Error adding comment:", error);
       toast({
@@ -81,7 +79,8 @@ export function useComments(postId: string) {
         title: "Error posting comment",
         description: "Please try again later.",
       });
-      return { success: false };
+    } finally {
+      setAddingComment(false);
     }
   };
 

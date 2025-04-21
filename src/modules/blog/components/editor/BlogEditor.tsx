@@ -61,14 +61,12 @@ const BlogEditor = ({
   const { getBlogTags, updateBlogTags } = useBlogTags();
   const { createEditorJSBlogPost, updateEditorJSBlogPost } = useBlogPostManagement();
 
-  // Format tags for MultiSelect component
   const tagOptions = allTags.map(tag => ({
     value: tag.id,
     label: tag.name,
-    color: tag.color || '#CBD5E1' // Provide a default color if none exists
+    color: tag.color || '#CBD5E1'
   }));
 
-  // Create ref for editor
   const editorRef = useRef<EditorJS | null>(null);
   const editorInitializedRef = useRef<boolean>(false);
 
@@ -87,7 +85,6 @@ const BlogEditor = ({
 
   const coverImage = watch('coverImage');
 
-  // Load blog tags if in edit mode
   useEffect(() => {
     if (isEdit && blogId) {
       const loadBlogTags = async () => {
@@ -104,9 +101,7 @@ const BlogEditor = ({
     }
   }, [blogId, isEdit, getBlogTags, setValue]);
 
-  // Initialize editor
   useEffect(() => {
-    // Cleanup function for editor instance
     const cleanupEditor = () => {
       if (editorRef.current) {
         try {
@@ -120,15 +115,12 @@ const BlogEditor = ({
       }
     };
 
-    // Initialize new editor
     const initEditor = async () => {
-      // Check if editor is already initialized to prevent multiple instances
       if (editorInitializedRef.current) {
         console.log("Editor already initialized, skipping initialization");
         return;
       }
 
-      // Clean up any existing editor first
       cleanupEditor();
 
       const editorElement = document.getElementById('editor');
@@ -137,7 +129,6 @@ const BlogEditor = ({
         return;
       }
 
-      // Create new editor instance with proper error handling
       try {
         console.log("Initializing editor with data:", initialContent);
         
@@ -280,17 +271,11 @@ const BlogEditor = ({
             console.log('Editor content changed');
           },
           autofocus: true,
-          // Enable paste handling with configuration
           minHeight: 300,
-          logLevel: 'VERBOSE',
-          
-          // Fix paste functionality
+          logLevel: 'ERROR',
           paste: {
-            // Enable plain text paste handling
             plainText: true,
-            // Enable HTML paste handling
             htmlText: true,
-            // Optional handlers for specific types of pasted content
             imageTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp'],
             patterns: {
               image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png|webp|bmp)$/i,
@@ -308,12 +293,10 @@ const BlogEditor = ({
       }
     };
 
-    // Initialize editor with error handling
     initEditor().catch(error => {
       console.error('Editor initialization failed:', error);
     });
 
-    // Cleanup on component unmount
     return cleanupEditor;
   }, [initialContent]);
 
@@ -363,12 +346,10 @@ const BlogEditor = ({
     }
   };
 
-  // Function to translate content using an API
   const translateContent = async (title: string, content: any) => {
     try {
       setIsTranslating(true);
       
-      // Convert EditorJS data to a simplified format for translation
       const blocks = content.blocks || [];
       const textBlocks = blocks.map((block: any) => {
         if (block.type === 'paragraph' || block.type === 'header') {
@@ -377,26 +358,19 @@ const BlogEditor = ({
         return null;
       }).filter(Boolean);
       
-      // Combine all text for title translation
       const textsToTranslate = [title, ...textBlocks];
       
-      // Call translation API (using a mock for now - would be replaced with actual API)
       const translatedTexts = await Promise.all(
         textsToTranslate.map(async (text) => {
-          // This is where you would call your actual translation API
-          // For now, we'll just append " (Translated)" to simulate translation
-          // In a real implementation, replace this with your API call
-          await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
+          await new Promise(resolve => setTimeout(resolve, 500));
           return text ? `${text} (Translated)` : '';
         })
       );
       
-      // Extract translated title and content
       const translatedTitle = translatedTexts[0];
       
-      // Create translated content by updating the original blocks
       const translatedBlocks = [...blocks];
-      let translatedTextIndex = 1; // Start after the title
+      let translatedTextIndex = 1;
       
       for (let i = 0; i < translatedBlocks.length; i++) {
         if (translatedBlocks[i].type === 'paragraph' || translatedBlocks[i].type === 'header') {
@@ -438,14 +412,11 @@ const BlogEditor = ({
         throw new Error("Editor not initialized");
       }
 
-      // Save content
       const outputData = await editorRef.current.save();
       
-      // Translate content to English automatically
       const { title_en, content_en } = await translateContent(formData.title, outputData);
 
       if (isEdit && blogId) {
-        // Use the hook for updating
         await updateEditorJSBlogPost(blogId, {
           title: formData.title,
           title_en,
@@ -455,7 +426,6 @@ const BlogEditor = ({
           slug: formData.slug,
         });
         
-        // Update blog tags
         await updateBlogTags(blogId, formData.tags);
 
         toast({
@@ -463,7 +433,6 @@ const BlogEditor = ({
           description: "Blog post updated successfully",
         });
       } else {
-        // Use the hook for creating
         const data = await createEditorJSBlogPost({
           title: formData.title,
           title_en,
@@ -473,7 +442,6 @@ const BlogEditor = ({
           slug: formData.slug,
         });
         
-        // If tags are selected, add them to the blog post
         if (data && formData.tags.length > 0) {
           await updateBlogTags(data.id, formData.tags);
         }
@@ -519,7 +487,6 @@ const BlogEditor = ({
         </div>
 
         <div className="space-y-4 mt-4">
-          {/* URL Slug - Common */}
           <div>
             <label htmlFor="blog-slug" className="block text-sm font-medium mb-1">
               URL Slug
@@ -551,7 +518,6 @@ const BlogEditor = ({
             </p>
           </div>
 
-          {/* Cover Image - Common */}
           <div>
             <label htmlFor="cover-image" className="block text-sm font-medium mb-1">
               Imagen de Portada
@@ -597,7 +563,6 @@ const BlogEditor = ({
             </div>
           </div>
 
-          {/* Tags - Common */}
           <div>
             <label htmlFor="blog-tags" className="block text-sm font-medium mb-1">
               Etiquetas
@@ -618,7 +583,6 @@ const BlogEditor = ({
             </p>
           </div>
 
-          {/* Spanish Content */}
           <div className="space-y-4">
             <div>
               <label htmlFor="blog-title" className="block text-sm font-medium mb-1">

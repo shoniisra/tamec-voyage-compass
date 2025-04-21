@@ -71,11 +71,11 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
       ? JSON.stringify(post.title)
       : "Untitled Post";
 
-  const content = post.isLegacy
-    ? language === "en"
-      ? post.content_en
-      : post.content_es
-    : post.content || post.newContent;
+  const isEnglish = language === "en";
+
+  const contentToRender = isEnglish
+    ? post.content_en || post.content
+    : post.content;
 
   const formattedDate = post.date
     ? new Date(post.date).toLocaleDateString()
@@ -103,13 +103,13 @@ const BlogDetail = ({ slug }: BlogDetailProps) => {
               className="prose max-w-none"
               dangerouslySetInnerHTML={{
                 __html:
-                  typeof content === "string"
-                    ? content
-                    : JSON.stringify(content),
+                  typeof contentToRender === "string"
+                    ? contentToRender
+                    : JSON.stringify(contentToRender),
               }}
             />
           ) : (
-            <BlogRenderer content={content} />
+            <BlogRenderer content={contentToRender} />
           )}
 
           <div className="mt-12">

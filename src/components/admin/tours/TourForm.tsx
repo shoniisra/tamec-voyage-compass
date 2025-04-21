@@ -1,24 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { useForm, useFieldArray, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useTourManagement, useDestinos } from '@/modules/tours';
-import { Tour, Destino } from '@/modules/tours/types';
+import { 
+  Tour, 
+  Destino, 
+  Aerolinea, 
+  Regalo, 
+  Incluye, 
+  TerminosCondiciones 
+} from '@/modules/tours/types/tour';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/components/ui/use-toast';
-import { CalendarIcon, Trash2, Plus, HelpCircle } from 'lucide-react';
+import { CalendarIcon, Trash2, Plus } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
@@ -122,7 +128,7 @@ const TourForm = ({ tour }: TourFormProps) => {
         setRegalosGenericos(regalosData || []);
         
         const { data: incluyeData, error: incluyeError } = await supabase
-          .from('incluye_generico')
+          .from('regalos_genericos')
           .select('*')
           .order('nombre');
           
@@ -239,13 +245,30 @@ const TourForm = ({ tour }: TourFormProps) => {
       }));
       
       if (tour) {
-        await updateTour(tour.id, tourData, destinos, salidas, precios, componentes, regalos, incluye);
+        await updateTour(
+          tour.id, 
+          tourData, 
+          destinos, 
+          salidas, 
+          precios, 
+          componentes, 
+          regalos
+        );
+        
         toast({
           title: language === 'en' ? "Tour Updated" : "Tour Actualizado",
           description: language === 'en' ? "The tour has been updated successfully." : "El tour ha sido actualizado con éxito.",
         });
       } else {
-        const newTourId = await createTour(tourData, destinos, salidas, precios, componentes, regalos, incluye);
+        const newTourId = await createTour(
+          tourData, 
+          destinos, 
+          salidas, 
+          precios, 
+          componentes, 
+          regalos
+        );
+        
         toast({
           title: language === 'en' ? "Tour Created" : "Tour Creado",
           description: language === 'en' ? "The tour has been created successfully." : "El tour ha sido creado con éxito.",
@@ -801,455 +824,4 @@ const TourForm = ({ tour }: TourFormProps) => {
                       <SelectContent>
                         {incluyeGenericos
                           .filter(i => !selectedIncluye.some(si => si.id === i.id))
-                          .map((incluye) => (
-                            <SelectItem key={incluye.id} value={incluye.id.toString()}>
-                              {incluye.nombre}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                
-                <div className="border rounded-md">
-                  {selectedIncluye.length > 0 ? (
-                    <div className="divide-y">
-                      {selectedIncluye.map((incluye) => (
-                        <div key={incluye.id} className="flex justify-between items-center p-3">
-                          <div>
-                            <span className="font-medium">{incluye.nombre}</span>
-                            {incluye.descripcion && (
-                              <p className="text-sm text-muted-foreground">{incluye.descripcion}</p>
-                            )}
-                          </div>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeIncluye(incluye.id)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-4 text-center text-muted-foreground">
-                      {language === 'en' 
-                        ? 'No included items selected.' 
-                        : 'No hay ítems incluidos seleccionados.'}
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  {language === 'en' ? 'Gifts' : 'Regalos'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex flex-col md:flex-row gap-4 items-start md:items-end">
-                  <div className="w-full md:w-3/4">
-                    <Select onValueChange={(value) => value && addRegalo(parseInt(value))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder={language === 'en' ? 'Add gift' : 'Agregar regalo'} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {regalosGenericos
-                          .filter(r => !selectedRegalos.some(sr => sr.id === r.id))
-                          .map((regalo) => (
-                            <SelectItem key={regalo.id} value={regalo.id.toString()}>
-                              {regalo.nombre}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                
-                <div className="border rounded-md">
-                  {selectedRegalos.length > 0 ? (
-                    <div className="divide-y">
-                      {selectedRegalos.map((regalo) => (
-                        <div key={regalo.id} className="flex justify-between items-center p-3">
-                          <div>
-                            <span className="font-medium">{regalo.nombre}</span>
-                            {regalo.descripcion && (
-                              <p className="text-sm text-muted-foreground">{regalo.descripcion}</p>
-                            )}
-                          </div>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeRegalo(regalo.id)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-4 text-center text-muted-foreground">
-                      {language === 'en' 
-                        ? 'No gifts selected.' 
-                        : 'No hay regalos seleccionados.'}
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  {language === 'en' ? 'Additional Information' : 'Información Adicional'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="coortesias"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{language === 'en' ? 'Courtesies' : 'Cortesías'}</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder={language === 'en' ? 'List of courtesies' : 'Lista de cortesías'} 
-                          {...field} 
-                          rows={3}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        {language === 'en' 
-                          ? 'Additional courtesies offered with the tour.' 
-                          : 'Cortesías adicionales ofrecidas con el tour.'}
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="terminos_condiciones_id"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{language === 'en' ? 'Terms & Conditions Template' : 'Plantilla de Términos y Condiciones'}</FormLabel>
-                      <Select
-                        onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
-                        value={field.value?.toString() || ''}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={language === 'en' ? 'Select a template' : 'Seleccionar una plantilla'} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="0">
-                            {language === 'en' ? '-- Custom terms --' : '-- Términos personalizados --'}
-                          </SelectItem>
-                          {terminosCondiciones.map((termino) => (
-                            <SelectItem key={termino.id} value={termino.id.toString()}>
-                              {termino.titulo || `Template #${termino.id}`}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="terminos_condiciones"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{language === 'en' ? 'Terms & Conditions' : 'Términos y Condiciones'}</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder={language === 'en' ? 'Terms and conditions text' : 'Texto de términos y condiciones'} 
-                          {...field} 
-                          rows={5}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        {language === 'en' 
-                          ? 'If you selected a template above, this will override it.' 
-                          : 'Si seleccionaste una plantilla arriba, esto la sobreescribirá.'}
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="politicas_cancelacion"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{language === 'en' ? 'Cancellation Policies' : 'Políticas de Cancelación'}</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder={language === 'en' ? 'Cancellation policies text' : 'Texto de políticas de cancelación'} 
-                          {...field} 
-                          rows={5}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="departures" className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle>
-                  {language === 'en' ? 'Tour Departures' : 'Salidas del Tour'}
-                </CardTitle>
-                <Button type="button" variant="outline" size="sm" onClick={addSalida}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  {language === 'en' ? 'Add Departure' : 'Agregar Salida'}
-                </Button>
-              </CardHeader>
-              <CardContent>
-                {salidas.length > 0 ? (
-                  <div className="space-y-4">
-                    {salidas.map((salida, index) => (
-                      <div key={index} className="border rounded-md p-4 space-y-4">
-                        <div className="flex justify-between items-center">
-                          <h4 className="font-medium">
-                            {language === 'en' ? `Departure #${index + 1}` : `Salida #${index + 1}`}
-                          </h4>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeSalida(index)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className="flex flex-col space-y-1.5">
-                            <FormLabel>
-                              {language === 'en' ? 'Departure Date' : 'Fecha de Salida'}
-                            </FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <Button
-                                  variant={"outline"}
-                                  className={`w-full pl-3 text-left font-normal ${!salida.fecha_salida ? "text-muted-foreground" : ""}`}
-                                >
-                                  {salida.fecha_salida ? (
-                                    format(new Date(salida.fecha_salida), "PP", { locale: language === 'es' ? es : undefined })
-                                  ) : (
-                                    <span>{language === 'en' ? 'Select date' : 'Seleccionar fecha'}</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-auto p-0" align="start">
-                                <Calendar
-                                  mode="single"
-                                  selected={salida.fecha_salida ? new Date(salida.fecha_salida) : undefined}
-                                  onSelect={(date) => updateSalida(index, 'fecha_salida', date ? format(date, 'yyyy-MM-dd') : null)}
-                                  initialFocus
-                                />
-                              </PopoverContent>
-                            </Popover>
-                          </div>
-                          
-                          <div className="flex flex-col space-y-1.5">
-                            <FormLabel>
-                              {language === 'en' ? 'Duration (days)' : 'Duración (días)'}
-                            </FormLabel>
-                            <Input
-                              type="number"
-                              value={salida.dias_duracion}
-                              onChange={(e) => updateSalida(index, 'dias_duracion', parseInt(e.target.value) || 0)}
-                            />
-                          </div>
-                          
-                          <div className="flex flex-col space-y-1.5">
-                            <FormLabel>
-                              {language === 'en' ? 'Available Spots' : 'Cupos Disponibles'}
-                            </FormLabel>
-                            <Input
-                              type="number"
-                              value={salida.cupos_disponibles || ''}
-                              onChange={(e) => updateSalida(index, 'cupos_disponibles', parseInt(e.target.value) || null)}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="border rounded-md p-6 text-center text-muted-foreground">
-                    {language === 'en' 
-                      ? 'No departures added. Click the button above to add a departure.' 
-                      : 'No hay salidas añadidas. Haz clic en el botón de arriba para añadir una salida.'}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="prices" className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle>
-                  {language === 'en' ? 'Tour Prices' : 'Precios del Tour'}
-                </CardTitle>
-                <Button type="button" variant="outline" size="sm" onClick={addPrecio}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  {language === 'en' ? 'Add Price' : 'Agregar Precio'}
-                </Button>
-              </CardHeader>
-              <CardContent>
-                {precios.length > 0 ? (
-                  <div className="space-y-4">
-                    {precios.map((precio, index) => (
-                      <div key={index} className="border rounded-md p-4 space-y-4">
-                        <div className="flex justify-between items-center">
-                          <h4 className="font-medium">
-                            {language === 'en' ? `Price Option #${index + 1}` : `Opción de Precio #${index + 1}`}
-                          </h4>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removePrecio(index)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="flex flex-col space-y-1.5">
-                            <FormLabel>
-                              {language === 'en' ? 'Departure City' : 'Ciudad de Salida'}
-                            </FormLabel>
-                            <Input
-                              value={precio.ciudad_salida}
-                              onChange={(e) => updatePrecio(index, 'ciudad_salida', e.target.value)}
-                              placeholder={language === 'en' ? 'Quito, Guayaquil...' : 'Quito, Guayaquil...'}
-                            />
-                          </div>
-                          
-                          <div className="flex flex-col space-y-1.5">
-                            <FormLabel>
-                              {language === 'en' ? 'Room Type' : 'Tipo de Habitación'}
-                            </FormLabel>
-                            <Select
-                              value={precio.tipo_habitacion}
-                              onValueChange={(value) => updatePrecio(index, 'tipo_habitacion', value as 'doble' | 'triple' | 'individual' | 'child')}
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="doble">
-                                  {language === 'en' ? 'Double' : 'Doble'}
-                                </SelectItem>
-                                <SelectItem value="triple">
-                                  {language === 'en' ? 'Triple' : 'Triple'}
-                                </SelectItem>
-                                <SelectItem value="individual">
-                                  {language === 'en' ? 'Single' : 'Individual'}
-                                </SelectItem>
-                                <SelectItem value="child">
-                                  {language === 'en' ? 'Child' : 'Niño'}
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="flex flex-col space-y-1.5">
-                            <FormLabel>
-                              {language === 'en' ? 'Payment Method' : 'Forma de Pago'}
-                            </FormLabel>
-                            <Select
-                              value={precio.forma_pago}
-                              onValueChange={(value) => updatePrecio(index, 'forma_pago', value as 'efectivo' | 'tarjeta')}
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="efectivo">
-                                  {language === 'en' ? 'Cash' : 'Efectivo'}
-                                </SelectItem>
-                                <SelectItem value="tarjeta">
-                                  {language === 'en' ? 'Card' : 'Tarjeta'}
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          
-                          <div className="flex flex-col space-y-1.5">
-                            <FormLabel>
-                              {language === 'en' ? 'Price' : 'Precio'}
-                            </FormLabel>
-                            <Input
-                              type="number"
-                              value={precio.precio}
-                              onChange={(e) => updatePrecio(index, 'precio', parseFloat(e.target.value) || 0)}
-                              step="0.01"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="border rounded-md p-6 text-center text-muted-foreground">
-                    {language === 'en' 
-                      ? 'No prices added. Click the button above to add a price option.' 
-                      : 'No hay precios añadidos. Haz clic en el botón de arriba para añadir una opción de precio.'}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-        
-        <div className="flex justify-end gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate('/admin/tours')}
-            disabled={isLoading || isSubmitting}
-          >
-            {language === 'en' ? 'Cancel' : 'Cancelar'}
-          </Button>
-          <Button type="submit" disabled={isLoading || isSubmitting}>
-            {isLoading || isSubmitting ? (
-              <>
-                <div className="animate-spin mr-2 h-4 w-4 border-2 border-background border-t-transparent rounded-full" />
-                {language === 'en' ? 'Saving...' : 'Guardando...'}
-              </>
-            ) : tour ? (
-              language === 'en' ? 'Update Tour' : 'Actualizar Tour'
-            ) : (
-              language === 'en' ? 'Create Tour' : 'Crear Tour'
-            )}
-          </Button>
-        </div>
-      </form>
-    </Form>
-  );
-};
-
-export default TourForm;
+                          .map((incluye)

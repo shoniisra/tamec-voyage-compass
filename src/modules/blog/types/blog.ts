@@ -15,6 +15,7 @@ export interface BlogPost {
   created_at?: string;
   isLegacy?: boolean;
   content?: any;
+  newContent?: any; // Adding this property for compatibility with existing code
   tags?: Tag[];
 }
 
@@ -31,6 +32,7 @@ export interface BlogComment {
   email: string;
   content: string;
   created_at: string;
+  blog_id?: string; // Adding this for compatibility
 }
 
 export type Comment = BlogComment;

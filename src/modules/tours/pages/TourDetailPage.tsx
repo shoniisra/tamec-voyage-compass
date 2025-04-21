@@ -1,4 +1,3 @@
-
 // File moved from src/pages/TourDetailPage.tsx
 // Imports rewritten to use the module paths
 import React from 'react';
@@ -55,6 +54,10 @@ const TourDetailPage: React.FC = () => {
     );
   }
   
+  const tourImages = tour?.fotos && tour.fotos.length > 0
+    ? tour.fotos.map(foto => foto.url_imagen)
+    : ['https://placehold.co/600x400?text=No+Image'];
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
@@ -69,9 +72,9 @@ const TourDetailPage: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-2">
-              {tour.fotos && tour.fotos.length > 0 && (
+              {tourImages.length > 0 && (
                 <img 
-                  src={tour.fotos[0].url_imagen} 
+                  src={tourImages[0]} 
                   alt={tour.titulo} 
                   className="w-full h-80 object-cover rounded-lg mb-6" 
                 />

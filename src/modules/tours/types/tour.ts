@@ -20,6 +20,15 @@ export interface Tour {
   regalos?: Regalo[];
   componentes?: ComponentesIncluidos;
   precio_desde?: number;
+  // Added properties needed by components
+  fotos?: Foto[];
+  incluye?: Incluye[];
+  incluye_boleto_aereo?: boolean;
+  incluye_vuelo?: boolean;
+  incluye_transporte?: boolean;
+  incluye_hospedaje?: boolean;
+  incluye_comida?: boolean;
+  incluye_actividades?: boolean;
 }
 
 export interface TourDestino {
@@ -42,6 +51,8 @@ export interface Salida {
   fecha_salida: string | null;
   dias_duracion: number;
   cupos_disponibles: number | null;
+  // Adding precios needed by components
+  precios?: Precio[];
 }
 
 export interface Precio {
@@ -78,6 +89,29 @@ export interface ComponentesIncluidos {
   incluye_maleta_10: boolean;
   incluye_maleta_23: boolean;
   incluye_articulo_personal: boolean;
+}
+
+// Add Foto interface for TourCard
+export interface Foto {
+  id: number;
+  tour_id: number;
+  url_imagen: string;
+  descripcion?: string;
+  orden?: number;
+}
+
+// Add Incluye interface for TourForm
+export interface Incluye {
+  id: number;
+  nombre: string;
+  descripcion?: string;
+}
+
+// Add TerminosCondiciones interface for TourForm
+export interface TerminosCondiciones {
+  id: number;
+  titulo: string;
+  contenido: string;
 }
 
 export interface TourFilterParams {

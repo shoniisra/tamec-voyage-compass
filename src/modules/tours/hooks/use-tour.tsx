@@ -62,13 +62,27 @@ export function useTour(slug: string) {
           destino: item.destino
         })) || [];
         
-        // Set final tour object with all relations
-        const finalTour: Tour = {
-          ...tourData,
-          destinos,
-          precio_desde,
-          regalos
+        // Map tour data to Tour type
+        const mapTourData = (rawTourData: any): Tour => {
+          const precios = rawTourData.precios?.map((precio: any) => ({
+            id: precio.id,
+            tour_id: precio.tour_id,
+            ciudad_salida: precio.ciudad_salida,
+            tipo_habitacion: (precio.tipo_habitacion as "doble" | "triple" | "individual" | "child"),
+            forma_pago: (precio.forma_pago as "efectivo" | "tarjeta"),
+            precio: precio.precio
+          })) || [];
+
+          return {
+            ...rawTourData,
+            destinos,
+            precio_desde,
+            regalos,
+            precios
+          } as Tour;
         };
+
+        const finalTour = mapTourData(tourData);
         
         setTour(finalTour);
         
