@@ -1,8 +1,10 @@
 
+// File moved from src/pages/TourDetailPage.tsx
+// Imports rewritten to use the module paths
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
-import { useTour } from '@/hooks/use-tour';
+import { useParams } from 'react-router-dom';
+import { useTour } from '../hooks/use-tour';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Skeleton } from '@/components/ui/skeleton';
 

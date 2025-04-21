@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Tour, TourDestino } from '@/types/tour';
+import { Tour, TourDestino } from '@/modules/tours/types';
 import { useToast } from '@/components/ui/use-toast';
 
 export function useTour(slug: string) {

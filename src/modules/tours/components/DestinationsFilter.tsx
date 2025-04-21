@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useDestinos } from '@/hooks/use-destinos';
-import { TourFilterParams } from '@/types/tour';
+import { useDestinos } from '@/modules/tours/hooks';
+import { TourFilterParams } from '@/modules/tours/types';
 import { DateRange } from 'react-day-picker';
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";

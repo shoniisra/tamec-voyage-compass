@@ -1,12 +1,12 @@
 
+// File moved from src/pages/DestinationsPage.tsx
 import React, { useState } from 'react';
 import Layout from '@/components/layout/Layout';
-import DestinationsFilter from '@/components/destinations/DestinationsFilter';
-import DestinationsList from '@/components/destinations/DestinationsList';
-import { useTours } from '@/hooks/use-tours';
-import { TourFilterParams } from '@/types/tour';
+import { DestinationsFilter, DestinationsList } from '../components';
+import { useTours } from '../hooks/use-tours';
+import { TourFilterParams } from '../types/tour';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { MapPinned, Search } from 'lucide-react';
+import { MapPinned } from 'lucide-react';
 
 const DestinationsPage: React.FC = () => {
   const { language } = useLanguage();

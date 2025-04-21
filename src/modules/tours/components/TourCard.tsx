@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Tour } from '@/types/tour';
+import { Tour } from '@/modules/tours/types';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPinned, Star, Users, Sparkles, Plane, Bus, Bed, Utensils, Camera, Clock } from 'lucide-react';

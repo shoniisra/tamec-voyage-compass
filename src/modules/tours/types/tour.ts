@@ -1,4 +1,3 @@
-
 export type Tour = {
   id: number;
   titulo: string;

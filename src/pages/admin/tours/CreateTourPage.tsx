@@ -1,9 +1,10 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/admin/layout/AdminLayout';
 import TourForm from '@/components/admin/tours/TourForm';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTours, useTour, useTourManagement, useDestinos } from '@/modules/tours';
+import { Tour, TourFilterParams } from '@/modules/tours';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 

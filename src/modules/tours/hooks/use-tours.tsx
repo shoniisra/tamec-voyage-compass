@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Tour, TourFilterParams } from '@/types/tour';
+import { Tour, TourFilterParams } from '@/modules/tours/types';
 
 export const useTours = (filters?: TourFilterParams) => {
   const [tours, setTours] = useState<Tour[]>([]);

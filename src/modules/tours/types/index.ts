@@ -1,2 +1,2 @@
 
-export * from '@/types/tour';
+export * from './tour';

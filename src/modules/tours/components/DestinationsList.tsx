@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Tour } from '@/types/tour';
+import { Tour } from '@/modules/tours/types';
 import TourCard from './TourCard';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { FileSearch } from 'lucide-react';

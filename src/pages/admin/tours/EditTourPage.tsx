@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/admin/layout/AdminLayout';
 import TourForm from '@/components/admin/tours/TourForm';
-import { useTour } from '@/hooks/use-tour';
+import { useTour } from '@/modules/tours';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
