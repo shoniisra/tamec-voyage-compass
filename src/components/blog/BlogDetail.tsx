@@ -9,7 +9,7 @@ import { useBlogPost } from '@/hooks/use-blog-post';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Tag } from '@/types/blog';
-import ContactInfo from '@/components/contact/ContactInfo';
+import ContactInfo from '@/modules/contact/components/ContactInfo';
 import { Badge } from '@/components/ui/badge';
 import { useBlogTags } from '@/hooks/use-blog-tags';
 
