@@ -6,12 +6,10 @@ import { PlusCircle, FilterIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTours } from '@/modules/tours';
-import { TourFilterParams, Tour } from '@/modules/tours/types/tour'; // Import from correct path
+import { TourFilterParams } from '@/modules/tours/types/tour'; // Import from correct path
 import ToursList from '@/components/admin/tours/ToursList';
 import ToursFilter from '@/components/admin/tours/ToursFilter';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-
-// Removed duplicate TourFilterParams interface
 
 const ToursPage: React.FC = () => {
   const { language } = useLanguage();
