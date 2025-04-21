@@ -1,2 +1,4 @@
 
-// Export public API for contact module
+export * from './components';
+export * from './pages';
+export * from './types';

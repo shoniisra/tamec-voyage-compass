@@ -8,21 +8,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
-
-interface FormValues {
-  name: string;
-  email: string;
-  phone: string;
-  message: string;
-}
+import { ContactFormData } from '../types';
 
 const ContactForm = () => {
   const { t } = useLanguage();
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<FormValues>();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<ContactFormData>();
   
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = async (data: ContactFormData) => {
     try {
-      // Insert data into the leads table
       const { error } = await supabase
         .from('leads')
         .insert({
@@ -30,26 +23,25 @@ const ContactForm = () => {
           email: data.email,
           phone: data.phone,
           message: data.message,
-          status: 'New', // Default status for new leads
+          status: 'New',
           source: 'Website Contact Form'
         });
 
       if (error) {
         console.error('Error submitting form:', error);
-        if (error.code === '23505') { // Unique constraint violation
-          toast.error(t('contact.form.emailExists') || 'This email is already registered.');
+        if (error.code === '23505') {
+          toast.error(t('contact.form.emailExists'));
         } else {
-          toast.error(t('contact.form.submitError') || 'Something went wrong. Please try again.');
+          toast.error(t('contact.form.submitError'));
         }
         return;
       }
 
-      // On success
-      toast.success(t('contact.form.success') || 'Thank you for your message! We\'ll get back to you soon.');
+      toast.success(t('contact.form.success'));
       reset();
     } catch (err) {
       console.error('Error submitting form:', err);
-      toast.error(t('contact.form.submitError') || 'Something went wrong. Please try again.');
+      toast.error(t('contact.form.submitError'));
     }
   };
   
