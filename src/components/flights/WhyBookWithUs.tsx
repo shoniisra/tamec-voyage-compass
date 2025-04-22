@@ -20,7 +20,7 @@ const WhyBookWithUs = () => {
       icon: <Clock className="h-10 w-10 text-tamec-600 mb-4" />,
       title: language === 'en' ? 'Avoid Complications' : 'Evita complicaciones',
       description: language === 'en'
-        ? 'We handle complex itineraries, transit visas, and special requirements so you don't have to worry about them.'
+        ? 'We handle complex itineraries, transit visas, and special requirements so you don\'t have to worry about them.'
         : 'Nos encargamos de itinerarios complejos, visados de tránsito y requisitos especiales para que no tengas que preocuparte.'
     },
     {
@@ -28,7 +28,7 @@ const WhyBookWithUs = () => {
       icon: <Shield className="h-10 w-10 text-tamec-600 mb-4" />,
       title: language === 'en' ? 'Support Throughout the Process' : 'Acompañamiento durante todo el proceso',
       description: language === 'en'
-        ? 'From the moment you contact us until you return home, we're just a message away if you need any assistance.'
+        ? 'From the moment you contact us until you return home, we\'re just a message away if you need any assistance.'
         : 'Desde el momento en que nos contactas hasta que regresas a casa, estamos a solo un mensaje si necesitas ayuda.'
     },
     {
@@ -79,7 +79,7 @@ const WhyBookWithUs = () => {
             <div className="md:w-3/4 md:pl-6">
               <p className="text-gray-700 dark:text-gray-200 italic text-lg">
                 {language === 'en'
-                  ? '"I was trying to book a complicated multi-city trip with long layovers and was getting frustrated with online booking sites. Your team made it so easy, found me great options, and took care of everything. I'll never go back to booking flights myself!"'
+                  ? '"I was trying to book a complicated multi-city trip with long layovers and was getting frustrated with online booking sites. Your team made it so easy, found me great options, and took care of everything. I\'ll never go back to booking flights myself!"'
                   : '"Estaba tratando de reservar un viaje complicado con múltiples ciudades y largas escalas, y me estaba frustrando con los sitios de reserva en línea. Su equipo lo hizo muy fácil, me encontró excelentes opciones y se encargó de todo. ¡Nunca volveré a reservar vuelos por mi cuenta!"'}
               </p>
               <p className="mt-4 font-semibold">
