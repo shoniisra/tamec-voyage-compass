@@ -3,53 +3,24 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
-  AlignLeft,
-  AlignCenter,
-  AlignJustify,
-  AlignRight,
   Bold,
-  Code,
-  Heading1,
-  Heading2,
-  Heading3,
-  Image,
   Italic,
+  Underline,
   Link as LinkIcon,
   List,
   ListOrdered,
-  Quote,
-  Underline,
   ImageIcon,
-  GripVertical,
-  Plus,
-  Minus,
-  Text,
-  CheckCircle2,
-  XCircle,
-  Loader2,
+  Text
 } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
-import { useToast } from '@/hooks/use-toast';
-import { useLanguage } from '@/contexts/LanguageContext';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Progress } from "@/components/ui/progress";
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useToast } from '@/hooks/use-toast';
 
-// Simple placeholder implementation
 interface EditorProps {
   initialContent?: string;
 }
@@ -58,9 +29,29 @@ const BlogEditor: React.FC<EditorProps> = ({ initialContent = "" }) => {
   const { language } = useLanguage();
   const { toast } = useToast();
   const [content, setContent] = useState(initialContent);
+  const [title, setTitle] = useState("");
+
+  const handleSave = () => {
+    toast({
+      title: language === 'en' ? 'Successfully saved' : 'Guardado con éxito',
+      description: language === 'en' ? 'Your blog post has been saved.' : 'Tu publicación ha sido guardada.'
+    });
+  };
 
   return (
     <div className="border rounded-md p-4">
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">
+          {language === 'en' ? 'Title' : 'Título'}
+        </label>
+        <Input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder={language === 'en' ? 'Enter blog title...' : 'Ingresa el título del blog...'}
+          className="mb-4"
+        />
+      </div>
+
       <div className="flex flex-wrap items-center p-2 border-b bg-gray-50">
         <TooltipProvider>
           <Tooltip>
@@ -89,6 +80,51 @@ const BlogEditor: React.FC<EditorProps> = ({ initialContent = "" }) => {
             </TooltipTrigger>
             <TooltipContent>{language === 'en' ? 'Underline' : 'Subrayado'}</TooltipContent>
           </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="sm" onClick={() => {}}>
+                <LinkIcon className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{language === 'en' ? 'Link' : 'Enlace'}</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="sm" onClick={() => {}}>
+                <List className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{language === 'en' ? 'Bullet List' : 'Lista con viñetas'}</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="sm" onClick={() => {}}>
+                <ListOrdered className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{language === 'en' ? 'Numbered List' : 'Lista numerada'}</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="sm" onClick={() => {}}>
+                <ImageIcon className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{language === 'en' ? 'Insert Image' : 'Insertar imagen'}</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="sm" onClick={() => {}}>
+                <Text className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{language === 'en' ? 'Format Text' : 'Formatear texto'}</TooltipContent>
+          </Tooltip>
         </TooltipProvider>
       </div>
 
@@ -104,12 +140,7 @@ const BlogEditor: React.FC<EditorProps> = ({ initialContent = "" }) => {
       <div className="flex justify-end mt-4">
         <Button
           className="bg-tamec-600 hover:bg-tamec-700 text-white"
-          onClick={() => 
-            toast({
-              title: language === 'en' ? 'Successfully saved' : 'Guardado con éxito',
-              description: language === 'en' ? 'Your blog post has been saved.' : 'Tu publicación ha sido guardada.'
-            })
-          }
+          onClick={handleSave}
         >
           {language === 'en' ? 'Save' : 'Guardar'}
         </Button>

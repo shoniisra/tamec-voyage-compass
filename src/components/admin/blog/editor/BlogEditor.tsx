@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from "react";
 import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
@@ -272,7 +273,7 @@ const BlogEditor = ({
           },
           autofocus: true,
           minHeight: 300,
-          logLevel: 'ERROR' as const,
+          logLevel: 'ERROR' as 'ERROR' | 'WARN' | 'INFO',
           paste: {
             plainText: true,
             htmlText: true,

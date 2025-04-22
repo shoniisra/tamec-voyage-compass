@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { MessageCircle, Send } from 'lucide-react';
+import { MessageSquare, Send } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -39,17 +39,22 @@ const BlogComments = ({ postId }: BlogCommentsProps) => {
     try {
       const result = await addComment(name, email, content);
       
-      // Fix the type checking issue
-      if (result && 'success' in result && result.success) {
-        setName('');
-        setEmail('');
-        setContent('');
-        
-        toast({
-          title: "Success",
-          description: "Your comment has been posted",
-        });
-      }
+      // Clear the form on successful comment submission
+      setName('');
+      setEmail('');
+      setContent('');
+      
+      toast({
+        title: "Success",
+        description: "Your comment has been posted",
+      });
+    } catch (error) {
+      console.error("Error posting comment:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to post your comment. Please try again.",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -62,7 +67,7 @@ const BlogComments = ({ postId }: BlogCommentsProps) => {
   return (
     <div className="mt-12 pt-8 border-t">
       <h3 className="text-2xl font-bold flex items-center mb-6">
-        <MessageCircle className="mr-2" />
+        <MessageSquare className="mr-2" />
         {t('blog.comments')} ({comments.length})
       </h3>
 
