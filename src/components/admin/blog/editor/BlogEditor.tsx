@@ -272,7 +272,7 @@ const BlogEditor = ({
           },
           autofocus: true,
           minHeight: 300,
-          logLevel: 'ERROR',
+          logLevel: 'ERROR' as const,
           paste: {
             plainText: true,
             htmlText: true,

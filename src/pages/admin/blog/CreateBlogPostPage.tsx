@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import BlogEditor from '@/modules/blog/components/editor/BlogEditor';
@@ -26,9 +27,7 @@ const CreateBlogPostPage = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Create Blog Post</h1>
       </div>
-      <BlogEditor 
-        initialContent=""
-      />
+      <BlogEditor />
     </AdminLayout>
   );
 };

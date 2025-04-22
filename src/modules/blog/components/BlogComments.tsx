@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useComments } from '@/hooks/use-comments';
 import { Button } from '@/components/ui/button';
@@ -38,7 +39,8 @@ const BlogComments = ({ postId }: BlogCommentsProps) => {
     try {
       const result = await addComment(name, email, content);
       
-      if (result && result.success) {
+      // Fix the type checking issue
+      if (result && 'success' in result && result.success) {
         setName('');
         setEmail('');
         setContent('');

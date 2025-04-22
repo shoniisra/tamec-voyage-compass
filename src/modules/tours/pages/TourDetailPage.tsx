@@ -6,7 +6,7 @@ import { useTour } from '../hooks/use-tour';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Plane, Bus, Bed, Utensils, Camera } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const TourDetailPage: React.FC = () => {
