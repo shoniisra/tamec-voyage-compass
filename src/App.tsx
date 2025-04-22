@@ -11,6 +11,7 @@ import AdminDashboardPage from "@/pages/AdminDashboardPage";
 import { DestinationsPage, TourDetailPage } from "@/modules/tours";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import VisaProcessingPage from "@/pages/VisaProcessingPage";
+import FlightServicePage from "@/pages/FlightServicePage";
 
 // Admin Tour Pages
 import ToursPage from "@/pages/admin/tours/ToursPage";
@@ -41,6 +42,7 @@ function App() {
       <Route path="/destinations" element={<DestinationsPage />} />
       <Route path="/destinations/:slug" element={<TourDetailPage />} />
       <Route path="/services/visa-processing" element={<VisaProcessingPage />} />
+      <Route path="/services/flights" element={<FlightServicePage />} />
       <Route path="/auth" element={<AuthPage />} />
 
       {/* Admin Routes */}

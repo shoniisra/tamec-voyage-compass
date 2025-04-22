@@ -45,7 +45,7 @@ const ServicesSection = () => {
         value: '58+',
         label: language === 'en' ? 'International destinations' : 'Destinos internacionales'
       },
-      link: '#'
+      link: '/services/flights'
     },
     {
       id: 3,
