@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import HomePage from "@/pages/HomePage";
@@ -12,6 +11,7 @@ import { DestinationsPage, TourDetailPage } from "@/modules/tours";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import VisaProcessingPage from "@/pages/VisaProcessingPage";
 import FlightServicePage from "@/pages/FlightServicePage";
+import GalapagosServicePage from "@/pages/GalapagosServicePage";
 
 // Admin Tour Pages
 import ToursPage from "@/pages/admin/tours/ToursPage";
@@ -159,6 +159,7 @@ function App() {
 
       {/* 404 Route */}
       <Route path="*" element={<NotFound />} />
+      <Route path="/services/galapagos" element={<GalapagosServicePage />} />
     </Routes>
   );
 }
