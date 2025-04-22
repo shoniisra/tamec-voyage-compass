@@ -1,622 +1,599 @@
-import React, { useEffect, useRef, useState } from "react";
-import EditorJS from "@editorjs/editorjs";
-import Header from "@editorjs/header";
-import List from "@editorjs/list";
-import Image from "@editorjs/image";
-import Paragraph from "@editorjs/paragraph";
-import Link from "@editorjs/link";
-import Underline from "@editorjs/underline";
-import InlineCode from "@editorjs/inline-code";
-import Marker from "@editorjs/marker";
-import Quote from "@editorjs/quote";
-import Table from "@editorjs/table";
-import Warning from "@editorjs/warning";
-import Delimiter from "@editorjs/delimiter";
-import Raw from "@editorjs/raw";
-import AlignmentTuneTool from "editorjs-text-alignment-blocktune";
-import { supabaseExtended } from "@/integrations/supabase/client-extended";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
-import { Image as ImageIcon, Save } from "lucide-react";
-import { toKebabCase } from "@/utils/stringUtils";
-import { useForm } from "react-hook-form";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { useTags } from "@/hooks/use-tags";
-import { useBlogTags } from "@/hooks/use-blog-tags";
-import { MultiSelect } from "@/components/ui/multi-select";
-import { useBlogPostManagement } from "@/hooks/use-blog-post-management";
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { createEditor } from 'slate';
+import { Slate, Editable, withReact } from 'slate-react';
+import { Transforms, Editor, Element, Descendant } from 'slate';
+import isUrl from 'is-url';
+import { useDebounce } from '@/hooks/use-debounce';
+import { useToast } from '@/components/ui/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
+import {
+  Bold,
+  Code,
+  Heading1,
+  Heading2,
+  Image as ImageIcon,
+  Italic,
+  Link as LinkIcon,
+  List,
+  ListOrdered,
+  Quote,
+  Underline,
+  ImageIcon as ImageIconComponent,
+  Pilcrow,
+  TextCursorInput,
+  Code2,
+  ImagePlus,
+  Type,
+  LayoutDashboard,
+  ListChecks,
+} from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { AspectRatio } from "@/components/ui/aspect-ratio"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { supabase } from '@/integrations/supabase/client';
+import { v4 as uuidv4 } from 'uuid';
+import { useMutation } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 
-interface FormValues {
-  title: string;
-  slug: string;
-  coverImage: string;
-  tags: string[];
+// Define custom types for elements
+export type BlockQuoteElement = {
+  type: 'block-quote'
+  children: Descendant[]
 }
 
-interface BlogEditorProps {
-  initialTitle?: string;
-  initialContent?: any;
-  initialCoverImage?: string;
-  initialSlug?: string;
-  initialTags?: string[];
-  blogId?: string;
-  isEdit?: boolean;
+export type BulletedListElement = {
+  type: 'bulleted-list'
+  children: Descendant[]
 }
 
-const BlogEditor = ({
-  initialTitle = "",
-  initialContent = {},
-  initialCoverImage = "",
-  initialSlug = "",
-  initialTags = [],
-  blogId,
-  isEdit = false
-}: BlogEditorProps) => {
+export type CheckListItemElement = {
+  type: 'check-list-item'
+  checked: boolean
+  children: Descendant[]
+}
+
+export type EditableVoidElement = {
+  type: 'editable-void'
+  children: Descendant[]
+}
+
+export type HeadingElement = {
+  type: 'heading-one' | 'heading-two'
+  children: Descendant[]
+}
+
+export type ImageElement = {
+  type: 'image'
+  url: string
+  alt: string | null
+  children: Descendant[]
+}
+
+export type LinkElement = {
+  type: 'link'
+  url: string
+  children: Descendant[]
+}
+
+export type ListItemElement = {
+  type: 'list-item'
+  children: Descendant[]
+}
+
+export type NumberedListElement = {
+  type: 'numbered-list'
+  children: Descendant[]
+}
+
+export type ParagraphElement = {
+  type: 'paragraph'
+  children: Descendant[]
+}
+
+export type CodeElement = {
+  type: 'code'
+  children: Descendant[]
+}
+
+// Union type for all custom elements
+export type CustomElement =
+  | BlockQuoteElement
+  | BulletedListElement
+  | CheckListItemElement
+  | EditableVoidElement
+  | HeadingElement
+  | ImageElement
+  | LinkElement
+  | ListItemElement
+  | NumberedListElement
+  | ParagraphElement
+  | CodeElement
+
+// Define custom types for text nodes
+export type CustomText = {
+  text: string
+  bold?: boolean
+  italic?: boolean
+  underline?: boolean
+  code?: boolean
+}
+
+declare module 'slate' {
+  interface CustomTypes {
+    Editor: BaseEditor & ReactEditor
+    Element: CustomElement
+    Text: CustomText
+  }
+}
+
+const BlogEditor = ({ initialValue, onChange }: { initialValue: Descendant[], onChange: (value: Descendant[]) => void }) => {
   const { toast } = useToast();
-  const navigate = useNavigate();
-  const { t } = useLanguage();
-  const { tags: allTags, loading: tagsLoading } = useTags();
-  const { getBlogTags, updateBlogTags } = useBlogTags();
-  const { createEditorJSBlogPost, updateEditorJSBlogPost } = useBlogPostManagement();
-
-  const tagOptions = allTags.map(tag => ({
-    value: tag.id,
-    label: tag.name,
-    color: tag.color || '#CBD5E1'
-  }));
-
-  const editorRef = useRef<EditorJS | null>(null);
-  const editorInitializedRef = useRef<boolean>(false);
-
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormValues>({
-    defaultValues: {
-      title: initialTitle,
-      slug: initialSlug,
-      coverImage: initialCoverImage,
-      tags: initialTags
-    }
-  });
-
-  const [isUploading, setIsUploading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isTranslating, setIsTranslating] = useState(false);
-
-  const coverImage = watch('coverImage');
-
+  const { language } = useLanguage();
+  const router = useRouter();
+  const [value, setValue] = useState<Descendant[]>(initialValue);
+  const debouncedValue = useDebounce(value, 500);
+  const editor = useMemo(() => withReact(createEditor()), []);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [imageUrl, setImageUrl] = useState('');
+  const [imageAlt, setImageAlt] = useState('');
+  
   useEffect(() => {
-    if (isEdit && blogId) {
-      const loadBlogTags = async () => {
-        try {
-          const blogTags = await getBlogTags(blogId);
-          const tagIds = blogTags.map(tag => tag.id);
-          setValue('tags', tagIds);
-        } catch (error) {
-          console.error('Error loading blog tags:', error);
-        }
-      };
-      
-      loadBlogTags();
+    onChange(debouncedValue);
+  }, [debouncedValue, onChange]);
+  
+  const renderElement = useCallback(props => {
+    switch (props.element.type) {
+      case 'block-quote':
+        return <BlockQuoteElementComponent {...props} />
+      case 'bulleted-list':
+        return <BulletedListElementComponent {...props} />
+      case 'check-list-item':
+        return <CheckListItemElementComponent {...props} />
+      case 'code':
+        return <CodeElementComponent {...props} />
+      case 'heading-one':
+        return <HeadingElementComponent {...props} />;
+      case 'heading-two':
+        return <HeadingTwoElementComponent {...props} />;
+      case 'image':
+        return <ImageElementComponent {...props} />
+      case 'link':
+        return <LinkElementComponent {...props} />
+      case 'list-item':
+        return <ListItemElementComponent {...props} />
+      case 'numbered-list':
+        return <NumberedListElementComponent {...props} />
+      default:
+        return <ParagraphElementComponent {...props} />
     }
-  }, [blogId, isEdit, getBlogTags, setValue]);
+  }, []);
 
-  useEffect(() => {
-    const cleanupEditor = () => {
-      if (editorRef.current) {
-        try {
-          editorRef.current.destroy();
-          editorRef.current = null;
-          editorInitializedRef.current = false;
-          console.log("Editor destroyed successfully");
-        } catch (e) {
-          console.error("Error destroying editor", e);
-        }
-      }
-    };
+  const renderLeaf = useCallback(props => {
+    return <Leaf {...props} />
+  }, []);
 
-    const initEditor = async () => {
-      if (editorInitializedRef.current) {
-        console.log("Editor already initialized, skipping initialization");
-        return;
-      }
+  const insertImage = (editor: Editor, url: string, alt: string | null = null) => {
+    const text = { text: '' }
+    const image: ImageElement = { type: 'image', url, alt, children: [text] }
+    Editor.insertNode(editor, image)
+  }
 
-      cleanupEditor();
-
-      const editorElement = document.getElementById('editor');
-      if (!editorElement) {
-        console.error("Editor element not found");
-        return;
-      }
-
-      try {
-        console.log("Initializing editor with data:", initialContent);
-        
-        const editor = new EditorJS({
-          holder: "editor",
-          tools: {
-            header: {
-              class: Header,
-              shortcut: 'CMD+SHIFT+H',
-              inlineToolbar: true,
-              tunes: ['alignmentTune'],
-              config: {
-                levels: [1, 2, 3, 4],
-                defaultLevel: 1
-              }
-            },
-            list: {
-              class: List as any,
-              inlineToolbar: true,
-              tunes: ['alignmentTune']
-            },
-            paragraph: {
-              class: Paragraph,
-              inlineToolbar: ['link', 'bold', 'italic', 'underline', 'marker', 'inlineCode'],
-              tunes: ['alignmentTune'],
-              config: {
-                preserveBlank: true,
-                placeholder: 'Escribe tu contenido aquí...'
-              }
-            },
-            alignmentTune: {
-              class: AlignmentTuneTool,
-              config: {
-                default: 'left',
-                blocks: {
-                  header: 'center',
-                  list: 'left'
-                }
-              }
-            },
-            link: {
-              class: Link,
-              inlineToolbar: true
-            },
-            underline: Underline,
-            marker: {
-              class: Marker,
-              shortcut: 'CMD+SHIFT+M'
-            },
-            inlineCode: {
-              class: InlineCode,
-              shortcut: 'CMD+SHIFT+C'
-            },
-            quote: {
-              class: Quote,
-              inlineToolbar: true,
-              shortcut: 'CMD+SHIFT+O',
-              config: {
-                quotePlaceholder: 'Ingresa una cita',
-                captionPlaceholder: 'Autor de la cita'
-              }
-            },
-            table: {
-              class: Table as any,
-              inlineToolbar: true,
-              tunes: ['alignmentTune'],
-              config: {
-                rows: 2,
-                cols: 3,
-                withHeadings: true,
-              }
-            },
-            warning: {
-              class: Warning,
-              inlineToolbar: true,
-              shortcut: 'CMD+SHIFT+W',
-              config: {
-                titlePlaceholder: 'Título',
-                messagePlaceholder: 'Mensaje'
-              }
-            },
-            delimiter: Delimiter,
-            raw: Raw,
-            image: {
-              class: Image,
-              config: {
-                uploader: {
-                  async uploadByFile(file: File) {
-                    try {
-                      const fileExt = file.name.split('.').pop();
-                      const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-                      const filePath = `blog-images/${fileName}`;
-
-                      const { error: uploadError } = await supabaseExtended.storage
-                        .from('blog-content')
-                        .upload(filePath, file);
-
-                      if (uploadError) {
-                        throw uploadError;
-                      }
-
-                      const { data } = supabaseExtended.storage
-                        .from('blog-content')
-                        .getPublicUrl(filePath);
-
-                      return {
-                        success: 1,
-                        file: {
-                          url: data.publicUrl
-                        }
-                      };
-                    } catch (error) {
-                      console.error('Error uploading image:', error);
-                      return {
-                        success: 0,
-                        file: {
-                          url: null
-                        }
-                      };
-                    }
-                  },
-                  async uploadByUrl(url: string) {
-                    return {
-                      success: 1,
-                      file: {
-                        url
-                      }
-                    };
-                  }
-                }
-              }
-            }
-          },
-          data: Object.keys(initialContent).length > 0 ? initialContent : undefined,
-          onReady: () => {
-            console.log('Editor is ready to work');
-            editorInitializedRef.current = true;
-          },
-          onChange: () => {
-            console.log('Editor content changed');
-          },
-          autofocus: true,
-          minHeight: 300,
-          logLevel: 'ERROR',
-          paste: {
-            plainText: true,
-            htmlText: true,
-            imageTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp'],
-            patterns: {
-              image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png|webp|bmp)$/i,
-              video: /https?:\/\/\S+\.(mp4|webm|ogv|mov|avi)$/i,
-            }
-          }
-        });
-
-        editorRef.current = editor;
-        console.log("Editor initialized successfully");
-      } catch (error) {
-        console.error('Error initializing editor:', error);
-        editorRef.current = null;
-        editorInitializedRef.current = false;
-      }
-    };
-
-    initEditor().catch(error => {
-      console.error('Editor initialization failed:', error);
-    });
-
-    return cleanupEditor;
-  }, [initialContent]);
-
-  const handleGenerateSlug = () => {
-    const sourceTitle = watch('title');
-    setValue('slug', toKebabCase(sourceTitle));
-  };
-
-  const handleCoverImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const uploadImage = async (file: File) => {
     try {
-      setIsUploading(true);
-
       const fileExt = file.name.split('.').pop();
-      const fileName = `cover-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-      const filePath = `blog-covers/${fileName}`;
+      const fileName = `${uuidv4()}.${fileExt}`;
+      const filePath = `${fileName}`;
 
-      const { error: uploadError } = await supabaseExtended.storage
-        .from('blog-content')
-        .upload(filePath, file);
+      const { data, error } = await supabase.storage
+        .from('blog-images')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      const { data } = supabaseExtended.storage
-        .from('blog-content')
-        .getPublicUrl(filePath);
-
-      setValue('coverImage', data.publicUrl);
-
-      toast({
-        title: "Success",
-        description: "Cover image uploaded successfully",
-      });
-    } catch (error: any) {
-      console.error('Error uploading cover image:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to upload cover image",
-        variant: "destructive"
-      });
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const translateContent = async (title: string, content: any) => {
-    try {
-      setIsTranslating(true);
-      
-      const blocks = content.blocks || [];
-      const textBlocks = blocks.map((block: any) => {
-        if (block.type === 'paragraph' || block.type === 'header') {
-          return block.data.text;
-        }
+      if (error) {
+        console.log('ERROR', error);
+        toast({
+          variant: "destructive",
+          title: "Ups! There was an error.",
+          description: "Failed to upload image. Please try again.",
+        });
         return null;
-      }).filter(Boolean);
-      
-      const textsToTranslate = [title, ...textBlocks];
-      
-      const translatedTexts = await Promise.all(
-        textsToTranslate.map(async (text) => {
-          await new Promise(resolve => setTimeout(resolve, 500));
-          return text ? `${text} (Translated)` : '';
-        })
-      );
-      
-      const translatedTitle = translatedTexts[0];
-      
-      const translatedBlocks = [...blocks];
-      let translatedTextIndex = 1;
-      
-      for (let i = 0; i < translatedBlocks.length; i++) {
-        if (translatedBlocks[i].type === 'paragraph' || translatedBlocks[i].type === 'header') {
-          if (translatedTextIndex < translatedTexts.length) {
-            translatedBlocks[i] = {
-              ...translatedBlocks[i],
-              data: {
-                ...translatedBlocks[i].data,
-                text: translatedTexts[translatedTextIndex]
-              }
-            };
-            translatedTextIndex++;
-          }
-        }
-      }
-      
-      const translatedContent = {
-        ...content,
-        blocks: translatedBlocks
-      };
-      
-      return {
-        title_en: translatedTitle,
-        content_en: translatedContent
-      };
-    } catch (error) {
-      console.error('Translation error:', error);
-      throw new Error('Failed to translate content');
-    } finally {
-      setIsTranslating(false);
-    }
-  };
-
-  const onSubmit = async (formData: FormValues) => {
-    try {
-      setIsSaving(true);
-
-      if (!editorRef.current) {
-        throw new Error("Editor not initialized");
-      }
-
-      const outputData = await editorRef.current.save();
-      
-      const { title_en, content_en } = await translateContent(formData.title, outputData);
-
-      if (isEdit && blogId) {
-        await updateEditorJSBlogPost(blogId, {
-          title: formData.title,
-          title_en,
-          content: outputData,
-          content_en,
-          cover_image: formData.coverImage,
-          slug: formData.slug,
-        });
-        
-        await updateBlogTags(blogId, formData.tags);
-
-        toast({
-          title: "Success",
-          description: "Blog post updated successfully",
-        });
       } else {
-        const data = await createEditorJSBlogPost({
-          title: formData.title,
-          title_en,
-          content: outputData,
-          content_en,
-          cover_image: formData.coverImage,
-          slug: formData.slug,
-        });
-        
-        if (data && formData.tags.length > 0) {
-          await updateBlogTags(data.id, formData.tags);
-        }
-
-        toast({
-          title: "Success",
-          description: "Blog post saved successfully",
-        });
+        const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/blog-images/${filePath}`;
+        return imageUrl;
       }
-
-      navigate('/admin/blog/posts');
-    } catch (error: any) {
-      console.error('Error saving blog:', error);
+    } catch (error) {
+      console.log('error', error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to save blog post",
-        variant: "destructive"
+        variant: "destructive",
+        title: "Ups! There was an error.",
+        description: "Failed to upload image. Please try again.",
       });
-    } finally {
-      setIsSaving(false);
+      return null;
     }
   };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const imageUrl = await uploadImage(file);
+      if (imageUrl) {
+        setImageUrl(imageUrl);
+        setIsDialogOpen(true);
+      }
+    }
+  };
+
+  const confirmImage = () => {
+    insertImage(editor, imageUrl, imageAlt);
+    setIsDialogOpen(false);
+    setImageUrl('');
+    setImageAlt('');
+  };
+
+  const imageFormSchema = z.object({
+    alt: z.string().optional(),
+  })
+
+  type ImageFormValues = z.infer<typeof imageFormSchema>
+
+  const imageForm = useForm<ImageFormValues>({
+    resolver: zodResolver(imageFormSchema),
+    defaultValues: {
+      alt: "",
+    },
+  })
+
+  function onSubmit(data: ImageFormValues) {
+    setImageAlt(data.alt);
+    confirmImage();
+    imageForm.reset();
+  }
 
   return (
-    <div className="space-y-4">
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">
-            {isEdit ? "Editar Post" : "Crear Nuevo Post"}
-          </h1>
-          <Button
-            type="submit"
-            disabled={isSaving || isTranslating}
-            className="bg-tamec-600 hover:bg-tamec-700 text-white flex items-center gap-2"
-          >
-            <Save className="h-4 w-4" />
-            {isSaving 
-              ? "Guardando..." 
-              : isTranslating 
-                ? "Traduciendo..." 
-                : "Guardar Post"}
-          </Button>
-        </div>
-
-        <div className="space-y-4 mt-4">
-          <div>
-            <label htmlFor="blog-slug" className="block text-sm font-medium mb-1">
-              URL Slug
-            </label>
-            <div className="flex items-center gap-2">
-              <span className="text-gray-500">/blog/</span>
-              <div className="flex-1 flex gap-2">
-                <Input
-                  id="blog-slug"
-                  placeholder="url-amigable"
-                  className="flex-1"
-                  {...register('slug', { required: 'El URL slug es requerido' })}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleGenerateSlug}
-                  className="whitespace-nowrap"
-                >
-                  Generar desde Título
-                </Button>
-              </div>
-            </div>
-            {errors.slug && (
-              <p className="text-red-500 text-sm mt-1">{errors.slug.message}</p>
-            )}
-            <p className="text-xs text-gray-500 mt-1">
-              Esto se usará en la URL. Utiliza solo letras minúsculas, números y guiones.
-            </p>
-          </div>
-
-          <div>
-            <label htmlFor="cover-image" className="block text-sm font-medium mb-1">
-              Imagen de Portada
-            </label>
-            <div className="space-y-3">
-              {coverImage && (
-                <div className="relative rounded-md overflow-hidden border h-60 w-full bg-gray-100">
-                  <img
-                    src={coverImage}
-                    alt="Cover"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
-
-              <div className="flex gap-2">
-                <label htmlFor="cover-image-upload" className="cursor-pointer">
-                  <div className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md inline-flex items-center transition-colors">
-                    <ImageIcon className="h-4 w-4 mr-2" />
-                    {coverImage ? "Cambiar Imagen" : "Subir Imagen"}
+    <>
+      <div className="flex flex-col">
+        <div className="flex w-full items-center justify-start gap-2 py-2 border-b">
+          <MarkButton
+            format="bold"
+            icon={<Bold className="h-4 w-4" />}
+            title={language === 'en' ? 'Bold' : 'Negrita'}
+          />
+          <MarkButton
+            format="italic"
+            icon={<Italic className="h-4 w-4" />}
+            title={language === 'en' ? 'Italic' : 'Itálica'}
+          />
+          <MarkButton
+            format="underline"
+            icon={<Underline className="h-4 w-4" />}
+            title={language === 'en' ? 'Underline' : 'Subrayado'}
+          />
+          <MarkButton
+            format="code"
+            icon={<Code className="h-4 w-4" />}
+            title={language === 'en' ? 'Code' : 'Código'}
+          />
+          <BlockButton
+            format="heading-one"
+            icon={<Heading1 className="h-4 w-4" />}
+            title={language === 'en' ? 'Heading 1' : 'Título 1'}
+          />
+          <BlockButton
+            format="heading-two"
+            icon={<Heading2 className="h-4 w-4" />}
+            title={language === 'en' ? 'Heading 2' : 'Título 2'}
+          />
+          <BlockButton
+            format="block-quote"
+            icon={<Quote className="h-4 w-4" />}
+            title={language === 'en' ? 'Quote' : 'Cita'}
+          />
+          <BlockButton
+            format="bulleted-list"
+            icon={<List className="h-4 w-4" />}
+            title={language === 'en' ? 'Bulleted List' : 'Lista'}
+          />
+          <BlockButton
+            format="numbered-list"
+            icon={<ListOrdered className="h-4 w-4" />}
+            title={language === 'en' ? 'Numbered List' : 'Lista Numerada'}
+          />
+          <Dialog>
+            <DialogTrigger asChild>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <ImageIcon className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {language === 'en' ? 'Image' : 'Imagen'}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipTrigger>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>{language === 'en' ? 'Insert image' : 'Insertar imagen'}</DialogTitle>
+                <DialogDescription>
+                  {language === 'en' ? 'Upload an image from your computer.' : 'Sube una imagen desde tu ordenador.'}
+                </DialogDescription>
+              </DialogHeader>
+              <Form {...imageForm}>
+                <form onSubmit={imageForm.handleSubmit(onSubmit)} className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Label htmlFor="name">{language === 'en' ? 'Image' : 'Imagen'}</Label>
+                    <Input
+                      id="image"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                    <Button variant="outline" size="sm" asChild>
+                      <Label htmlFor="image" className="cursor-pointer">
+                        {language === 'en' ? 'Select image' : 'Seleccionar imagen'}
+                      </Label>
+                    </Button>
                   </div>
-                  <input
-                    id="cover-image-upload"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleCoverImageUpload}
-                    className="hidden"
-                    disabled={isUploading}
+                  <FormField
+                    control={imageForm.control}
+                    name="alt"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{language === 'en' ? 'Alt' : 'Texto alternativo'}</FormLabel>
+                        <FormControl>
+                          <Input placeholder={language === 'en' ? 'Alt text' : 'Texto alternativo'} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </label>
-
-                {coverImage && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setValue('coverImage', '')}
-                    disabled={isUploading}
-                  >
-                    Eliminar
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="blog-tags" className="block text-sm font-medium mb-1">
-              Etiquetas
-            </label>
-            <MultiSelect
-              options={tagOptions}
-              selected={watch('tags')}
-              onChange={(selectedValues) => setValue('tags', selectedValues)}
-              placeholder="Selecciona etiquetas para este post"
-              emptyIndicator={
-                <p className="text-center text-sm text-muted-foreground">
-                  No hay etiquetas disponibles.
-                </p>
-              }
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Agrega etiquetas para categorizar tu contenido. Puedes crear nuevas etiquetas en la sección de Etiquetas del admin.
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="blog-title" className="block text-sm font-medium mb-1">
-                Título del Blog
-              </label>
-              <Input
-                id="blog-title"
-                placeholder="Ingresa el título del blog"
-                className="w-full"
-                {...register('title', { required: 'El título es requerido' })}
-              />
-              
-              {errors.title && (
-                <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
-              )}
-              <p className="text-xs text-gray-500 mt-1">
-                El contenido en inglés se generará automáticamente mediante traducción al guardar.
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Contenido del Blog
-              </label>
-              <div
-                id="editor"
-                className="border rounded-md min-h-[400px] p-4"
-              />
-            </div>
-          </div>
+                  <DialogFooter>
+                    <Button type="submit">{language === 'en' ? 'Insert' : 'Insertar'}</Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
         </div>
-      </form>
+        <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+          <Editable
+            placeholder={language === 'en' ? 'Enter some rich text…' : 'Escribe algo…'}
+            className="h-full p-4 outline-none"
+            renderElement={renderElement}
+            renderLeaf={renderLeaf}
+          />
+        </Slate>
+      </div>
+    </>
+  )
+}
+
+const BlockQuoteElementComponent = (props: any) => {
+  return (
+    <blockquote>{props.children}</blockquote>
+  )
+}
+
+const BulletedListElementComponent = (props: any) => {
+  return (
+    <ul className="list-disc pl-5">{props.children}</ul>
+  )
+}
+
+const CheckListItemElementComponent = (props: any) => {
+  return (
+    <li className="flex items-center">
+      <input type="checkbox" checked={props.element.checked} readOnly />
+      <span className="ml-2">{props.children}</span>
+    </li>
+  )
+}
+
+const CodeElementComponent = (props: any) => {
+  return (
+    <pre>
+      <code className="bg-gray-100 p-2 rounded-md">{props.children}</code>
+    </pre>
+  )
+}
+
+const HeadingElementComponent = (props: any) => {
+  return (
+    <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight">{props.children}</h1>
+  )
+}
+
+const HeadingTwoElementComponent = (props: any) => {
+  return (
+    <h2 className="scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0">{props.children}</h2>
+  )
+}
+
+const ImageElementComponent = (props: any) => {
+  const { element, attributes, children } = props
+  return (
+    <div {...attributes}>
+      <div className="relative">
+        <AspectRatio ratio={16 / 9}>
+          <img
+            src={element.url}
+            alt={element.alt}
+            className="rounded-md object-cover"
+          />
+        </AspectRatio>
+        {children}
+      </div>
+      {element.alt && (
+        <div className="text-sm text-muted-foreground">
+          {element.alt}
+        </div>
+      )}
     </div>
-  );
-};
+  )
+}
+
+const LinkElementComponent = (props: any) => {
+  const { element, attributes, children } = props
+  return (
+    <a href={element.url} {...attributes}>
+      {children}
+    </a>
+  )
+}
+
+const ListItemElementComponent = (props: any) => {
+  return (
+    <li>{props.children}</li>
+  )
+}
+
+const NumberedListElementComponent = (props: any) => {
+  return (
+    <ol className="list-decimal pl-5">{props.children}</ol>
+  )
+}
+
+const ParagraphElementComponent = (props: any) => {
+  return (
+    <p className="scroll-m-20 leading-7 [&:not(:first-child)]:mt-6">{props.children}</p>
+  )
+}
+
+const Leaf = ({ attributes, children, leaf }: any) => {
+  if (leaf.bold) {
+    children = <strong>{children}</strong>
+  }
+
+  if (leaf.italic) {
+    children = <em>{children}</em>
+  }
+
+  if (leaf.underline) {
+    children = <u>{children}</u>
+  }
+
+  if (leaf.code) {
+    children = <code>{children}</code>
+  }
+
+  return <span {...attributes}>{children}</span>
+}
+
+const MarkButton = ({ format, icon, title }: { format: string, icon: React.ReactNode, title: string }) => {
+  const editor = useSlate()
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              const isActive = isMarkActive(editor, format)
+              if (isActive) {
+                Editor.removeMark(editor, format)
+              } else {
+                Editor.addMark(editor, format, true)
+              }
+            }}
+          >
+            {icon}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          {title}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  )
+}
+
+const BlockButton = ({ format, icon, title }: { format: string, icon: React.ReactNode, title: string }) => {
+  const editor = useSlate()
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              const isActive = isBlockActive(editor, format)
+              Transforms.setNodes(
+                editor,
+                { type: isActive ? 'paragraph' : format },
+                { match: n => Editor.isBlock(editor, n), split: false }
+              )
+            }}
+          >
+            {icon}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          {title}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  )
+}
+
+const isMarkActive = (editor: Editor, format: string) => {
+  const marks = Editor.marks(editor)
+
+  return marks ? marks[format] === true : false
+}
+
+const isBlockActive = (editor: Editor, format: string) => {
+  const [match] = Editor.nodes(editor, {
+    match: n => !Editor.isEditor(n) && Element.isElement(n) && n.type === format,
+  })
+
+  return !!match
+}
+
+const useSlate = () => {
+  return React.useContext(SlateContext) as ReactEditor
+}
+
+const SlateContext = React.createContext<ReactEditor | null>(null)
 
 export default BlogEditor;

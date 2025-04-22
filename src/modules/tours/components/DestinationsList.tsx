@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Tour } from '@/modules/tours/types';
 import TourCard from './TourCard';
@@ -52,7 +53,8 @@ const DestinationsList: React.FC<DestinationsListProps> = ({ tours, loading, err
     );
   }
   
-  if (tours.length === 0) {
+  // Handle case when tours is undefined
+  if (!tours || tours.length === 0) {
     return (
       <div className="text-center py-16">
         <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 space-y-4">

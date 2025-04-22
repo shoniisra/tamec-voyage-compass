@@ -38,7 +38,7 @@ const BlogComments = ({ postId }: BlogCommentsProps) => {
     try {
       const result = await addComment(name, email, content);
       
-      if (result.success) {
+      if (result && result.success) {
         setName('');
         setEmail('');
         setContent('');

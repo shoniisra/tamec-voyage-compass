@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Tour } from '@/modules/tours/types';
@@ -19,12 +20,19 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
     ?.filter(d => d.destino)
     .map(d => d.destino?.ciudad || d.destino?.pais)
     .join(', ');
+    
+  // Use a generic placeholder if the image fails to load or isn't available
+  const defaultPlaceholder = 'https://placehold.co/600x400?text=Beautiful+Destination';
+  
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    e.currentTarget.src = defaultPlaceholder;
+  };
 
   const featuredImage = tour.fotos && tour.fotos.length > 0
     ? tour.fotos.sort((a, b) => 
         ((a.orden || 0) - (b.orden || 0))
       )[0]?.url_imagen 
-    : 'https://placehold.co/600x400?text=No+Image';
+    : defaultPlaceholder;
 
   const nextDeparture = tour.salidas
     ?.filter(s => s.fecha_salida && new Date(s.fecha_salida) > new Date())
@@ -74,12 +82,13 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
             <img 
               src={featuredImage} 
               alt={tour.titulo}
+              onError={handleImageError}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             />
             
             <div className="absolute top-4 right-4 z-20">
               <Badge className="bg-white/95 hover:bg-white text-gray-900 px-3 py-1.5 text-sm font-semibold shadow-lg backdrop-blur-sm">
-                ${tour.precio_desde?.toLocaleString()}
+                ${tour.precio_desde?.toLocaleString() || '0'}
               </Badge>
             </div>
             
