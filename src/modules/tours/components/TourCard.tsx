@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Tour } from '@/modules/tours/types';
 import { Card } from "@/components/ui/card";
@@ -15,24 +15,33 @@ interface TourCardProps {
 
 const TourCard: React.FC<TourCardProps> = ({ tour }) => {
   const { language } = useLanguage();
+  const [imageError, setImageError] = useState(false);
   
   const destinationText = tour.destinos
     ?.filter(d => d.destino)
     .map(d => d.destino?.ciudad || d.destino?.pais)
     .join(', ');
     
-  // Use a generic placeholder if the image fails to load or isn't available
+  // Improved placeholder image
   const defaultPlaceholder = 'https://placehold.co/600x400?text=Beautiful+Destination';
   
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    setImageError(true);
     e.currentTarget.src = defaultPlaceholder;
   };
 
-  const featuredImage = tour.fotos && tour.fotos.length > 0
-    ? tour.fotos.sort((a, b) => 
-        ((a.orden || 0) - (b.orden || 0))
-      )[0]?.url_imagen 
-    : defaultPlaceholder;
+  // Try to get featured image with improved fallback logic
+  let featuredImage = defaultPlaceholder;
+  
+  if (!imageError && tour.fotos && tour.fotos.length > 0) {
+    const sortedPhotos = [...tour.fotos].sort((a, b) => 
+      ((a.orden || 0) - (b.orden || 0))
+    );
+    
+    if (sortedPhotos[0]?.url_imagen) {
+      featuredImage = sortedPhotos[0].url_imagen;
+    }
+  }
 
   const nextDeparture = tour.salidas
     ?.filter(s => s.fecha_salida && new Date(s.fecha_salida) > new Date())
@@ -81,8 +90,9 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
             <div className="absolute inset-0 bg-gradient-to-b from-black/0 to-black/60 z-10" />
             <img 
               src={featuredImage} 
-              alt={tour.titulo}
+              alt={tour.titulo || 'Tour destination'}
               onError={handleImageError}
+              loading="lazy"
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             />
             

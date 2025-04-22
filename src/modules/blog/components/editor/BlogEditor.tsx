@@ -1,38 +1,35 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { createEditor } from 'slate';
+import { createEditor, Editor, Transforms, Element as SlateElement } from 'slate';
 import { Slate, Editable, withReact } from 'slate-react';
-import { Transforms, Editor, Element, Descendant } from 'slate';
-import isUrl from 'is-url';
-import { useDebounce } from '@/hooks/use-debounce';
-import { useToast } from '@/components/ui/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
+  AlignLeft,
+  AlignCenter,
+  AlignJustify,
+  AlignRight,
   Bold,
   Code,
   Heading1,
   Heading2,
-  Image as ImageIcon,
+  Heading3,
+  Image,
   Italic,
   Link as LinkIcon,
   List,
   ListOrdered,
   Quote,
   Underline,
-  ImageIcon as ImageIconComponent,
-  Pilcrow,
-  TextCursorInput,
-  Code2,
-  ImagePlus,
-  Type,
-  LayoutDashboard,
-  ListChecks,
+  ImageIcon,
+  GripVertical,
+  Plus,
+  Minus,
+  Text,
+  CheckCircle2,
+  XCircle,
+  Loader2,
 } from 'lucide-react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,560 +37,725 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { AspectRatio } from "@/components/ui/aspect-ratio"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Label } from "@/components/ui/label"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { supabase } from '@/integrations/supabase/client';
+import { Slider } from "@/components/ui/slider"
+import { Switch } from "@/components/ui/switch"
+import { useToast } from '@/hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
-import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { Progress } from "@/components/ui/progress"
+import { useUploadThing } from "@/utils/uploadthing";
 
-// Define custom types for elements
-export type BlockQuoteElement = {
-  type: 'block-quote'
-  children: Descendant[]
-}
-
-export type BulletedListElement = {
-  type: 'bulleted-list'
-  children: Descendant[]
-}
-
-export type CheckListItemElement = {
-  type: 'check-list-item'
-  checked: boolean
-  children: Descendant[]
-}
-
-export type EditableVoidElement = {
-  type: 'editable-void'
-  children: Descendant[]
-}
-
-export type HeadingElement = {
-  type: 'heading-one' | 'heading-two'
-  children: Descendant[]
-}
-
-export type ImageElement = {
-  type: 'image'
-  url: string
-  alt: string | null
-  children: Descendant[]
-}
-
-export type LinkElement = {
-  type: 'link'
-  url: string
-  children: Descendant[]
-}
-
-export type ListItemElement = {
-  type: 'list-item'
-  children: Descendant[]
-}
-
-export type NumberedListElement = {
-  type: 'numbered-list'
-  children: Descendant[]
-}
-
-export type ParagraphElement = {
-  type: 'paragraph'
-  children: Descendant[]
-}
-
-export type CodeElement = {
-  type: 'code'
-  children: Descendant[]
-}
-
-// Union type for all custom elements
-export type CustomElement =
-  | BlockQuoteElement
-  | BulletedListElement
-  | CheckListItemElement
-  | EditableVoidElement
-  | HeadingElement
-  | ImageElement
-  | LinkElement
-  | ListItemElement
-  | NumberedListElement
-  | ParagraphElement
-  | CodeElement
-
-// Define custom types for text nodes
-export type CustomText = {
-  text: string
-  bold?: boolean
-  italic?: boolean
-  underline?: boolean
-  code?: boolean
-}
-
-declare module 'slate' {
-  interface CustomTypes {
-    Editor: BaseEditor & ReactEditor
-    Element: CustomElement
-    Text: CustomText
-  }
-}
-
-const BlogEditor = ({ initialValue, onChange }: { initialValue: Descendant[], onChange: (value: Descendant[]) => void }) => {
-  const { toast } = useToast();
+const BlogEditor = () => {
+  const { t } = useTranslation();
   const { language } = useLanguage();
-  const router = useRouter();
-  const [value, setValue] = useState<Descendant[]>(initialValue);
-  const debouncedValue = useDebounce(value, 500);
-  const editor = useMemo(() => withReact(createEditor()), []);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [imageUrl, setImageUrl] = useState('');
-  const [imageAlt, setImageAlt] = useState('');
-  
+  const [editor] = useState(() => withReact(createEditor()));
+  const [value, setValue] = useState<any>([]);
+  const [url, setUrl] = useState('');
+  const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [imageWidth, setImageWidth] = useState(50);
+	const [imageRounded, setImageRounded] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const { startUpload } = useUploadThing("imageUploader");
+  const { toast } = useToast();
+
   useEffect(() => {
-    onChange(debouncedValue);
-  }, [debouncedValue, onChange]);
-  
+    // Set initial value with a default paragraph if it's empty
+    if (!value || value.length === 0) {
+      setValue([{
+        type: 'paragraph',
+        children: [{ text: '' }],
+      }]);
+    }
+  }, [value]);
+
   const renderElement = useCallback(props => {
     switch (props.element.type) {
       case 'block-quote':
-        return <BlockQuoteElementComponent {...props} />
+        return <BlockQuoteElement {...props} />;
       case 'bulleted-list':
-        return <BulletedListElementComponent {...props} />
-      case 'check-list-item':
-        return <CheckListItemElementComponent {...props} />
-      case 'code':
-        return <CodeElementComponent {...props} />
-      case 'heading-one':
-        return <HeadingElementComponent {...props} />;
-      case 'heading-two':
-        return <HeadingTwoElementComponent {...props} />;
-      case 'image':
-        return <ImageElementComponent {...props} />
-      case 'link':
-        return <LinkElementComponent {...props} />
-      case 'list-item':
-        return <ListItemElementComponent {...props} />
+        return <BulletedListElement {...props} />;
       case 'numbered-list':
-        return <NumberedListElementComponent {...props} />
+        return <NumberedListElement {...props} />;
+      case 'list-item':
+        return <ListItemElement {...props} />;
+      case 'heading-one':
+        return <HeadingOneElement {...props} />;
+      case 'heading-two':
+        return <HeadingTwoElement {...props} />;
+      case 'heading-three':
+        return <HeadingThreeElement {...props} />;
+      case 'code':
+        return <CodeElement {...props} />;
+      case 'link':
+        return <LinkElement {...props} />;
+      case 'image':
+        return <ImageElement {...props} />;
+      case 'paragraph':
+        return <ParagraphElement {...props} />;
       default:
-        return <ParagraphElementComponent {...props} />
+        return <DefaultElement {...props} />;
     }
   }, []);
 
   const renderLeaf = useCallback(props => {
-    return <Leaf {...props} />
+    return <Leaf {...props} />;
   }, []);
 
-  const insertImage = (editor: Editor, url: string, alt: string | null = null) => {
-    const text = { text: '' }
-    const image: ImageElement = { type: 'image', url, alt, children: [text] }
-    Editor.insertNode(editor, image)
-  }
-
-  const uploadImage = async (file: File) => {
+  const handleImageUpload = async (file: File) => {
+    setUploading(true);
+    setUploadProgress(0);
+  
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${uuidv4()}.${fileExt}`;
-      const filePath = `${fileName}`;
-
-      const { data, error } = await supabase.storage
-        .from('blog-images')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
+      const result = await startUpload([file], {
+        onProgress: (progress) => {
+          setUploadProgress(progress);
+        },
+      });
+  
+      if (result && result.length > 0) {
+        const imageUrl = result[0].url;
+        insertImage(editor, imageUrl);
+        toast({
+          title: "Image uploaded successfully!",
         });
-
-      if (error) {
-        console.log('ERROR', error);
+      } else {
         toast({
           variant: "destructive",
-          title: "Ups! There was an error.",
-          description: "Failed to upload image. Please try again.",
+          title: "Upload failed",
+          description: "Could not upload image. Please try again.",
         });
-        return null;
-      } else {
-        const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/blog-images/${filePath}`;
-        return imageUrl;
       }
-    } catch (error) {
-      console.log('error', error);
+    } catch (e: any) {
       toast({
         variant: "destructive",
-        title: "Ups! There was an error.",
-        description: "Failed to upload image. Please try again.",
+        title: "Upload failed",
+        description: e.message,
       });
-      return null;
+    } finally {
+      setUploading(false);
+      setUploadProgress(0);
     }
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const imageUrl = await uploadImage(file);
-      if (imageUrl) {
-        setImageUrl(imageUrl);
-        setIsDialogOpen(true);
+  const insertImage = (editor: Editor, url: string) => {
+    const text = { text: '' }
+    const image: any = { type: 'image', url, children: [text], id: uuidv4() }
+    Transforms.insertNodes(editor, image)
+  };
+
+  const insertLink = (editor: Editor, url: string) => {
+    if (editor.selection) {
+      wrapLink(editor, url)
+    }
+  };
+
+  const isLinkActive = () => {
+    const [link] = Editor.nodes(editor, {
+      match: n =>
+        !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === 'link',
+    })
+    return !!link
+  }
+
+  const unwrapLink = (editor: Editor) => {
+    Transforms.unwrapNodes(editor, {
+      match: n =>
+        !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === 'link',
+    })
+  }
+
+  const wrapLink = (editor: Editor, url: string) => {
+    if (isLinkActive()) {
+      unwrapLink(editor)
+    }
+
+    const { selection } = editor
+    const isCollapsed = selection && Editor.isCollapsed(selection)
+    const link: any = {
+      type: 'link',
+      url,
+      children: isCollapsed ? [{ text: url }] : [],
+    }
+
+    if (isCollapsed) {
+      Transforms.insertNodes(editor, link)
+    } else {
+      Transforms.wrapNodes(editor, link, { split: true })
+      Transforms.collapse(editor, { edge: 'end' })
+    }
+  }
+
+  const toggleLink = () => {
+    if (isLinkActive()) {
+      unwrapLink(editor)
+    } else {
+      setIsLinkModalOpen(true);
+    }
+  }
+
+  const handleConfirmLink = () => {
+    insertLink(editor, url);
+    setIsLinkModalOpen(false);
+    setUrl('');
+  };
+
+  const handleCancelLink = () => {
+    setIsLinkModalOpen(false);
+    setUrl('');
+  };
+
+  const handleImageClick = (url: string) => {
+		setSelectedImage(url);
+		setImageWidth(50);
+		setImageRounded(false);
+	};
+
+	const handleImageWidthChange = (value: number[]) => {
+		setImageWidth(value[0]);
+	};
+
+	const handleImageRoundedChange = (checked: boolean) => {
+		setImageRounded(checked);
+	};
+
+	const applyImageStyles = () => {
+		if (!selectedImage) return;
+
+		const nodes = Editor.nodes(editor, {
+			match: n =>
+				!Editor.isEditor(n) &&
+				SlateElement.isElement(n) &&
+				n.type === 'image' &&
+				n.url === selectedImage,
+		});
+
+		for (const [node, path] of nodes) {
+			if (SlateElement.isElement(node) && node.type === 'image') {
+				Transforms.setNodes(
+					editor,
+					{
+						width: imageWidth,
+						rounded: imageRounded,
+					},
+					{ at: path }
+				);
+			}
+		}
+
+		setSelectedImage(null);
+	};
+
+  const LIST_TYPES = ['numbered-list', 'bulleted-list']
+  const TEXT_ALIGN_TYPES = ['left', 'center', 'right', 'justify']
+
+  const isBlockActive = (editor: Editor, type: string, attribute: string = 'type') => {
+    const { selection } = editor
+    if (!selection) return false
+
+    const [node] = Editor.nodes(editor, {
+      match: n =>
+        !Editor.isEditor(n) && SlateElement.isElement(n) && n[attribute] === type,
+    })
+    return !!node
+  }
+
+  const isMarkActive = (editor: Editor, type: string) => {
+    const marks = Editor.marks(editor) as any;
+    return marks ? !!marks[type] : false
+  }
+
+  const toggleBlock = (editor: Editor, type: string, attribute: string = 'type') => {
+    const isActive = isBlockActive(editor, type, attribute)
+    const isList = LIST_TYPES.includes(type)
+
+    Transforms.unwrapNodes(editor, {
+      match: n =>
+        !Editor.isEditor(n) &&
+        SlateElement.isElement(n) &&
+        LIST_TYPES.includes(n.type as string),
+      split: true,
+    })
+
+    let newProperties: Partial<SlateElement>
+    if (isActive) {
+      newProperties = {
+        type: 'paragraph',
+      }
+    } else if (isList) {
+      newProperties = {
+        type: 'list-item',
+      }
+    } else {
+      newProperties = {
+        type,
       }
     }
-  };
 
-  const confirmImage = () => {
-    insertImage(editor, imageUrl, imageAlt);
-    setIsDialogOpen(false);
-    setImageUrl('');
-    setImageAlt('');
-  };
+    Transforms.setNodes(editor, newProperties)
 
-  const imageFormSchema = z.object({
-    alt: z.string().optional(),
-  })
+    if (!isActive && isList) {
+      const block: any = { type, children: [] }
+      Transforms.wrapNodes(editor, block)
+    }
+  }
 
-  type ImageFormValues = z.infer<typeof imageFormSchema>
-
-  const imageForm = useForm<ImageFormValues>({
-    resolver: zodResolver(imageFormSchema),
-    defaultValues: {
-      alt: "",
-    },
-  })
-
-  function onSubmit(data: ImageFormValues) {
-    setImageAlt(data.alt);
-    confirmImage();
-    imageForm.reset();
+  const toggleMark = (editor: Editor, type: string) => {
+    Editor.mark(editor, type)
   }
 
   return (
-    <>
-      <div className="flex flex-col">
-        <div className="flex w-full items-center justify-start gap-2 py-2 border-b">
-          <MarkButton
-            format="bold"
-            icon={<Bold className="h-4 w-4" />}
-            title={language === 'en' ? 'Bold' : 'Negrita'}
-          />
-          <MarkButton
-            format="italic"
-            icon={<Italic className="h-4 w-4" />}
-            title={language === 'en' ? 'Italic' : 'Itálica'}
-          />
-          <MarkButton
-            format="underline"
-            icon={<Underline className="h-4 w-4" />}
-            title={language === 'en' ? 'Underline' : 'Subrayado'}
-          />
-          <MarkButton
-            format="code"
-            icon={<Code className="h-4 w-4" />}
-            title={language === 'en' ? 'Code' : 'Código'}
-          />
-          <BlockButton
-            format="heading-one"
-            icon={<Heading1 className="h-4 w-4" />}
-            title={language === 'en' ? 'Heading 1' : 'Título 1'}
-          />
-          <BlockButton
-            format="heading-two"
-            icon={<Heading2 className="h-4 w-4" />}
-            title={language === 'en' ? 'Heading 2' : 'Título 2'}
-          />
-          <BlockButton
-            format="block-quote"
-            icon={<Quote className="h-4 w-4" />}
-            title={language === 'en' ? 'Quote' : 'Cita'}
-          />
-          <BlockButton
-            format="bulleted-list"
-            icon={<List className="h-4 w-4" />}
-            title={language === 'en' ? 'Bulleted List' : 'Lista'}
-          />
-          <BlockButton
-            format="numbered-list"
-            icon={<ListOrdered className="h-4 w-4" />}
-            title={language === 'en' ? 'Numbered List' : 'Lista Numerada'}
-          />
-          <Dialog>
-            <DialogTrigger asChild>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <ImageIcon className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {language === 'en' ? 'Image' : 'Imagen'}
-                  </TooltipContent>
-                </Tooltip>
+    <div className="border rounded-md">
+      <div className="flex flex-wrap items-center p-2 border-b bg-gray-50">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => toggleMark(editor, 'bold')}
+                active={isMarkActive(editor, 'bold')}
+              >
+                <Bold className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('editor.bold')}</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => toggleMark(editor, 'italic')}
+                active={isMarkActive(editor, 'italic')}
+              >
+                <Italic className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('editor.italic')}</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => toggleMark(editor, 'underline')}
+                active={isMarkActive(editor, 'underline')}
+              >
+                <Underline className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('editor.underline')}</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => toggleMark(editor, 'code')}
+                active={isMarkActive(editor, 'code')}
+              >
+                <Code className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('editor.code')}</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleLink}
+                active={isLinkActive()}
+              >
+                <LinkIcon className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('editor.link')}</TooltipContent>
+          </Tooltip>
+
+          <DropdownMenu>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <ImageIcon className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
               </TooltipTrigger>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>{language === 'en' ? 'Insert image' : 'Insertar imagen'}</DialogTitle>
-                <DialogDescription>
-                  {language === 'en' ? 'Upload an image from your computer.' : 'Sube una imagen desde tu ordenador.'}
-                </DialogDescription>
-              </DialogHeader>
-              <Form {...imageForm}>
-                <form onSubmit={imageForm.handleSubmit(onSubmit)} className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <Label htmlFor="name">{language === 'en' ? 'Image' : 'Imagen'}</Label>
-                    <Input
-                      id="image"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                    />
-                    <Button variant="outline" size="sm" asChild>
-                      <Label htmlFor="image" className="cursor-pointer">
-                        {language === 'en' ? 'Select image' : 'Seleccionar imagen'}
-                      </Label>
-                    </Button>
-                  </div>
-                  <FormField
-                    control={imageForm.control}
-                    name="alt"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{language === 'en' ? 'Alt' : 'Texto alternativo'}</FormLabel>
-                        <FormControl>
-                          <Input placeholder={language === 'en' ? 'Alt text' : 'Texto alternativo'} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <DialogFooter>
-                    <Button type="submit">{language === 'en' ? 'Insert' : 'Insertar'}</Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
-        </div>
+              <TooltipContent>{t('editor.image')}</TooltipContent>
+            </Tooltip>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuItem>
+                <Label htmlFor="image-upload" className="cursor-pointer">
+                  {t('editor.uploadImage')}
+                </Label>
+                <Input
+                  type="file"
+                  id="image-upload"
+                  className="hidden"
+                  onChange={(e: any) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                      handleImageUpload(e.target.files[0]);
+                    }
+                  }}
+                />
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {uploading ? (
+                <DropdownMenuItem className="flex items-center gap-2">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <span>{t('editor.uploading')} ({uploadProgress}%)</span>
+                </DropdownMenuItem>
+              ) : null}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => toggleBlock(editor, 'block-quote')}
+                active={isBlockActive(editor, 'block-quote')}
+              >
+                <Quote className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('editor.quote')}</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => toggleBlock(editor, 'heading-one')}
+                active={isBlockActive(editor, 'heading-one')}
+              >
+                <Heading1 className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('editor.heading1')}</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => toggleBlock(editor, 'heading-two')}
+                active={isBlockActive(editor, 'heading-two')}
+              >
+                <Heading2 className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('editor.heading2')}</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => toggleBlock(editor, 'heading-three')}
+                active={isBlockActive(editor, 'heading-three')}
+              >
+                <Heading3 className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('editor.heading3')}</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => toggleBlock(editor, 'bulleted-list')}
+                active={isBlockActive(editor, 'bulleted-list')}
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('editor.bulletList')}</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => toggleBlock(editor, 'numbered-list')}
+                active={isBlockActive(editor, 'numbered-list')}
+              >
+                <ListOrdered className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('editor.numberedList')}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+
+      <div className="p-4">
         <Slate editor={editor} value={value} onChange={value => setValue(value)}>
           <Editable
-            placeholder={language === 'en' ? 'Enter some rich text…' : 'Escribe algo…'}
-            className="h-full p-4 outline-none"
+            placeholder={t('editor.placeholder')}
+            spellCheck
             renderElement={renderElement}
             renderLeaf={renderLeaf}
+            className="focus:outline-none"
           />
         </Slate>
       </div>
-    </>
-  )
-}
 
-const BlockQuoteElementComponent = (props: any) => {
-  return (
-    <blockquote>{props.children}</blockquote>
-  )
-}
-
-const BulletedListElementComponent = (props: any) => {
-  return (
-    <ul className="list-disc pl-5">{props.children}</ul>
-  )
-}
-
-const CheckListItemElementComponent = (props: any) => {
-  return (
-    <li className="flex items-center">
-      <input type="checkbox" checked={props.element.checked} readOnly />
-      <span className="ml-2">{props.children}</span>
-    </li>
-  )
-}
-
-const CodeElementComponent = (props: any) => {
-  return (
-    <pre>
-      <code className="bg-gray-100 p-2 rounded-md">{props.children}</code>
-    </pre>
-  )
-}
-
-const HeadingElementComponent = (props: any) => {
-  return (
-    <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight">{props.children}</h1>
-  )
-}
-
-const HeadingTwoElementComponent = (props: any) => {
-  return (
-    <h2 className="scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0">{props.children}</h2>
-  )
-}
-
-const ImageElementComponent = (props: any) => {
-  const { element, attributes, children } = props
-  return (
-    <div {...attributes}>
-      <div className="relative">
-        <AspectRatio ratio={16 / 9}>
-          <img
-            src={element.url}
-            alt={element.alt}
-            className="rounded-md object-cover"
-          />
-        </AspectRatio>
-        {children}
-      </div>
-      {element.alt && (
-        <div className="text-sm text-muted-foreground">
-          {element.alt}
+      {/* Link Modal */}
+      {isLinkModalOpen && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
+          <div className="relative p-4 w-full max-w-md h-auto">
+            <div className="bg-white rounded-lg shadow relative">
+              <div className="flex items-start justify-between p-4 border-b rounded-t">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {t('editor.insertLink')}
+                </h3>
+                <button
+                  type="button"
+                  className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                  data-modal-toggle="defaultModal"
+                  onClick={handleCancelLink}
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"></path></svg>
+                </button>
+              </div>
+              <div className="p-6 space-y-6">
+                <Input
+                  type="url"
+                  placeholder={t('editor.linkPlaceholder')}
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                />
+              </div>
+              <div className="flex items-center p-6 border-t rounded-b">
+                <Button
+                  className="bg-tamec-600 hover:bg-tamec-700 text-white mr-2"
+                  onClick={handleConfirmLink}
+                >
+                  {t('editor.confirm')}
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={handleCancelLink}
+                >
+                  {t('editor.cancel')}
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
-    </div>
-  )
-}
 
-const LinkElementComponent = (props: any) => {
-  const { element, attributes, children } = props
+      {/* Image Settings Modal */}
+			{selectedImage && (
+				<div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
+					<div className="relative p-4 w-full max-w-md h-auto">
+						<div className="bg-white rounded-lg shadow relative">
+							<div className="flex items-start justify-between p-4 border-b rounded-t">
+								<h3 className="text-lg font-semibold text-gray-900">
+									{t('editor.imageSettings')}
+								</h3>
+								<button
+									type="button"
+									className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+									onClick={() => setSelectedImage(null)}
+								>
+									<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+										<path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"></path></svg>
+								</button>
+							</div>
+							<div className="p-6 space-y-6">
+								<div className="space-y-2">
+									<Label htmlFor="image-width">{t('editor.width')}: {imageWidth}%</Label>
+									<Slider
+										id="image-width"
+										defaultValue={[imageWidth]}
+										max={100}
+										min={10}
+										step={1}
+										onValueChange={handleImageWidthChange}
+									/>
+								</div>
+								<div className="flex items-center justify-between">
+									<Label htmlFor="image-rounded">{t('editor.roundedCorners')}</Label>
+									<Switch
+										id="image-rounded"
+										checked={imageRounded}
+										onCheckedChange={handleImageRoundedChange}
+									/>
+								</div>
+							</div>
+							<div className="flex items-center p-6 border-t rounded-b">
+								<Button
+									className="bg-tamec-600 hover:bg-tamec-700 text-white mr-2"
+									onClick={applyImageStyles}
+								>
+									{t('editor.apply')}
+								</Button>
+								<Button
+									variant="ghost"
+									onClick={() => setSelectedImage(null)}
+								>
+									{t('editor.cancel')}
+								</Button>
+							</div>
+						</div>
+					</div>
+				</div>
+			)}
+    </div >
+  );
+};
+
+const BlockQuoteElement = (props: any) => {
   return (
-    <a href={element.url} {...attributes}>
-      {children}
+    <blockquote {...props.attributes}>
+      {props.children}
+    </blockquote>
+  );
+};
+
+const BulletedListElement = (props: any) => {
+  return (
+    <ul {...props.attributes}>
+      {props.children}
+    </ul>
+  );
+};
+
+const NumberedListElement = (props: any) => {
+  return (
+    <ol {...props.attributes}>
+      {props.children}
+    </ol>
+  );
+};
+
+const ListItemElement = (props: any) => {
+  return (
+    <li {...props.attributes}>
+      {props.children}
+    </li>
+  );
+};
+
+const HeadingOneElement = (props: any) => {
+  return (
+    <h1 {...props.attributes}>
+      {props.children}
+    </h1>
+  );
+};
+
+const HeadingTwoElement = (props: any) => {
+  return (
+    <h2 {...props.attributes}>
+      {props.children}
+    </h2>
+  );
+};
+
+const HeadingThreeElement = (props: any) => {
+  return (
+    <h3 {...props.attributes}>
+      {props.children}
+    </h3>
+  );
+};
+
+const CodeElement = (props: any) => {
+  return (
+    <pre {...props.attributes}>
+      <code>{props.children}</code>
+    </pre>
+  );
+};
+
+const LinkElement = (props: any) => {
+  return (
+    <a href={props.element.url} {...props.attributes}>
+      {props.children}
     </a>
-  )
-}
+  );
+};
 
-const ListItemElementComponent = (props: any) => {
+const ImageElement = (props: any) => {
+	const { attributes, element } = props;
+	const { url, width = 50, rounded = false } = element;
+
+	const imageStyle: React.CSSProperties = {
+		width: `${width}%`,
+		maxWidth: '100%',
+		height: 'auto',
+		borderRadius: rounded ? '10px' : '0',
+		objectFit: 'cover',
+		cursor: 'pointer',
+	};
+
+	return (
+		<div {...attributes} style={{ textAlign: 'center' }}>
+			<img
+				src={url}
+				alt="Blog Image"
+				style={imageStyle}
+				onClick={() => props.onClick(url)}
+			/>
+		</div>
+	);
+};
+
+const ParagraphElement = (props: any) => {
   return (
-    <li>{props.children}</li>
-  )
-}
+    <p {...props.attributes}>
+      {props.children}
+    </p>
+  );
+};
 
-const NumberedListElementComponent = (props: any) => {
+const DefaultElement = (props: any) => {
   return (
-    <ol className="list-decimal pl-5">{props.children}</ol>
-  )
-}
+    <p {...props.attributes}>
+      {props.children}
+    </p>
+  );
+};
 
-const ParagraphElementComponent = (props: any) => {
+const Leaf = (props: any) => {
   return (
-    <p className="scroll-m-20 leading-7 [&:not(:first-child)]:mt-6">{props.children}</p>
-  )
-}
-
-const Leaf = ({ attributes, children, leaf }: any) => {
-  if (leaf.bold) {
-    children = <strong>{children}</strong>
-  }
-
-  if (leaf.italic) {
-    children = <em>{children}</em>
-  }
-
-  if (leaf.underline) {
-    children = <u>{children}</u>
-  }
-
-  if (leaf.code) {
-    children = <code>{children}</code>
-  }
-
-  return <span {...attributes}>{children}</span>
-}
-
-const MarkButton = ({ format, icon, title }: { format: string, icon: React.ReactNode, title: string }) => {
-  const editor = useSlate()
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              const isActive = isMarkActive(editor, format)
-              if (isActive) {
-                Editor.removeMark(editor, format)
-              } else {
-                Editor.addMark(editor, format, true)
-              }
-            }}
-          >
-            {icon}
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          {title}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  )
-}
-
-const BlockButton = ({ format, icon, title }: { format: string, icon: React.ReactNode, title: string }) => {
-  const editor = useSlate()
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              const isActive = isBlockActive(editor, format)
-              Transforms.setNodes(
-                editor,
-                { type: isActive ? 'paragraph' : format },
-                { match: n => Editor.isBlock(editor, n), split: false }
-              )
-            }}
-          >
-            {icon}
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          {title}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  )
-}
-
-const isMarkActive = (editor: Editor, format: string) => {
-  const marks = Editor.marks(editor)
-
-  return marks ? marks[format] === true : false
-}
-
-const isBlockActive = (editor: Editor, format: string) => {
-  const [match] = Editor.nodes(editor, {
-    match: n => !Editor.isEditor(n) && Element.isElement(n) && n.type === format,
-  })
-
-  return !!match
-}
-
-const useSlate = () => {
-  return React.useContext(SlateContext) as ReactEditor
-}
-
-const SlateContext = React.createContext<ReactEditor | null>(null)
+    <span
+      {...props.attributes}
+      style={{
+        fontWeight: props.leaf.bold ? 'bold' : undefined,
+        fontStyle: props.leaf.italic ? 'italic' : undefined,
+        textDecoration: props.leaf.underline ? 'underline' : undefined,
+        fontFamily: props.leaf.code ? 'monospace' : undefined,
+      }}
+    >
+      {props.children}
+    </span>
+  );
+};
 
 export default BlogEditor;
