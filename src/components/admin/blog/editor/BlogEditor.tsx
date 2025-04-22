@@ -1,6 +1,5 @@
-
 import React, { useEffect, useRef, useState } from "react";
-import EditorJS from "@editorjs/editorjs";
+import EditorJS, { LogLevels } from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 import List from "@editorjs/list";
 import Image from "@editorjs/image";
@@ -273,7 +272,7 @@ const BlogEditor = ({
           },
           autofocus: true,
           minHeight: 300,
-          logLevel: 'ERROR' as 'ERROR' | 'WARN' | 'INFO',
+          logLevel: 'ERROR' as LogLevels,
           paste: {
             plainText: true,
             htmlText: true,
