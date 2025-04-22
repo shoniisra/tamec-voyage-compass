@@ -1,3 +1,4 @@
+
 export interface TranslationType {
   nav: {
     home: string;
@@ -7,6 +8,18 @@ export interface TranslationType {
     bookNow: string;
     login: string;
     logout: string;
+    about: string;
+    services: string;
+    visaProcessing: string;
+    visaProcessingDesc: string;
+    flights: string;
+    flightsDesc: string;
+    toursPrograms: string;
+    toursProgramsDesc: string;
+    galapagos: string;
+    galapagosDesc: string;
+    exchangePrograms: string;
+    exchangeProgramsDesc: string;
   };
   home: {
     heroTitle: string;
@@ -22,6 +35,130 @@ export interface TranslationType {
     newsletterSubtitle: string;
     subscribeButton: string;
     emailPlaceholder: string;
+  };
+  visa: {
+    heroTitle: string;
+    heroSubtitle: string;
+    introduction: {
+      title: string;
+      subtitle: string;
+      experience: string;
+      personalizedSupport: string;
+      timeSaving: string;
+      transparency: string;
+    };
+    visaTypes: {
+      title: string;
+      tourist: string;
+      study: string;
+      work: string;
+      business: string;
+      transit: string;
+      other: string;
+      requirements: string;
+      estimatedTime: string;
+      approximateCosts: string;
+      applicableCountries: string;
+    };
+    countries: {
+      title: string;
+      subtitle: string;
+      usa: string;
+      canada: string;
+      spain: string;
+      uk: string;
+      australia: string;
+      schengen: string;
+      otherCountries: string;
+    };
+    requirements: {
+      title: string;
+      subtitle: string;
+      validPassport: string;
+      recentPhoto: string;
+      ds160Form: string;
+      employmentLetter: string;
+      financialProof: string;
+      otherDocuments: string;
+    };
+    process: {
+      title: string;
+      subtitle: string;
+      initialContact: string;
+      documentSubmission: string;
+      advisoryFormFilling: string;
+      feePayment: string;
+      appointmentScheduling: string;
+      interviewPreparation: string;
+      result: string;
+      estimatedTimeline: string;
+    };
+    faq: {
+      title: string;
+      approval: {
+        question: string;
+        answer: string;
+      };
+      processingTime: {
+        question: string;
+        answer: string;
+      };
+      denial: {
+        question: string;
+        answer: string;
+      };
+      installments: {
+        question: string;
+        answer: string;
+      };
+      interviewHelp: {
+        question: string;
+        answer: string;
+      };
+      previousDenial: {
+        question: string;
+        answer: string;
+      };
+    };
+    testimonials: {
+      title: string;
+      subtitle: string;
+    };
+    pricing: {
+      title: string;
+      subtitle: string;
+      basicPackage: string;
+      standardPackage: string;
+      premiumPackage: string;
+      includedServices: string;
+    };
+    contact: {
+      title: string;
+      subtitle: string;
+      form: string;
+      whatsapp: string;
+      schedule: string;
+      businessHours: string;
+    };
+    guarantee: {
+      title: string;
+      subtitle: string;
+      policy: string;
+    };
+    notices: {
+      title: string;
+      subtitle: string;
+      recentChanges: string;
+      embassyNews: string;
+      scamAlerts: string;
+    };
+    location: {
+      title: string;
+      subtitle: string;
+      physicalOffice: string;
+      onlineService: string;
+      coverage: string;
+    };
   };
   blog: {
     title: string;

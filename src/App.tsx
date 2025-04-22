@@ -10,6 +10,7 @@ import AuthPage from "@/pages/AuthPage";
 import AdminDashboardPage from "@/pages/AdminDashboardPage";
 import { DestinationsPage, TourDetailPage } from "@/modules/tours";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import VisaProcessingPage from "@/pages/VisaProcessingPage";
 
 // Admin Tour Pages
 import ToursPage from "@/pages/admin/tours/ToursPage";
@@ -39,6 +40,7 @@ function App() {
       <Route path="/blog/:slug" element={<BlogDetailPage />} />
       <Route path="/destinations" element={<DestinationsPage />} />
       <Route path="/destinations/:slug" element={<TourDetailPage />} />
+      <Route path="/services/visa-processing" element={<VisaProcessingPage />} />
       <Route path="/auth" element={<AuthPage />} />
 
       {/* Admin Routes */}

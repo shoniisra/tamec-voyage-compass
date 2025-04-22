@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Card } from '@/components/ui/card';
 import { Check, Plane, FileText, Map, Globe, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 const ServicesSection = () => {
   const { language } = useLanguage();
@@ -25,7 +25,8 @@ const ServicesSection = () => {
       stat: {
         value: '98%',
         label: language === 'en' ? 'Visa approval rate' : 'Tasa de aprobación de visas'
-      }
+      },
+      link: '/services/visa-processing'
     },
     {
       id: 2,
@@ -43,7 +44,8 @@ const ServicesSection = () => {
       stat: {
         value: '58+',
         label: language === 'en' ? 'International destinations' : 'Destinos internacionales'
-      }
+      },
+      link: '#'
     },
     {
       id: 3,
@@ -154,8 +156,10 @@ const ServicesSection = () => {
                       <div className="text-2xl font-bold">{service.stat.value}</div>
                       <div className="text-sm text-tamec-100">{service.stat.label}</div>
                     </div>
-                    <Button className="bg-tamec-600 hover:bg-tamec-700 text-white">
-                      {language === 'en' ? 'Learn More' : 'Más Información'}
+                    <Button className="bg-tamec-600 hover:bg-tamec-700 text-white" asChild>
+                      <Link to={service.link}>
+                        {language === 'en' ? 'Learn More' : 'Más Información'}
+                      </Link>
                     </Button>
                   </div>
                 </div>

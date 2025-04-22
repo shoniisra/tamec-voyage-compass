@@ -1,7 +1,8 @@
+
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, User, Settings } from "lucide-react";
+import { Menu, X, LogOut, User, Settings, ChevronDown, FileText, Plane, Book, Globe, GraduationCap } from "lucide-react";
 import LanguageSwitch from "../language/LanguageSwitch";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,6 +16,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -42,6 +52,39 @@ const Header = () => {
     if (isMenuOpen) setIsMenuOpen(false);
   };
 
+  const services = [
+    {
+      title: t("nav.visaProcessing"),
+      description: t("nav.visaProcessingDesc"),
+      href: "/services/visa-processing",
+      icon: <FileText className="h-5 w-5 text-tamec-600" />,
+    },
+    {
+      title: t("nav.flights"),
+      description: t("nav.flightsDesc"),
+      href: "#",
+      icon: <Plane className="h-5 w-5 text-tamec-600" />,
+    },
+    {
+      title: t("nav.toursPrograms"),
+      description: t("nav.toursProgramsDesc"),
+      href: "#",
+      icon: <Book className="h-5 w-5 text-tamec-600" />,
+    },
+    {
+      title: t("nav.galapagos"),
+      description: t("nav.galapagosDesc"),
+      href: "#",
+      icon: <Globe className="h-5 w-5 text-tamec-600" />,
+    },
+    {
+      title: t("nav.exchangePrograms"),
+      description: t("nav.exchangeProgramsDesc"),
+      href: "#",
+      icon: <GraduationCap className="h-5 w-5 text-tamec-600" />,
+    },
+  ];
+
   return (
     <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-md border-b">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
@@ -63,6 +106,39 @@ const Header = () => {
           >
             {t("nav.destinations")}
           </Link>
+          
+          <NavigationMenu>
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="text-foreground hover:text-tamec-600 transition-colors">
+                  {t("nav.services")}
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                    {services.map((service) => (
+                      <li key={service.title} className="row-span-3">
+                        <NavigationMenuLink asChild>
+                          <Link
+                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md hover:bg-accent"
+                            to={service.href}
+                          >
+                            <div className="mb-2 mt-4 flex items-center gap-2 text-sm font-medium">
+                              {service.icon}
+                              {service.title}
+                            </div>
+                            <p className="text-sm leading-tight text-muted-foreground">
+                              {service.description}
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    ))}
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+          
           <Link
             to="/about-us"
             className="text-foreground hover:text-tamec-600 transition-colors"
@@ -145,18 +221,47 @@ const Header = () => {
         <div className="md:hidden bg-background border-b animate-fade-in">
           <div className="flex flex-col space-y-4 px-4 py-6">
             <Link
-              to="/about-us"
-              className="text-foreground hover:text-tamec-600 transition-colors py-2"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              {t("nav.home")}
-            </Link>
-            <Link
-              to="/destinations"
+              to="/"
               className="text-foreground hover:text-tamec-600 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               {t("nav.destinations")}
+            </Link>
+            
+            <div className="py-2">
+              <div 
+                className="flex items-center justify-between text-foreground hover:text-tamec-600 transition-colors"
+                onClick={() => {
+                  const servicesSubmenu = document.getElementById('services-submenu');
+                  if (servicesSubmenu) {
+                    servicesSubmenu.classList.toggle('hidden');
+                  }
+                }}
+              >
+                <span>{t("nav.services")}</span>
+                <ChevronDown size={16} />
+              </div>
+              <div id="services-submenu" className="hidden pl-4 mt-2 space-y-2">
+                {services.map((service) => (
+                  <Link
+                    key={service.title}
+                    to={service.href}
+                    className="flex items-center py-1 text-foreground hover:text-tamec-600 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {service.icon}
+                    <span className="ml-2">{service.title}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+            
+            <Link
+              to="/about-us"
+              className="text-foreground hover:text-tamec-600 transition-colors py-2"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {t("nav.about")}
             </Link>
             <Link
               to="/blog"
