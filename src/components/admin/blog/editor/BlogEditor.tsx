@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import EditorJS, { LogLevels } from "@editorjs/editorjs";
+import EditorJS, { LogLevels, EditorConfig } from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 import List from "@editorjs/list";
 import Image from "@editorjs/image";
@@ -132,7 +132,7 @@ const BlogEditor = ({
       try {
         console.log("Initializing editor with data:", initialContent);
         
-        const editor = new EditorJS({
+        const editorConfig: EditorConfig = {
           holder: "editor",
           tools: {
             header: {
@@ -273,16 +273,9 @@ const BlogEditor = ({
           autofocus: true,
           minHeight: 300,
           logLevel: 'ERROR' as LogLevels,
-          paste: {
-            plainText: true,
-            htmlText: true,
-            imageTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp'],
-            patterns: {
-              image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png|webp|bmp)$/i,
-              video: /https?:\/\/\S+\.(mp4|webm|ogv|mov|avi)$/i,
-            }
-          }
-        });
+        };
+
+        const editor = new EditorJS(editorConfig);
 
         editorRef.current = editor;
         console.log("Editor initialized successfully");
