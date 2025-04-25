@@ -2,7 +2,7 @@
 import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Card } from '@/components/ui/card';
-import { Ship, Compass, Beach, Camera } from 'lucide-react';
+import { Ship, Compass, WavesLadder, Camera } from 'lucide-react';
 
 const GalapagosActivities = () => {
   const { language } = useLanguage();
@@ -23,7 +23,7 @@ const GalapagosActivities = () => {
         : 'Experimenta la emoción de caminar junto a tortugas gigantes en su hábitat natural.'
     },
     {
-      icon: <Beach className="h-10 w-10 text-tamec-600 mb-4" />,
+      icon: <WavesLadder className="h-10 w-10 text-tamec-600 mb-4" />,
       title: language === 'en' ? 'Island Hopping' : 'Recorrido por Islas',
       description: language === 'en'
         ? 'Visit multiple islands and discover dream beaches with pristine white sand and turquoise waters.' 
