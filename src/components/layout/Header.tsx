@@ -62,7 +62,7 @@ const Header = () => {
     {
       title: t("nav.flights"),
       description: t("nav.flightsDesc"),
-      href: "#",
+      href: "/services/flights",
       icon: <Plane className="h-5 w-5 text-tamec-600" />,
     },
     {
@@ -74,7 +74,7 @@ const Header = () => {
     {
       title: t("nav.galapagos"),
       description: t("nav.galapagosDesc"),
-      href: "#",
+      href: "/services/galapagos",
       icon: <Globe className="h-5 w-5 text-tamec-600" />,
     },
     {
@@ -110,7 +110,7 @@ const Header = () => {
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-foreground hover:text-tamec-600 transition-colors">
+                <NavigationMenuTrigger className=" text-base text-foreground hover:text-tamec-600 transition-colors">
                   {t("nav.services")}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>

@@ -4,14 +4,16 @@ import { Card } from '@/components/ui/card';
 import { Check, Plane, FileText, Map, Globe, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import LanguageSwitch from "../language/LanguageSwitch";
 
 const ServicesSection = () => {
+  const { t } = useLanguage();
   const { language } = useLanguage();
   
   const services = [
     {
       id: 1,
-      title: language === 'en' ? 'Visa Processing' : 'Trámite de Visas',
+      title: t("nav.visaProcessing"),
       description: language === 'en' 
         ? 'Expert assistance with American, Schengen, Mexican visas and more. We guide you through every step of the process.'
         : 'Asistencia experta con visas americanas, Schengen, mexicanas y más. Te guiamos en cada paso del proceso.',
@@ -30,7 +32,7 @@ const ServicesSection = () => {
     },
     {
       id: 2,
-      title: language === 'en' ? 'Flights' : 'Vuelos Aéreos',
+      title: t("nav.flights"),
       description: language === 'en'
         ? 'We find the best airfares for your trip with personalized rates and a wide network of international destinations.'
         : 'Encontramos las mejores tarifas aéreas para tu viaje con tarifas personalizadas y una amplia red de destinos internacionales.',
@@ -49,7 +51,7 @@ const ServicesSection = () => {
     },
     {
       id: 3,
-      title: language === 'en' ? 'Tours & Programs' : 'Tours y Programas',
+      title: t("nav.toursPrograms"),
       description: language === 'en'
         ? 'Unique travel experiences with quality accommodations, personalized itineraries, and activities for all tastes.'
         : 'Experiencias de viaje únicas con hospedajes de calidad, itinerarios personalizados y actividades para todos los gustos.',
