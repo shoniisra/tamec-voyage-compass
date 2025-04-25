@@ -17,6 +17,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { FileEdit, Trash2, Plus, Search, FileText, Eye } from 'lucide-react';
+import AdminLayout from '@/components/admin/layout/AdminLayout';
 
 const TerminosPage = () => {
   const { language } = useLanguage();
@@ -223,10 +224,7 @@ const TerminosPage = () => {
   );
   
   return (
-    <Layout>
-      <div className="container mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-[250px_1fr] gap-8">
-        <AdminSidebar />
-        
+    <AdminLayout>   
         <div>
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">
@@ -333,7 +331,6 @@ const TerminosPage = () => {
             </Table>
           )}
         </div>
-      </div>
       
       {/* Create/Edit Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -459,7 +456,7 @@ const TerminosPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </Layout>
+    </AdminLayout>
   );
 };
 

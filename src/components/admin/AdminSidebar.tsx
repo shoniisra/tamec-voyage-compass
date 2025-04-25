@@ -85,22 +85,22 @@ const AdminSidebar = () => {
             <AccordionContent className="pt-1 pb-0 px-1">
               <div className="flex flex-col space-y-1 ml-6">
                 <Button 
-                  variant={isActive('/admin/blog/posts') ? "default" : "ghost"} 
+                  variant={isActive('/admin/blog') ? "default" : "ghost"} 
                   size="sm" 
                   className="justify-start" 
                   asChild
                 >
-                  <Link to="/admin/blog/posts">
+                  <Link to="/admin/blog">
                     {language === 'en' ? 'All Posts' : 'Todos los Posts'}
                   </Link>
                 </Button>
                 <Button 
-                  variant={isActive('/admin/blog/posts/create') ? "default" : "ghost"} 
+                  variant={isActive('/admin/blog/create') ? "default" : "ghost"} 
                   size="sm" 
                   className="justify-start" 
                   asChild
                 >
-                  <Link to="/admin/blog/posts/create">
+                  <Link to="/admin/blog/create">
                     {language === 'en' ? 'Create Post' : 'Crear Post'}
                   </Link>
                 </Button>

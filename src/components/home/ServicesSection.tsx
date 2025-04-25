@@ -69,7 +69,7 @@ const ServicesSection = () => {
     },
     {
       id: 4,
-      title: language === 'en' ? 'Galapagos' : 'Galápagos',
+      title: t("nav.galapagos"),
       description: language === 'en'
         ? 'Discover one of the most amazing natural paradises in the world with our specialized Galapagos packages.'
         : 'Descubre uno de los paraísos naturales más asombrosos del mundo con nuestros paquetes especializados a Galápagos.',
@@ -87,7 +87,7 @@ const ServicesSection = () => {
     },
     {
       id: 5,
-      title: language === 'en' ? 'Student Exchange Programs' : 'Programas de Intercambio Estudiantil',
+      title: t("nav.exchangePrograms"),
       description: language === 'en'
         ? 'Educational experiences abroad that enrich your academic profile and broaden your cultural horizons.'
         : 'Experiencias educativas en el extranjero que enriquecen tu perfil académico y amplían tus horizontes culturales.',
