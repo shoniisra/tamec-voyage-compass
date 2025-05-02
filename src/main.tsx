@@ -9,6 +9,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { Toaster } from './components/ui/toaster';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from './providers/ThemeProvider';
+import { HelmetProvider } from 'react-helmet-async';
 
 // Initialize the React Query client
 const queryClient = new QueryClient({
@@ -23,14 +24,16 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <ThemeProvider>
-          <AuthProvider>
-            <LanguageProvider>
-              <App />
-              <Toaster />
-            </LanguageProvider>
-          </AuthProvider>
-        </ThemeProvider>
+        <HelmetProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <LanguageProvider>
+                <App />
+                <Toaster />
+              </LanguageProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </HelmetProvider>
       </BrowserRouter>
     </QueryClientProvider>
   </React.StrictMode>,

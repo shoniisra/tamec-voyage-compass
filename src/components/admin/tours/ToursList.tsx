@@ -1,13 +1,22 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tour } from '@/modules/tours/types/tour';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { Edit, ExternalLink, CircleAlert } from 'lucide-react';
+import { Edit, ExternalLink, CircleAlert, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMobile } from '@/shared/hooks/use-mobile';
+import { useTourManagement } from '@/modules/tours';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface ToursListProps {
   tours: Tour[];
@@ -18,6 +27,15 @@ interface ToursListProps {
 const ToursList: React.FC<ToursListProps> = ({ tours, loading, error }) => {
   const { language } = useLanguage();
   const isMobile = useMobile();
+  const [tourIdToDelete, setTourIdToDelete] = useState<number | null>(null);
+  const { deleteTour, isLoading } = useTourManagement();
+
+  const handleDelete = async () => {
+    if (tourIdToDelete) {
+      await deleteTour(tourIdToDelete);
+      setTourIdToDelete(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -112,12 +130,61 @@ const ToursList: React.FC<ToursListProps> = ({ tours, loading, error }) => {
                       {isMobile ? '' : language === 'en' ? 'Edit' : 'Editar'}
                     </Link>
                   </Button>
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                    onClick={() => setTourIdToDelete(tour.id)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    {isMobile ? '' : language === 'en' ? 'Delete' : 'Eliminar'}
+                  </Button>
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
       ))}
+
+      <Dialog open={tourIdToDelete !== null} onOpenChange={(open) => !open && setTourIdToDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {language === 'en' ? 'Delete Tour' : 'Eliminar Tour'}
+            </DialogTitle>
+            <DialogDescription>
+              {language === 'en' 
+                ? 'Are you sure you want to delete this tour? This action cannot be undone.' 
+                : '¿Estás seguro de que quieres eliminar este tour? Esta acción no se puede deshacer.'}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setTourIdToDelete(null)}
+              disabled={isLoading}
+            >
+              {language === 'en' ? 'Cancel' : 'Cancelar'}
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleDelete}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin mr-2 h-4 w-4 border-2 border-background border-t-transparent rounded-full" />
+                  {language === 'en' ? 'Deleting...' : 'Eliminando...'}
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  {language === 'en' ? 'Delete' : 'Eliminar'}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

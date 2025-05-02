@@ -1,6 +1,6 @@
 
 import React from 'react';
-import Head from 'next/head';
+import { Helmet } from 'react-helmet-async';
 import { Tour } from '@/modules/tours/types';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -27,7 +27,7 @@ const TourHead: React.FC<TourHeadProps> = ({ tour, canonicalUrl }) => {
     : (language === 'en' ? 'Contact for pricing' : 'Consultar precio');
 
   return (
-    <Head>
+    <Helmet>
       {/* Basic Meta Tags */}
       <title>{`${tour.titulo} | TAMEC ${language === 'en' ? 'Travels' : 'Viajes'}`}</title>
       <meta name="description" content={description} />
@@ -55,7 +55,7 @@ const TourHead: React.FC<TourHeadProps> = ({ tour, canonicalUrl }) => {
       {/* Additional SEO Tags */}
       <meta name="keywords" content={`${tour.titulo}, ${tour.destinos?.map(d => d.destino?.pais).join(', ')}, travel, tours, TAMEC`} />
       <meta name="robots" content="index, follow" />
-    </Head>
+    </Helmet>
   );
 };
 
