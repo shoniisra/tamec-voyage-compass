@@ -28,7 +28,7 @@ import {
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { user, signOut, isAdmin } = useAuth();
   const { theme } = useTheme();
   const navigate = useNavigate();
@@ -52,30 +52,31 @@ const Header = () => {
     if (isMenuOpen) setIsMenuOpen(false);
   };
 
+  // Updated services with language-specific URLs
   const services = [
     {
       title: t("nav.visaProcessing"),
       description: t("nav.visaProcessingDesc"),
-      href: "/services/visa-processing",
+      href: language === 'en' ? "/en/services/visa-processing" : "/es/servicios/tramite-de-visas",
       icon: <FileText className="h-5 w-5 text-tamec-600" />,
     },
     {
       title: t("nav.flights"),
       description: t("nav.flightsDesc"),
-      href: "/services/flights",
+      href: language === 'en' ? "/en/services/flights" : "/es/servicios/vuelos",
       icon: <Plane className="h-5 w-5 text-tamec-600" />,
+    },
+    {
+      title: t("nav.galapagos"),
+      description: t("nav.galapagosDesc"),
+      href: language === 'en' ? "/en/services/galapagos" : "/es/servicios/galapagos",
+      icon: <Globe className="h-5 w-5 text-tamec-600" />,
     },
     {
       title: t("nav.toursPrograms"),
       description: t("nav.toursProgramsDesc"),
       href: "#",
       icon: <Book className="h-5 w-5 text-tamec-600" />,
-    },
-    {
-      title: t("nav.galapagos"),
-      description: t("nav.galapagosDesc"),
-      href: "/services/galapagos",
-      icon: <Globe className="h-5 w-5 text-tamec-600" />,
     },
     {
       title: t("nav.exchangePrograms"),
