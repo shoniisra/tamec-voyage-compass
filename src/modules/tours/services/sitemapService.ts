@@ -8,7 +8,7 @@ import { Tour } from '../types';
 export const fetchAllTourSlugs = async (): Promise<{ slug: string; updated_at?: string }[]> => {
   const { data, error } = await supabase
     .from('tours')
-    .select('slug, updated_at')
+    .select('slug, id')
     .filter('slug', 'not.is', null);
     
   if (error) {
@@ -16,7 +16,11 @@ export const fetchAllTourSlugs = async (): Promise<{ slug: string; updated_at?: 
     throw error;
   }
   
-  return data || [];
+  // Make sure each entry has a slug property
+  return data?.map(tour => ({
+    slug: tour.slug || '',
+    updated_at: new Date().toISOString() // Use current date since updated_at doesn't exist
+  })) || [];
 };
 
 /**
@@ -41,6 +45,21 @@ export const generateToursSitemap = async (baseUrl: string): Promise<string> => 
     xml += `    <loc>${baseUrl}/destinations</loc>\n`;
     xml += '    <priority>0.9</priority>\n';
     xml += '  </url>\n';
+    
+    // Add about-us page for both languages
+    xml += '  <url>\n';
+    xml += `    <loc>${baseUrl}/about-us</loc>\n`;
+    xml += '    <priority>0.8</priority>\n';
+    xml += '  </url>\n';
+    
+    // Add services pages for both languages
+    const services = ['visa-processing', 'flights', 'galapagos'];
+    services.forEach(service => {
+      xml += '  <url>\n';
+      xml += `    <loc>${baseUrl}/services/${service}</loc>\n`;
+      xml += '    <priority>0.8</priority>\n';
+      xml += '  </url>\n';
+    });
     
     // Add each tour
     tours.forEach(tour => {

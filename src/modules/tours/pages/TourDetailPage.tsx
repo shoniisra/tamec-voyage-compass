@@ -1,21 +1,22 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@/components/layout/Layout';
-import { useParams } from 'react-router-dom';
-import { useTour } from '../hooks/use-tour';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useTour, prefetchTour } from '../hooks/use-tour';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Plane, Bus, Bed, Utensils, Camera } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import TourHead from '@/components/seo/TourHead';
 import TourStructuredData from '@/components/seo/TourStructuredData';
+import { preloadTourData } from '@/utils/seoUtils';
 
 const TourDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { tour, loading, error } = useTour(slug || '');
   const { language } = useLanguage();
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
+  const navigate = useNavigate();
   
   // Default placeholder for images
   const defaultPlaceholder = 'https://placehold.co/600x400?text=Beautiful+Destination';
@@ -30,6 +31,37 @@ const TourDetailPage: React.FC = () => {
       [index]: true
     }));
   };
+
+  // Preload next tour if available
+  useEffect(() => {
+    if (tour?.id) {
+      // Try to preload related tours based on same destination
+      const preloadRelatedTour = async () => {
+        try {
+          if (tour.destinos && tour.destinos.length > 0) {
+            const mainDestinationId = tour.destinos[0].destino_id;
+            
+            // Find other tours with the same main destination
+            const { data } = await supabase
+              .from('tour_destinos')
+              .select('tour_id, tours!inner(slug)')
+              .eq('destino_id', mainDestinationId)
+              .neq('tour_id', tour.id)
+              .limit(1);
+              
+            if (data && data.length > 0 && data[0].tours?.slug) {
+              // Preload the related tour data
+              preloadTourData(data[0].tours.slug);
+            }
+          }
+        } catch (error) {
+          console.error('Error preloading related tour:', error);
+        }
+      };
+      
+      preloadRelatedTour();
+    }
+  }, [tour?.id]);
   
   if (loading) {
     return (

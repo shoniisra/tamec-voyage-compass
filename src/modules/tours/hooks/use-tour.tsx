@@ -1,7 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tour, TourDestino } from '@/modules/tours/types';
 import { useToast } from '@/components/ui/use-toast';
+import { preloadTourImage } from '@/utils/seoUtils';
 
 export function useTour(slug: string) {
   const [tour, setTour] = useState<Tour | null>(null);
@@ -86,6 +88,19 @@ export function useTour(slug: string) {
         
         setTour(finalTour);
         
+        // Preload related tour images for better performance
+        if (finalTour.fotos && finalTour.fotos.length > 0) {
+          // Preload the first image (hero image)
+          preloadTourImage(finalTour.fotos[0].url_imagen);
+          
+          // Preload up to 3 more gallery images with lower priority
+          finalTour.fotos.slice(1, 4).forEach(foto => {
+            if (foto.url_imagen) {
+              setTimeout(() => preloadTourImage(foto.url_imagen), 1000);
+            }
+          });
+        }
+        
       } catch (error) {
         console.error('Error fetching tour:', error);
         setError('Error loading tour data');
@@ -106,3 +121,37 @@ export function useTour(slug: string) {
   
   return { tour, loading, error };
 }
+
+// Helper function to prefetch tour data (can be used by other components)
+export const prefetchTour = async (slug: string): Promise<Tour | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('tours')
+      .select(`
+        *,
+        aerolinea:aerolinea_id(*),
+        destinos:tour_destinos(
+          id,
+          orden,
+          destino:destino_id(*)
+        ),
+        fotos(*),
+        salidas(*),
+        precios(*),
+        regalos:tour_regalos(
+          regalo:regalo_id(*)
+        ),
+        actividades(*),
+        adjuntos(*),
+        componentes:componentes_incluidos!componentes_incluidos_tour_id_fkey(*)
+      `)
+      .eq('slug', slug)
+      .single();
+      
+    if (error) throw error;
+    return data as Tour;
+  } catch (error) {
+    console.error('Error prefetching tour:', error);
+    return null;
+  }
+};

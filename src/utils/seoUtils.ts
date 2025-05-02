@@ -2,37 +2,50 @@
 import { generateToursSitemap } from '@/modules/tours/services/sitemapService';
 
 /**
- * Generate a sitemap for the entire site
+ * Generate a complete sitemap for the website
+ * This combines tour pages and static pages
  */
 export const generateSitemap = async (baseUrl: string): Promise<string> => {
-  // For now we're only including tours in our sitemap
-  // This can be expanded to include other dynamic content
-  return generateToursSitemap(baseUrl);
+  try {
+    // Generate the tour sitemap
+    const toursSitemap = await generateToursSitemap(baseUrl);
+    
+    return toursSitemap;
+  } catch (error) {
+    console.error('Error in generateSitemap:', error);
+    throw error;
+  }
 };
 
 /**
- * Format a string for use in URLs (slug)
+ * Preload tour data helper function
+ * @param slug The tour slug to preload
  */
-export const slugify = (text: string): string => {
-  return text
-    .toString()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '') // Remove diacritics/accents
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-') // Replace spaces with hyphens
-    .replace(/[^\w\-]+/g, '') // Remove all non-word characters
-    .replace(/\-\-+/g, '-') // Replace multiple hyphens with single hyphen
-    .replace(/^-+/, '') // Trim hyphens from start
-    .replace(/-+$/, ''); // Trim hyphens from end
+export const preloadTourData = (slug: string): void => {
+  if (!slug) return;
+  
+  // Create a link element for resource hint
+  const linkElement = document.createElement('link');
+  linkElement.rel = 'preload';
+  linkElement.as = 'fetch';
+  linkElement.href = `/api/tours/${slug}`;
+  linkElement.crossOrigin = 'anonymous';
+  
+  // Append to document head
+  document.head.appendChild(linkElement);
 };
 
 /**
- * Create a canonical URL for a page
+ * Preload critical tour images
+ * @param imageUrl The image URL to preload
  */
-export const getCanonicalUrl = (path: string, baseUrl?: string): string => {
-  const base = baseUrl || window.location.origin;
-  // Ensure path starts with a slash and remove any trailing slash
-  const formattedPath = path.startsWith('/') ? path : `/${path}`;
-  return `${base}${formattedPath}`.replace(/\/$/, '');
+export const preloadTourImage = (imageUrl: string): void => {
+  if (!imageUrl) return;
+  
+  const linkElement = document.createElement('link');
+  linkElement.rel = 'preload';
+  linkElement.as = 'image';
+  linkElement.href = imageUrl;
+  
+  document.head.appendChild(linkElement);
 };
