@@ -24,6 +24,21 @@ import SpanishVisaProcessingPage from "@/pages/es/VisaProcessingPage";
 import SpanishFlightServicePage from "@/pages/es/FlightServicePage";
 import SpanishGalapagosServicePage from "@/pages/es/GalapagosServicePage";
 
+// Language-specific main pages
+import EnglishHomePage from "@/pages/en/HomePage";
+import EnglishContactPage from "@/pages/en/ContactPage";
+import EnglishBlogPage from "@/pages/en/BlogPage";
+import EnglishBlogDetailPage from "@/pages/en/BlogDetailPage";
+import EnglishDestinationsPage from "@/pages/en/DestinationsPage";
+import EnglishTourDetailPage from "@/pages/en/TourDetailPage";
+
+import SpanishHomePage from "@/pages/es/HomePage";
+import SpanishContactPage from "@/pages/es/ContactPage";
+import SpanishBlogPage from "@/pages/es/BlogPage";
+import SpanishBlogDetailPage from "@/pages/es/BlogDetailPage";
+import SpanishDestinationsPage from "@/pages/es/DestinationsPage";
+import SpanishTourDetailPage from "@/pages/es/TourDetailPage";
+
 // Sitemap and Robots
 import SitemapXML from "@/pages/sitemap.xml";
 import RobotsTXT from "@/pages/robots.txt";
@@ -49,6 +64,7 @@ import ItemsPage from "@/pages/admin/settings/ItemsPage";
 function App() {
   return (
     <Routes>
+      {/* Default routes (will be redirected to language-specific in production) */}
       <Route path="/" element={<DestinationsPage />} />
       <Route path="/about-us" element={<HomePage />} />
       <Route path="/contact" element={<ContactPage />} />
@@ -62,10 +78,26 @@ function App() {
       <Route path="/services/flights" element={<FlightServicePage />} />
       <Route path="/services/galapagos" element={<GalapagosServicePage />} />
       
+      {/* English language routes */}
+      <Route path="/en/about-us" element={<EnglishHomePage />} />
+      <Route path="/en/contact" element={<EnglishContactPage />} />
+      <Route path="/en/blog" element={<EnglishBlogPage />} />
+      <Route path="/en/blog/:slug" element={<EnglishBlogDetailPage />} />
+      <Route path="/en/destinations" element={<EnglishDestinationsPage />} />
+      <Route path="/en/destinations/:slug" element={<EnglishTourDetailPage />} />
+      
       {/* English language service routes */}
       <Route path="/en/services/visa-processing" element={<EnglishVisaProcessingPage />} />
       <Route path="/en/services/flights" element={<EnglishFlightServicePage />} />
       <Route path="/en/services/galapagos" element={<EnglishGalapagosServicePage />} />
+      
+      {/* Spanish language routes */}
+      <Route path="/es/sobre-nosotros" element={<SpanishHomePage />} />
+      <Route path="/es/contacto" element={<SpanishContactPage />} />
+      <Route path="/es/blog" element={<SpanishBlogPage />} />
+      <Route path="/es/blog/:slug" element={<SpanishBlogDetailPage />} />
+      <Route path="/es/destinos" element={<SpanishDestinationsPage />} />
+      <Route path="/es/destinos/:slug" element={<SpanishTourDetailPage />} />
       
       {/* Spanish language service routes */}
       <Route path="/es/servicios/tramite-de-visas" element={<SpanishVisaProcessingPage />} />

@@ -86,6 +86,29 @@ const Header = () => {
     },
   ];
 
+  // Language-specific navigation URLs
+  const getNavUrls = () => {
+    if (language === 'en') {
+      return {
+        home: "/en/destinations",
+        about: "/en/about-us",
+        blog: "/en/blog",
+        contact: "/en/contact",
+        destinations: "/en/destinations"
+      };
+    } else {
+      return {
+        home: "/es/destinos",
+        about: "/es/sobre-nosotros",
+        blog: "/es/blog",
+        contact: "/es/contacto",
+        destinations: "/es/destinos"
+      };
+    }
+  };
+
+  const navUrls = getNavUrls();
+
   return (
     <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-md border-b">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
@@ -102,7 +125,7 @@ const Header = () => {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-4">
           <Link
-            to="/"
+            to={navUrls.destinations}
             className="text-foreground hover:text-tamec-600 transition-colors"
           >
             {t("nav.destinations")}
@@ -141,20 +164,20 @@ const Header = () => {
           </NavigationMenu>
           
           <Link
-            to="/about-us"
+            to={navUrls.about}
             className="text-foreground hover:text-tamec-600 transition-colors"
           >
             {t("nav.about")}
           </Link>
 
           <Link
-            to="/blog"
+            to={navUrls.blog}
             className="text-foreground hover:text-tamec-600 transition-colors"
           >
             {t("nav.blog")}
           </Link>
           <Link
-            to="/contact"
+            to={navUrls.contact}
             className="text-foreground hover:text-tamec-600 transition-colors"
           >
             {t("nav.contact")}
@@ -222,7 +245,7 @@ const Header = () => {
         <div className="md:hidden bg-background border-b animate-fade-in">
           <div className="flex flex-col space-y-4 px-4 py-6">
             <Link
-              to="/"
+              to={navUrls.destinations}
               className="text-foreground hover:text-tamec-600 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
@@ -258,21 +281,21 @@ const Header = () => {
             </div>
             
             <Link
-              to="/about-us"
+              to={navUrls.about}
               className="text-foreground hover:text-tamec-600 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               {t("nav.about")}
             </Link>
             <Link
-              to="/blog"
+              to={navUrls.blog}
               className="text-foreground hover:text-tamec-600 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               {t("nav.blog")}
             </Link>
             <Link
-              to="/contact"
+              to={navUrls.contact}
               className="text-foreground hover:text-tamec-600 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >

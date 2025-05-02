@@ -3,5 +3,10 @@
 User-agent: *
 Allow: /
 
+# Language specific paths
+Allow: /en/
+Allow: /es/
+
 # Sitemaps
 Sitemap: https://tamecviajes.com/sitemap.xml
+
