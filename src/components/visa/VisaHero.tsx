@@ -40,7 +40,7 @@ const VisaHero = () => {
             <Button size="lg" className="bg-tamec-600 hover:bg-tamec-700 text-white">
               {language === 'en' ? 'Schedule a Consultation' : 'Agenda una Consulta'}
             </Button>
-            <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10" asChild>
+            <Button variant="outline" size="lg" className="border-white text-white bg-white/20 hover:bg-white/10 py-6" asChild>
               <Link to="#visa-types" className="flex items-center">
                 {language === 'en' ? 'Explore Visa Types' : 'Explora Tipos de Visas'}
                 <ArrowRight className="ml-2 h-4 w-4" />

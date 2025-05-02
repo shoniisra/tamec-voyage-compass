@@ -40,7 +40,7 @@ const FlightHero = () => {
             <Button size="lg" className="bg-tamec-600 hover:bg-tamec-700 text-white">
               {language === 'en' ? 'Request Your Flight' : 'Solicita tu vuelo'}
             </Button>
-            <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10" asChild>
+            <Button variant="outline" size="lg" className="border-white text-white bg-white/20 hover:bg-white/10 py-6" asChild>
               <Link to="#flight-benefits" className="flex items-center">
                 {language === 'en' ? 'Learn More' : 'Más información'}
                 <ArrowRight className="ml-2 h-4 w-4" />

@@ -33,12 +33,12 @@ const GalapagosHero = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 animate-fade-in delay-300">
-            <Button size="lg" className="bg-tamec-600 hover:bg-tamec-700">
+            <Button size="lg" className="bg-tamec-600 hover:bg-tamec-700 ">
               <CalendarDays className="mr-2 h-5 w-5" />
               {language === 'en' ? 'See Available Dates' : 'Ver fechas disponibles'}
             </Button>
             
-            <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10">
+            <Button variant="outline" size="lg" className="border-white text-white bg-white/20 hover:bg-white/10">
               <Send className="mr-2 h-5 w-5" />
               {language === 'en' ? 'Get a Quote' : 'Cotiza tu viaje'}
             </Button>
