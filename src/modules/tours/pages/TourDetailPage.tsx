@@ -8,6 +8,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Plane, Bus, Bed, Utensils, Camera } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import TourHead from '@/components/seo/TourHead';
+import TourStructuredData from '@/components/seo/TourStructuredData';
 
 const TourDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -17,6 +19,10 @@ const TourDetailPage: React.FC = () => {
   
   // Default placeholder for images
   const defaultPlaceholder = 'https://placehold.co/600x400?text=Beautiful+Destination';
+  
+  // Build canonical URL for SEO
+  const baseUrl = window.location.origin;
+  const canonicalUrl = `${baseUrl}/destinations/${slug}`;
   
   const handleImageError = (index: number) => {
     setImageErrors(prev => ({
@@ -95,6 +101,14 @@ const TourDetailPage: React.FC = () => {
 
   return (
     <Layout>
+      {/* Add SEO components */}
+      {tour && (
+        <>
+          <TourHead tour={tour} canonicalUrl={canonicalUrl} />
+          <TourStructuredData tour={tour} canonicalUrl={canonicalUrl} />
+        </>
+      )}
+      
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-5xl mx-auto">
           <Button asChild variant="ghost" className="mb-4">
@@ -104,9 +118,9 @@ const TourDetailPage: React.FC = () => {
             </Link>
           </Button>
           
-          <h1 className="text-3xl font-bold mb-4">{tour.titulo}</h1>
+          <h1 className="text-3xl font-bold mb-4">{tour?.titulo}</h1>
           
-          {tour.descripcion && (
+          {tour?.descripcion && (
             <div className="prose dark:prose-invert mb-6 max-w-none">
               <p>{tour.descripcion}</p>
             </div>
