@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/layout/Layout';
 import { useParams, Link, useNavigate } from 'react-router-dom';
@@ -10,6 +9,7 @@ import { ArrowLeft, Plane, Bus, Bed, Utensils, Camera } from 'lucide-react';
 import TourHead from '@/components/seo/TourHead';
 import TourStructuredData from '@/components/seo/TourStructuredData';
 import { preloadTourData } from '@/utils/seoUtils';
+import { supabase } from '@/integrations/supabase/client';
 
 const TourDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();

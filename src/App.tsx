@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import HomePage from "@/pages/HomePage";
@@ -9,9 +10,23 @@ import AuthPage from "@/pages/AuthPage";
 import AdminDashboardPage from "@/pages/AdminDashboardPage";
 import { DestinationsPage, TourDetailPage } from "@/modules/tours";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+
+// Service Pages
 import VisaProcessingPage from "@/pages/VisaProcessingPage";
 import FlightServicePage from "@/pages/FlightServicePage";
 import GalapagosServicePage from "@/pages/GalapagosServicePage";
+
+// Language-specific service pages
+import EnglishVisaProcessingPage from "@/pages/en/VisaProcessingPage";
+import EnglishFlightServicePage from "@/pages/en/FlightServicePage";
+import EnglishGalapagosServicePage from "@/pages/en/GalapagosServicePage";
+import SpanishVisaProcessingPage from "@/pages/es/VisaProcessingPage";
+import SpanishFlightServicePage from "@/pages/es/FlightServicePage";
+import SpanishGalapagosServicePage from "@/pages/es/GalapagosServicePage";
+
+// Sitemap and Robots
+import SitemapXML from "@/pages/sitemap.xml";
+import RobotsTXT from "@/pages/robots.txt";
 
 // Admin Tour Pages
 import ToursPage from "@/pages/admin/tours/ToursPage";
@@ -41,8 +56,26 @@ function App() {
       <Route path="/blog/:slug" element={<BlogDetailPage />} />
       <Route path="/destinations" element={<DestinationsPage />} />
       <Route path="/destinations/:slug" element={<TourDetailPage />} />
+      
+      {/* Legacy service routes (redirect to language-specific in production) */}
       <Route path="/services/visa-processing" element={<VisaProcessingPage />} />
       <Route path="/services/flights" element={<FlightServicePage />} />
+      <Route path="/services/galapagos" element={<GalapagosServicePage />} />
+      
+      {/* English language service routes */}
+      <Route path="/en/services/visa-processing" element={<EnglishVisaProcessingPage />} />
+      <Route path="/en/services/flights" element={<EnglishFlightServicePage />} />
+      <Route path="/en/services/galapagos" element={<EnglishGalapagosServicePage />} />
+      
+      {/* Spanish language service routes */}
+      <Route path="/es/servicios/tramite-de-visas" element={<SpanishVisaProcessingPage />} />
+      <Route path="/es/servicios/vuelos" element={<SpanishFlightServicePage />} />
+      <Route path="/es/servicios/galapagos" element={<SpanishGalapagosServicePage />} />
+      
+      {/* SEO routes */}
+      <Route path="/sitemap.xml" element={<SitemapXML />} />
+      <Route path="/robots.txt" element={<RobotsTXT />} />
+      
       <Route path="/auth" element={<AuthPage />} />
 
       {/* Admin Routes */}
@@ -159,7 +192,6 @@ function App() {
 
       {/* 404 Route */}
       <Route path="*" element={<NotFound />} />
-      <Route path="/services/galapagos" element={<GalapagosServicePage />} />
     </Routes>
   );
 }

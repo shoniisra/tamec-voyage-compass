@@ -11,13 +11,15 @@ export const prefetchStaticPages = async (): Promise<void> => {
   try {
     console.log('Prefetching static pages data...');
     
-    // Prefetch about us page content (if it comes from database)
+    // Prefetch about us page content (if it exists in the database)
     try {
+      // Using tours table as a placeholder since static_pages doesn't exist yet
+      // In a production environment, you would create a static_pages table
       const { data: aboutUsData } = await supabase
-        .from('static_pages')
-        .select('*')
+        .from('tours')
+        .select('titulo, descripcion')
         .eq('slug', 'about-us')
-        .single();
+        .maybeSingle();
         
       if (aboutUsData) {
         // Store in local storage or another cache mechanism
@@ -33,11 +35,12 @@ export const prefetchStaticPages = async (): Promise<void> => {
     
     for (const service of services) {
       try {
+        // Using tours table as a placeholder
         const { data: serviceData } = await supabase
-          .from('static_pages')
-          .select('*')
+          .from('tours')
+          .select('titulo, descripcion')
           .eq('slug', `services-${service}`)
-          .single();
+          .maybeSingle();
           
         if (serviceData) {
           localStorage.setItem(`static_page_${service}`, JSON.stringify(serviceData));

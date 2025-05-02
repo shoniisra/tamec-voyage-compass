@@ -149,7 +149,40 @@ export const prefetchTour = async (slug: string): Promise<Tour | null> => {
       .single();
       
     if (error) throw error;
-    return data as Tour;
+    
+    // Process data similar to useTour hook
+    if (data) {
+      // Calculate lowest price
+      let precio_desde;
+      if (data.precios && Array.isArray(data.precios)) {
+        const lowestPrice = data.precios.reduce((min, precio) => 
+          precio.precio < min ? precio.precio : min
+        , Infinity);
+        
+        precio_desde = lowestPrice !== Infinity ? lowestPrice : undefined;
+      }
+
+      // Format gifts array
+      const regalos = data.regalos?.map((item: any) => item.regalo).filter(Boolean) || [];
+      
+      // Format destinos to match TourDestino type
+      const destinos: TourDestino[] = data.destinos?.map((item: any) => ({
+        id: item.id,
+        tour_id: data.id,
+        destino_id: item.destino.id,
+        orden: item.orden,
+        destino: item.destino
+      })) || [];
+      
+      return {
+        ...data,
+        destinos,
+        precio_desde,
+        regalos
+      } as Tour;
+    }
+    
+    return null;
   } catch (error) {
     console.error('Error prefetching tour:', error);
     return null;
