@@ -143,7 +143,7 @@ const BlogList = () => {
             
             {isAdmin && (
               <Button 
-                onClick={() => navigate('/admin/blog/posts/create')}
+                onClick={() => navigate('/admin/blog/create')}
                 className="bg-tamec-600 hover:bg-tamec-700 whitespace-nowrap"
               >
                 <PlusCircle className="mr-2 h-4 w-4" />

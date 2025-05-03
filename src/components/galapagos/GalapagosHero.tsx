@@ -8,17 +8,17 @@ const GalapagosHero = () => {
   const { language } = useLanguage();
 
   return (
-    <div className="relative min-h-[90vh] w-full">
+    <div className="relative h-[90vh] min-h-[90vh] w-full">
       <div className="absolute inset-0">
         <img 
-          src="https://images.unsplash.com/photo-1518877593221-1f28583780b4?auto=format&fit=crop&w=2000" 
+          src="/assets/images/hero/turtle-background.webp" 
           alt="Galapagos Islands" 
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent" />
       </div>
       
-      <div className="relative z-10 container mx-auto px-4 h-full flex items-center">
+      <div className="container relative z-10 mx-auto h-full px-6 flex flex-col justify-center">
         <div className="max-w-3xl">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
             {language === 'en' 

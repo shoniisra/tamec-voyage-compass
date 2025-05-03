@@ -9,11 +9,11 @@ const VisaHero = () => {
   const { t, language } = useLanguage();
 
   return (
-    <div className="relative h-[70vh] min-h-[500px] w-full overflow-hidden">
+    <div className="relative h-[90vh] min-h-[90vh] w-full overflow-hidden">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 bg-black">
         <img 
-          src="https://images.unsplash.com/photo-1587743224878-71f849c10165?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80" 
+          src="/assets/images/hero/visa-background.webp" 
           alt="Visa Processing Hero" 
           className="w-full h-full object-cover opacity-50"
         />

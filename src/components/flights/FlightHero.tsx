@@ -9,11 +9,11 @@ const FlightHero = () => {
   const { t, language } = useLanguage();
 
   return (
-    <div className="relative h-[70vh] min-h-[500px] w-full overflow-hidden">
+    <div className="relative h-[90vh] min-h-[90vh] w-full overflow-hidden">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 bg-black">
         <img 
-          src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=1500&q=80" 
+          src="/assets/images/hero/avion-background.webp" 
           alt="Flight Service Hero" 
           className="w-full h-full object-cover opacity-50"
         />
@@ -22,7 +22,7 @@ const FlightHero = () => {
       
       {/* Content */}
       <div className="container relative z-10 mx-auto h-full px-6 flex flex-col justify-center">
-        <div className="max-w-2xl">
+        <div className="max-w-3xl">
           <h1 className="text-sm font-semibold uppercase tracking-wider text-yellow-400 mb-4">
             {language === 'en' ? 'Flight Booking Services' : 'Servicios de Reserva de Vuelos'}
           </h1>

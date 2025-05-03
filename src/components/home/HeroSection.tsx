@@ -9,7 +9,7 @@ const HeroSection = () => {
   const { t, language } = useLanguage();
   
   return (
-    <div className="relative h-[650px] overflow-hidden">
+    <div className="relative h-[90vh] min-h-[90vh] overflow-hidden">
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
         style={{ 

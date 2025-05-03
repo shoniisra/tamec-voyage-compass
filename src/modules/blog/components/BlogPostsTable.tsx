@@ -90,8 +90,8 @@ const BlogPostsTable: React.FC<BlogPostsTableProps> = ({ posts, isLoading, onDel
 
   const getEditUrl = (post: Post) => {
     return isLegacyPost(post) 
-      ? `/admin/blog/posts/edit/${post.id}` 
-      : `/admin/blog/posts/edit/${post.id}`;
+      ? `/admin/blog/edit/${post.id}` 
+      : `/admin/blog/edit/${post.id}`;
   };
 
   const getViewUrl = (post: Post) => {
@@ -106,7 +106,7 @@ const BlogPostsTable: React.FC<BlogPostsTableProps> = ({ posts, isLoading, onDel
     <div>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Blog Posts</h2>
-        <Button onClick={() => navigate('/admin/blog/posts/create')}>
+        <Button onClick={() => navigate('/admin/blog/create')}>
           <Plus className="mr-2 h-4 w-4" />  Nuevo Artículo
         </Button>
       </div>
