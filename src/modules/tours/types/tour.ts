@@ -112,4 +112,4 @@ export interface Precio {
   precio: number;
 }
 
-// Removing ComponentesIncluidos interface as it's no longer needed
+// Componentes_incluidos interface has been removed as its properties were moved directly to Tour

@@ -65,15 +65,15 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
   const isServiceIncluded = (serviceType: 'vuelo' | 'transporte' | 'hospedaje' | 'comida' | 'actividades'): boolean => {
     switch (serviceType) {
       case 'vuelo':
-        return !!tour.incluye_vuelo || !!tour.componentes?.incluye_vuelo;
+        return !!tour.incluye_vuelo;
       case 'transporte':
-        return !!tour.incluye_transporte || !!tour.componentes?.incluye_transporte;
+        return !!tour.incluye_transporte;
       case 'hospedaje':
-        return !!tour.incluye_hospedaje || !!tour.componentes?.incluye_hotel;
+        return !!tour.incluye_hospedaje || !!tour.incluye_hotel;
       case 'comida':
-        return !!tour.incluye_comida || !!tour.componentes?.incluye_comida;
+        return !!tour.incluye_comida;
       case 'actividades':
-        return !!tour.incluye_actividades || !!tour.componentes?.incluye_actividades;
+        return !!tour.incluye_actividades;
       default:
         return false;
     }

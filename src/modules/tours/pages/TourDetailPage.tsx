@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/layout/Layout';
 import { useParams, Link, useNavigate } from 'react-router-dom';
@@ -261,38 +262,38 @@ const TourDetailPage: React.FC = () => {
               </div>
               
               {/* Included services */}
-              {(tour.componentes || tour.incluye_vuelo || tour.incluye_transporte || 
+              {(tour.incluye_vuelo || tour.incluye_transporte || 
                 tour.incluye_hospedaje || tour.incluye_comida || tour.incluye_actividades) && (
                 <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-sm mt-6">
                   <h3 className="text-lg font-semibold mb-4">
                     {language === 'en' ? 'What\'s Included' : 'Qué Incluye'}
                   </h3>
                   <ul className="space-y-2">
-                    {(tour.incluye_vuelo || tour.componentes?.incluye_vuelo) && (
+                    {tour.incluye_vuelo && (
                       <li className="flex items-center">
                         <Plane className="text-tamec-600 mr-2 h-5 w-5" />
                         <span>{language === 'en' ? 'Flight' : 'Vuelo'}</span>
                       </li>
                     )}
-                    {(tour.incluye_transporte || tour.componentes?.incluye_transporte) && (
+                    {tour.incluye_transporte && (
                       <li className="flex items-center">
                         <Bus className="text-tamec-600 mr-2 h-5 w-5" />
                         <span>{language === 'en' ? 'Transportation' : 'Transporte'}</span>
                       </li>
                     )}
-                    {(tour.incluye_hospedaje || tour.componentes?.incluye_hotel) && (
+                    {(tour.incluye_hospedaje || tour.incluye_hotel) && (
                       <li className="flex items-center">
                         <Bed className="text-tamec-600 mr-2 h-5 w-5" />
                         <span>{language === 'en' ? 'Accommodation' : 'Hospedaje'}</span>
                       </li>
                     )}
-                    {(tour.incluye_comida || tour.componentes?.incluye_comida) && (
+                    {tour.incluye_comida && (
                       <li className="flex items-center">
                         <Utensils className="text-tamec-600 mr-2 h-5 w-5" />
                         <span>{language === 'en' ? 'Meals' : 'Comidas'}</span>
                       </li>
                     )}
-                    {(tour.incluye_actividades || tour.componentes?.incluye_actividades) && (
+                    {tour.incluye_actividades && (
                       <li className="flex items-center">
                         <Camera className="text-tamec-600 mr-2 h-5 w-5" />
                         <span>{language === 'en' ? 'Activities' : 'Actividades'}</span>
