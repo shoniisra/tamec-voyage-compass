@@ -4,7 +4,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useDestinos } from '@/modules/tours/hooks';
 import { TourFilterParams, Destino } from '@/modules/tours/types';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Command,
   CommandEmpty,
@@ -52,12 +51,10 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
   const durationOptions = Array.from({ length: 14 }, (_, i) => (i + 1).toString());
   
   const handleApplyFilters = () => {
-    const filters: TourFilterParams = {
-      search: searchQuery,
-    };
+    const filters: TourFilterParams = {};
     
-    if (destinoId) {
-      filters.destino = [parseInt(destinoId)];
+    if (searchQuery && selectedDestino) {
+      filters.destino = [selectedDestino.id];
     }
     
     if (duration) {
@@ -90,7 +87,6 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
   return (
     <div className="mb-2">
       <div className="bg-white dark:bg-gray-800 rounded-xl p-2 shadow-sm">
-        
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Destination Search with Suggestions */}
           <div className="space-y-2">
@@ -101,25 +97,28 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <div className="relative">
-                  <Input
-                    placeholder={language === 'en' ? 'Search destinations' : 'Buscar destinos'}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onFocus={() => setOpen(true)}
-                    className="w-full"
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => {
-                        setSearchQuery('');
-                        setSelectedDestino(null);
-                        setDestinoId('');
-                      }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  )}
+                  <div className="flex items-center border border-input rounded-md focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                    <Search className="ml-3 h-4 w-4 shrink-0 opacity-50" />
+                    <input
+                      placeholder={language === 'en' ? 'Search destinations' : 'Buscar destinos'}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onFocus={() => setOpen(true)}
+                      className="w-full py-2 px-3 bg-transparent focus:outline-none"
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => {
+                          setSearchQuery('');
+                          setSelectedDestino(null);
+                          setDestinoId('');
+                        }}
+                        className="mr-2 text-gray-500 hover:text-gray-700"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
                 </div>
               </PopoverTrigger>
               <PopoverContent className="w-full p-0" align="start">
@@ -176,8 +175,7 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
                 // Apply filters immediately when duration is selected
                 onFilterChange({
                   duracion: value ? [parseInt(value)] : undefined,
-                  destino: destinoId ? [parseInt(destinoId)] : undefined,
-                  search: searchQuery || undefined
+                  destino: selectedDestino ? [selectedDestino.id] : undefined
                 });
               }}
             >

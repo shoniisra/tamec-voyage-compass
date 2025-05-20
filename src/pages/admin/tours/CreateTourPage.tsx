@@ -1,40 +1,38 @@
 
 import React, { useState } from 'react';
-import AdminLayout from '@/components/admin/layout/AdminLayout';
-import TourForm from '@/components/admin/tours/TourForm';
-import { useTourManagement } from '@/modules/tours';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { Tour } from '@/modules/tours/types';
+import AdminLayout from '@/components/admin/layout/AdminLayout';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useTourManagement } from '@/modules/tours';
+import TourForm from '@/components/admin/tours/TourForm';
+import { useToast } from '@/components/ui/use-toast';
+import { Tour } from '@/modules/tours/types/tour';
 
 const CreateTourPage: React.FC = () => {
   const { language } = useLanguage();
-  const { createTour } = useTourManagement();
-  const { toast } = useToast();
   const navigate = useNavigate();
+  const { createTour } = useTourManagement();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
   
   const handleSubmit = async (tourData: Partial<Tour>) => {
     setIsSubmitting(true);
     try {
-      const newTourId = await createTour(tourData);
+      await createTour(tourData);
       toast({
-        title: language === 'en' ? 'Tour Created' : 'Tour Creado',
-        description: language === 'en' 
-          ? 'Tour has been created successfully' 
-          : 'El tour ha sido creado exitosamente',
-        variant: 'success',
+        title: language === 'en' ? 'Tour created successfully' : 'Tour creado con éxito',
+        description: language === 'en' ? 'The tour has been created.' : 'El tour ha sido creado.',
+        variant: "default",
       });
-      navigate(`/admin/tours/edit/${newTourId}`);
-    } catch (error) {
+      navigate('/admin/tours');
+    } catch (error: any) {
       console.error('Error creating tour:', error);
       toast({
-        title: language === 'en' ? 'Error' : 'Error',
-        description: language === 'en' 
-          ? 'There was an error creating the tour' 
-          : 'Hubo un error creando el tour',
-        variant: 'destructive',
+        title: language === 'en' ? 'Error creating tour' : 'Error al crear el tour',
+        description: error.message || (language === 'en' ? 'Please try again.' : 'Por favor, inténtalo de nuevo.'),
+        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
@@ -43,18 +41,18 @@ const CreateTourPage: React.FC = () => {
   
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">
-            {language === 'en' ? 'Create Tour' : 'Crear Tour'}
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="icon" onClick={() => navigate('/admin/tours')}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-2xl font-bold">
+            {language === 'en' ? 'Create New Tour' : 'Crear Nuevo Tour'}
           </h1>
-          <p className="text-muted-foreground">
-            {language === 'en' 
-              ? 'Fill in the details to create a new tour.' 
-              : 'Complete los detalles para crear un nuevo tour.'}
-          </p>
         </div>
-        
+      </div>
+      
+      <div className="space-y-6">
         <TourForm onSubmit={handleSubmit} isSubmitting={isSubmitting} />
       </div>
     </AdminLayout>

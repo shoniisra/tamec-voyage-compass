@@ -2,11 +2,16 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
-import TourDetailPage from '@/modules/tours/pages/TourDetailPage';
+import { TourDetailPage as TourDetail } from '@/modules/tours/pages';
 
-const SpanishTourDetailPage = () => {
+const SpanishTourDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  return <TourDetailPage slug={slug || ''} />;
+  
+  return (
+    <Layout>
+      <TourDetail slug={slug || ''} />
+    </Layout>
+  );
 };
 
 export default SpanishTourDetailPage;

@@ -1,146 +1,88 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Tour, TourFilterParams } from '@/modules/tours/types';
+import { Tour, TourFilterParams } from '../types/tour';
+import { useToast } from '@/components/ui/use-toast';
 
-export const useTours = (filters?: TourFilterParams) => {
+export const useTours = (filterParams: TourFilterParams = {}) => {
   const [tours, setTours] = useState<Tour[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
+  const { toast } = useToast();
+  
   useEffect(() => {
     const fetchTours = async () => {
       setLoading(true);
       setError(null);
-
+      
       try {
         let query = supabase
           .from('tours')
           .select(`
             *,
-            aerolinea:aerolinea_id(*),
-            tour_destinos(
+            destinos:tour_destinos(
               id,
+              tour_id,
               destino_id,
               orden,
-              destino:destino_id(*)
+              destino:destinos(*)
             ),
-            salidas(
-              id,
-              fecha_salida,
-              dias_duracion,
-              cupos_disponibles
-            ),
-            fotos(id, url_imagen, descripcion, orden),
-            precios(
-              id,
-              ciudad_salida,
-              tipo_habitacion,
-              forma_pago,
-              precio
-            )
-          `)
-          .order('id', { ascending: false });
-
-        // Apply filters if provided
-        if (filters) {
-          // Text search (on title or description)
-          if (filters.search) {
-            query = query.or(`titulo.ilike.%${filters.search}%,descripcion.ilike.%${filters.search}%`);
-          }
-          
-          // Filter by active status
-          if (filters.active !== undefined) {
-            const activeValue = filters.active === 'true' || filters.active === true;
-            query = query.eq('active', activeValue);
-          }
-
-          // Filter by includes flight
-          if (filters.incluye_vuelo === true) {
-            query = query.eq('incluye_vuelo', true);
+            fotos(*),
+            salidas(*),
+            adjuntos(*)
+          `);
+        
+        // Apply search filter if present
+        if (filterParams.search) {
+          query = query.ilike('titulo', `%${filterParams.search}%`);
+        }
+        
+        // Apply destination filter if present
+        if (filterParams.destino && filterParams.destino.length > 0) {
+          // Get tours that have this destination
+          const destinoId = filterParams.destino[0];
+          if (destinoId !== 'all') {
+            query = query.eq('tour_destinos.destino_id', destinoId);
           }
         }
-
+        
+        // Apply duration filter if present
+        if (filterParams.duracion && filterParams.duracion.length > 0) {
+          query = query.eq('dias_duracion', filterParams.duracion[0]);
+        }
+        
+        // Apply incluye_vuelo filter if present
+        if (filterParams.incluye_vuelo !== undefined) {
+          query = query.eq('incluye_vuelo', filterParams.incluye_vuelo === true);
+        }
+        
+        // Apply price filter (when implemented)
+        // This would require a more complex query or client-side filtering
+        
         const { data, error: supabaseError } = await query;
-
+        
         if (supabaseError) {
           throw supabaseError;
         }
-
+        
         if (data) {
-          // Process and transform the data
-          const transformedTours: Tour[] = data.map((tour: any) => {
-            // Calculate the minimum price across all prices
-            let precioDesde = Infinity;
-            
-            if (tour.precios && tour.precios.length > 0) {
-              tour.precios.forEach((precio: any) => {
-                if (precio.precio < precioDesde) {
-                  precioDesde = precio.precio;
-                }
-              });
-            }
-            
-            // Transform the destinos
-            const destinos = tour.tour_destinos?.map((td: any) => ({
-              id: td.id,
-              tour_id: tour.id,
-              destino_id: td.destino_id,
-              orden: td.orden || 0,
-              destino: td.destino
-            })) || [];
-            
-            return {
-              ...tour,
-              destinos,
-              precio_desde: precioDesde !== Infinity ? precioDesde : undefined
-            } as Tour;
-          });
-
-          // Apply client-side filtering
-          let filteredTours = transformedTours;
-          
-          // Filter by destination
-          if (filters && filters.destino && filters.destino.length > 0) {
-            filteredTours = filteredTours.filter(tour => {
-              if (!tour.destinos) return false;
-              
-              const destinoIds = filters.destino || [];
-              return tour.destinos.some(td => {
-                const id = td.destino_id;
-                return id !== undefined && destinoIds.includes(id);
-              });
-            });
-          }
-
-          // Filter by duration
-          if (filters && filters.duracion && filters.duracion.length > 0) {
-            filteredTours = filteredTours.filter(tour => {
-              return filters.duracion?.includes(tour.dias_duracion || 0);
-            });
-          }
-
-          // Filter by price range
-          if (filters && filters.precio_min !== undefined && filters.precio_max !== undefined) {
-            filteredTours = filteredTours.filter(tour => {
-              const precio = tour.precio_desde;
-              if (!precio) return false;
-              return precio >= (filters.precio_min || 0) && precio <= (filters.precio_max || Infinity);
-            });
-          }
-
-          setTours(filteredTours);
+          setTours(data as unknown as Tour[]);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error fetching tours:', err);
         setError('Failed to fetch tours');
+        toast({
+          variant: "destructive",
+          title: "Error loading tours",
+          description: err.message || "Please try again later.",
+        });
       } finally {
         setLoading(false);
       }
     };
-
+    
     fetchTours();
-  }, [filters]);
-
+  }, [filterParams, toast]);
+  
   return { tours, loading, error };
 };

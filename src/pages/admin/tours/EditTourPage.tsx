@@ -1,47 +1,55 @@
 
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/admin/layout/AdminLayout';
-import TourForm from '@/components/admin/tours/TourForm';
-import { useTour, useTourManagement } from '@/modules/tours';
-import { useParams } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useToast } from '@/hooks/use-toast';
-import { Tour } from '@/modules/tours/types';
+import { useTour, useTourManagement } from '@/modules/tours';
+import TourForm from '@/components/admin/tours/TourForm';
+import { useToast } from '@/components/ui/use-toast';
+import { Tour } from '@/modules/tours/types/tour';
 
 const EditTourPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const tourId = parseInt(id || '0');
-  
   const { language } = useLanguage();
-  const { tour, loading, error } = useTour(tourId);
+  const navigate = useNavigate();
   const { updateTour } = useTourManagement();
-  const { toast } = useToast();
+  const { tour, loading, error } = useTour(id || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+  
+  // Redirect if tour not found
+  useEffect(() => {
+    if (!loading && (!tour || error)) {
+      toast({
+        title: language === 'en' ? 'Tour not found' : 'Tour no encontrado',
+        description: language === 'en' ? 'The requested tour could not be found.' : 'El tour solicitado no pudo ser encontrado.',
+        variant: "destructive",
+      });
+      navigate('/admin/tours');
+    }
+  }, [tour, loading, error, navigate, language, toast]);
   
   const handleSubmit = async (tourData: Partial<Tour>) => {
-    if (!tourId) return;
+    if (!tour) return;
     
     setIsSubmitting(true);
-    
     try {
-      await updateTour(tourId, tourData);
-      
+      await updateTour(tour.id, tourData);
       toast({
-        title: language === 'en' ? 'Tour Updated' : 'Tour Actualizado',
-        description: language === 'en' 
-          ? 'Tour has been updated successfully' 
-          : 'El tour ha sido actualizado exitosamente',
-        variant: 'success',
+        title: language === 'en' ? 'Tour updated successfully' : 'Tour actualizado con éxito',
+        description: language === 'en' ? 'The tour has been updated.' : 'El tour ha sido actualizado.',
+        variant: "default",
       });
-    } catch (error) {
+      // Refresh page to show updated data
+      window.location.reload();
+    } catch (error: any) {
       console.error('Error updating tour:', error);
-      
       toast({
-        title: language === 'en' ? 'Error' : 'Error',
-        description: language === 'en' 
-          ? 'There was an error updating the tour' 
-          : 'Hubo un error actualizando el tour',
-        variant: 'destructive',
+        title: language === 'en' ? 'Error updating tour' : 'Error al actualizar el tour',
+        description: error.message || (language === 'en' ? 'Please try again.' : 'Por favor, inténtalo de nuevo.'),
+        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
@@ -51,56 +59,35 @@ const EditTourPage: React.FC = () => {
   if (loading) {
     return (
       <AdminLayout>
-        <div className="p-8">
-          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-md animate-pulse w-1/3 mb-4"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-md animate-pulse w-1/2 mb-8"></div>
-          
-          <div className="space-y-6">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="space-y-2">
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-md animate-pulse w-1/4"></div>
-                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-md animate-pulse w-full"></div>
-              </div>
-            ))}
-          </div>
+        <div className="flex items-center justify-center h-64">
+          <p>{language === 'en' ? 'Loading tour details...' : 'Cargando detalles del tour...'}</p>
         </div>
       </AdminLayout>
     );
   }
   
-  if (error || !tour) {
-    return (
-      <AdminLayout>
-        <div className="p-8 text-center">
-          <h2 className="text-xl font-semibold text-red-500 dark:text-red-400 mb-2">
-            {language === 'en' ? 'Error Loading Tour' : 'Error al Cargar el Tour'}
-          </h2>
-          <p className="text-muted-foreground">
-            {error || (language === 'en' ? 'Tour not found' : 'Tour no encontrado')}
-          </p>
-        </div>
-      </AdminLayout>
-    );
+  if (!tour) {
+    return null; // Will redirect via useEffect
   }
   
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">
-            {language === 'en' ? 'Edit Tour' : 'Editar Tour'}
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="icon" onClick={() => navigate('/admin/tours')}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-2xl font-bold">
+            {language === 'en' ? 'Edit Tour' : 'Editar Tour'}: {tour.titulo}
           </h1>
-          <p className="text-muted-foreground">
-            {language === 'en' 
-              ? `Update details for tour: ${tour.titulo}` 
-              : `Actualizar detalles para el tour: ${tour.titulo}`}
-          </p>
         </div>
-        
+      </div>
+      
+      <div className="space-y-6">
         <TourForm 
           tour={tour} 
-          onSubmit={handleSubmit}
-          isSubmitting={isSubmitting}
+          onSubmit={handleSubmit} 
+          isSubmitting={isSubmitting} 
         />
       </div>
     </AdminLayout>

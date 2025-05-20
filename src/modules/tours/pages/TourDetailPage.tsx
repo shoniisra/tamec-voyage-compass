@@ -1,9 +1,8 @@
-
-import React, { useState } from 'react';
+import React from 'react';
+import { useTour } from '../hooks/use-tour';
 import { useParams } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useTour } from '../hooks/use-tour';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -28,10 +27,12 @@ import {
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const TourDetailPage = () => {
-  const { slug } = useParams<{ slug: string }>();
-  const { language } = useLanguage();
-  const { tour, loading, error } = useTour(slug || '');
+interface TourDetailPageProps {
+  slug: string;
+}
+
+const TourDetailPage: React.FC<TourDetailPageProps> = ({ slug }) => {
+  const { tour, loading, error } = useTour(slug);
   const [activeTab, setActiveTab] = useState('details');
   
   if (loading) {

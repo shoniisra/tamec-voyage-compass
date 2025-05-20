@@ -1,4 +1,3 @@
-
 export interface Aerolinea {
   id: number;
   nombre: string;
@@ -115,11 +114,10 @@ export interface TourDestino {
 
 export interface Salida {
   id: number;
-  tour_id: number;
+  tour_id?: number;
   fecha_salida: string;
   dias_duracion: number;
   cupos_disponibles: number;
-  precios?: Precio[];
 }
 
 export interface Precio {
