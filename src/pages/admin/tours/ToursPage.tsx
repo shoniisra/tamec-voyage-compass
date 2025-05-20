@@ -6,7 +6,7 @@ import { PlusCircle, FilterIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTours } from '@/modules/tours';
-import { TourFilterParams } from '@/modules/tours/types/tour'; // Import from correct path
+import { TourFilterParams } from '@/modules/tours/types/tour';
 import ToursList from '@/components/admin/tours/ToursList';
 import ToursFilter from '@/components/admin/tours/ToursFilter';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -17,7 +17,18 @@ const ToursPage: React.FC = () => {
   const { tours, loading, error } = useTours(filterParams);
   
   const handleFilterSubmit = (filters: TourFilterParams) => {
-    setFilterParams(filters);
+    // Convert 'all' values to undefined for API compatibility
+    const processedFilters = { ...filters };
+    
+    if (processedFilters.destino_id === 'all') {
+      delete processedFilters.destino_id;
+    }
+    
+    if (processedFilters.active === 'all') {
+      delete processedFilters.active;
+    }
+    
+    setFilterParams(processedFilters);
   };
   
   return (

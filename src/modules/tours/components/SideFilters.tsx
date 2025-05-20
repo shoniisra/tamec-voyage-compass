@@ -32,7 +32,7 @@ const SideFilters = ({ filters, onFilterChange, onClearFilters }: SideFiltersPro
   
   // Price range options
   const priceOptions = [
-    { label: language === 'en' ? 'All Prices' : 'Todos los precios', value: '' },
+    { label: language === 'en' ? 'All Prices' : 'Todos los precios', value: 'all' },
     { label: '< $500', value: '1-500' },
     { label: '$500 - $1000', value: '500-1000' },
     { label: '$1000 - $2000', value: '1000-2000' },
@@ -57,7 +57,7 @@ const SideFilters = ({ filters, onFilterChange, onClearFilters }: SideFiltersPro
   
   // Handler for price range select
   const handlePriceRangeChange = (value: string) => {
-    if (!value) {
+    if (value === 'all') {
       const { precio_min, precio_max, ...restFilters } = filters;
       onFilterChange(restFilters);
       return;
@@ -84,7 +84,7 @@ const SideFilters = ({ filters, onFilterChange, onClearFilters }: SideFiltersPro
   const selectedDuration = filters.duracion?.[0]?.toString() || '';
   const selectedPriceRange = filters.precio_min && filters.precio_max
     ? `${filters.precio_min}-${filters.precio_max}`
-    : '';
+    : 'all';
   
   return (
     <Card className="sticky top-24">
@@ -119,7 +119,7 @@ const SideFilters = ({ filters, onFilterChange, onClearFilters }: SideFiltersPro
               <SelectValue placeholder={language === 'en' ? 'All destinations' : 'Todos los destinos'} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">
+              <SelectItem value="all">
                 {language === 'en' ? 'All destinations' : 'Todos los destinos'}
               </SelectItem>
               <ScrollArea className="h-60">
@@ -147,7 +147,7 @@ const SideFilters = ({ filters, onFilterChange, onClearFilters }: SideFiltersPro
               <SelectValue placeholder={language === 'en' ? 'Any duration' : 'Cualquier duración'} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">
+              <SelectItem value="all">
                 {language === 'en' ? 'Any duration' : 'Cualquier duración'}
               </SelectItem>
               <ScrollArea className="h-60">

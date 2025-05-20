@@ -20,7 +20,14 @@ const SpanishDestinationsPage: React.FC = () => {
   }, [filters]);
   
   const handleFilterChange = (newFilters: TourFilterParams) => {
-    setFilters(newFilters);
+    // Process 'all' values to be undefined for API compatibility
+    const processedFilters = { ...newFilters };
+    
+    if (processedFilters.destino && processedFilters.destino[0] === 'all') {
+      delete processedFilters.destino;
+    }
+    
+    setFilters(processedFilters);
   };
   
   const handleClearFilters = () => {

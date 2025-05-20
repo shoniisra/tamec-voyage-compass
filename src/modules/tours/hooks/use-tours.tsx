@@ -51,7 +51,8 @@ export const useTours = (filters?: TourFilterParams) => {
           
           // Filter by active status
           if (filters.active !== undefined) {
-            query = query.eq('active', filters.active === 'true');
+            const activeValue = filters.active === 'true' || filters.active === true;
+            query = query.eq('active', activeValue);
           }
 
           // Filter by includes flight

@@ -88,7 +88,7 @@ const ToursFilter: React.FC<ToursFilterProps> = ({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="">
+                  <SelectItem value="all">
                     {language === 'en' ? 'All destinations' : 'Todos los destinos'}
                   </SelectItem>
                   {destinos.map((destino) => (
@@ -120,7 +120,7 @@ const ToursFilter: React.FC<ToursFilterProps> = ({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="">
+                  <SelectItem value="all">
                     {language === 'en' ? 'All statuses' : 'Todos los estados'}
                   </SelectItem>
                   <SelectItem value="true">
