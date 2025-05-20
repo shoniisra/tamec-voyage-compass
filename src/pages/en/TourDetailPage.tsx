@@ -6,7 +6,7 @@ import TourDetailPage from '@/modules/tours/pages/TourDetailPage';
 
 const EnglishTourDetailPage = () => {
   const { slug } = useParams<{ slug: string }>();
-  return <TourDetailPage />;
+  return <TourDetailPage slug={slug || ''} />;
 };
 
 export default EnglishTourDetailPage;

@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Tour, TourFilterParams } from '@/modules/tours/types';
+import { Tour, TourFilterParams, TourDestino } from '@/modules/tours/types';
 
 export const useTours = (filters?: TourFilterParams) => {
   const [tours, setTours] = useState<Tour[]>([]);
@@ -47,11 +47,6 @@ export const useTours = (filters?: TourFilterParams) => {
           // Text search (on title or description)
           if (filters.search) {
             query = query.or(`titulo.ilike.%${filters.search}%,descripcion.ilike.%${filters.search}%`);
-          }
-          
-          // Filter by duration
-          if (filters.duracion && filters.duracion.length > 0) {
-            query = query.in('dias_duracion', filters.duracion);
           }
           
           // Filter by active status
@@ -100,11 +95,16 @@ export const useTours = (filters?: TourFilterParams) => {
           let filteredTours = transformedTours;
           
           if (filters && filters.destino && filters.destino.length > 0) {
-            filteredTours = filteredTours.filter(tour => 
-              tour.destinos?.some(td => 
-                filters.destino?.includes(td.destino_id || 0)
-              )
-            );
+            // Use simple array filtering instead of complex type instantiation
+            filteredTours = filteredTours.filter(tour => {
+              if (!tour.destinos) return false;
+              
+              const destinoIds = filters.destino || [];
+              return tour.destinos.some(td => {
+                const id = td.destino_id;
+                return id !== undefined && destinoIds.includes(id);
+              });
+            });
           }
 
           setTours(filteredTours);

@@ -20,6 +20,31 @@ export interface TerminosCondiciones {
   titulo: string;
 }
 
+export interface Actividad {
+  id: number;
+  nombre: string;
+  descripcion?: string;
+  costo_adicional?: number;
+  incluida?: boolean;
+  tour_id?: number;
+}
+
+export interface Adjunto {
+  id: number;
+  url_archivo: string;
+  descripcion?: string;
+  tipo_archivo?: string;
+  tour_id?: number;
+}
+
+export interface Foto {
+  id: number;
+  tour_id: number;
+  url_imagen: string;
+  descripcion?: string;
+  orden?: number;
+}
+
 export interface Tour {
   id: number;
   titulo: string;
@@ -41,11 +66,11 @@ export interface Tour {
   regalos?: Regalo[];
   incluye?: Incluye[];
   salidas?: Salida[];
-  // Add the missing properties
-  aerolinea?: Aerolinea;
+  fotos?: Foto[];
   actividades?: Actividad[];
   adjuntos?: Adjunto[];
   precios?: Precio[];
+  aerolinea?: Aerolinea;
   // Direct properties that were previously in 'componentes'
   incluye_vuelo?: boolean;
   incluye_hotel?: boolean;
@@ -56,34 +81,7 @@ export interface Tour {
   incluye_maleta_10?: boolean;
   incluye_maleta_23?: boolean;
   incluye_articulo_personal?: boolean;
-  // Add missing properties that are used in the code
-  fotos?: Foto[];
   precio_desde?: number;
-}
-
-export interface Foto {
-  id: number;
-  tour_id: number;
-  url_imagen: string;
-  descripcion?: string;
-  orden?: number;
-}
-
-export interface Actividad {
-  id: number;
-  nombre: string;
-  descripcion?: string;
-  costo_adicional?: number;
-  incluida?: boolean;
-  tour_id?: number;
-}
-
-export interface Adjunto {
-  id: number;
-  url_archivo: string;
-  descripcion?: string;
-  tipo_archivo?: string;
-  tour_id?: number;
 }
 
 export interface TourFilterParams {
