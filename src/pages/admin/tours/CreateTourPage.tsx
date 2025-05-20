@@ -20,7 +20,19 @@ const CreateTourPage: React.FC = () => {
   const handleSubmit = async (tourData: Partial<Tour>) => {
     setIsSubmitting(true);
     try {
-      await createTour(tourData);
+      // Create empty arrays for required arguments
+      const destinos: Array<{ destino_id: number; orden: number }> = [];
+      const salidas: Array<{ fecha_salida: string | null; dias_duracion: number; cupos_disponibles: number | null }> = [];
+      const precios: Array<{
+        ciudad_salida: string;
+        tipo_habitacion: 'doble' | 'triple' | 'individual' | 'child';
+        forma_pago: 'efectivo' | 'tarjeta';
+        precio: number;
+      }> = [];
+      const regalos: Array<{ regalo_id: number }> = [];
+      
+      await createTour(tourData, destinos, salidas, precios, regalos);
+      
       toast({
         title: language === 'en' ? 'Tour created successfully' : 'Tour creado con éxito',
         description: language === 'en' ? 'The tour has been created.' : 'El tour ha sido creado.',

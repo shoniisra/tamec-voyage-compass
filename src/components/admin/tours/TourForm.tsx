@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useForm } from 'react-hook-form';
@@ -7,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Tour } from '@/modules/tours/types';
+import { Tour } from '@/modules/tours/types/tour';
 import {
   Form,
   FormField,
@@ -32,18 +31,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 
 interface TourFormProps {
-  initialData?: Tour;
-  onSubmit: (data: Tour) => void;
+  tour?: Tour;
+  onSubmit: (data: Partial<Tour>) => void;
   isSubmitting: boolean;
 }
 
-const TourForm: React.FC<TourFormProps> = ({ initialData, onSubmit, isSubmitting }) => {
+const TourForm: React.FC<TourFormProps> = ({ tour, onSubmit, isSubmitting }) => {
   const { language } = useLanguage();
   const [tab, setTab] = useState("general");
   
   // Initialize form with default values or initial data
   const form = useForm<Tour>({
-    defaultValues: initialData || {
+    defaultValues: tour || {
       titulo: '',
       descripcion: '',
       dias_duracion: 1,
@@ -72,18 +71,18 @@ const TourForm: React.FC<TourFormProps> = ({ initialData, onSubmit, isSubmitting
     }
   };
 
-  // Update form if initialData changes
+  // Update form if tour changes
   useEffect(() => {
-    if (initialData) {
-      Object.keys(initialData).forEach((key) => {
+    if (tour) {
+      Object.keys(tour).forEach((key) => {
         // @ts-ignore - dynamic property access
-        if (initialData[key] !== undefined) {
+        if (tour[key] !== undefined) {
           // @ts-ignore - dynamic property access
-          form.setValue(key, initialData[key]);
+          form.setValue(key, tour[key]);
         }
       });
     }
-  }, [initialData, form]);
+  }, [tour, form]);
 
   return (
     <Form {...form}>

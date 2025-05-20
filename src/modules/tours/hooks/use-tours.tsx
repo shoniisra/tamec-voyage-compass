@@ -43,7 +43,7 @@ export const useTours = (filterParams: TourFilterParams = {}) => {
           const destinoId = filterParams.destino[0];
           if (destinoId !== 'all') {
             // Convert to number if it's a numeric string
-            const destinoIdNum = typeof destinoId === 'string' ? parseInt(destinoId, 10) : destinoId;
+            const destinoIdNum = parseInt(destinoId, 10);
             if (!isNaN(destinoIdNum)) {
               query = query.eq('tour_destinos.destino_id', destinoIdNum);
             }
@@ -54,7 +54,7 @@ export const useTours = (filterParams: TourFilterParams = {}) => {
         if (filterParams.duracion && filterParams.duracion.length > 0) {
           const duracionValue = filterParams.duracion[0];
           // Convert to number if it's a numeric string
-          const duracionNum = typeof duracionValue === 'string' ? parseInt(duracionValue, 10) : duracionValue;
+          const duracionNum = parseInt(duracionValue, 10);
           if (!isNaN(duracionNum)) {
             query = query.eq('dias_duracion', duracionNum);
           }
