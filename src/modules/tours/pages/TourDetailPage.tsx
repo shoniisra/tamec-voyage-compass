@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { useTour } from '../hooks/use-tour';
 import { useParams } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -34,6 +35,7 @@ interface TourDetailPageProps {
 const TourDetailPage: React.FC<TourDetailPageProps> = ({ slug }) => {
   const { tour, loading, error } = useTour(slug);
   const [activeTab, setActiveTab] = useState('details');
+  const { language } = useLanguage();
   
   if (loading) {
     return (

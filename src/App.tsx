@@ -71,7 +71,7 @@ function App() {
       <Route path="/blog" element={<BlogPage />} />
       <Route path="/blog/:slug" element={<BlogDetailPage />} />
       <Route path="/destinations" element={<DestinationsPage />} />
-      <Route path="/destinations/:slug" element={<TourDetailPage />} />
+      <Route path="/destinations/:slug" element={<TourDetailPage slug="" />} />
       
       {/* Legacy service routes (redirect to language-specific in production) */}
       <Route path="/services/visa-processing" element={<VisaProcessingPage />} />
