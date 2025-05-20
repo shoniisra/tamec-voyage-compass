@@ -19,15 +19,29 @@ const DestinationsPage: React.FC = () => {
   return (
     <Layout>
       {/* Hero Section with Pattern Background */}
-      <div className="relative bg-tamec-600 overflow-hidden">
-        <div className="absolute inset-0 hero-pattern opacity-10"></div>
-        <div className="container mx-auto px-4 py-20 relative z-10">
-          <div className="max-w-4xl mx-auto text-center space-y-4">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white font-poppins animate-fade-in">
-              <MapPinned className="inline-block h-8 w-8 mr-3 mb-1 text-tamec-200" />
+    {/* Hero Section with Background Image */}
+    <div className="relative h-[70vh] min-h-[500px] overflow-hidden bg-gradient-to-r from-white via-gray-50 to-tamec-50/20">
+        {/* Background Image Section */}
+        <div className="absolute right-0 top-0 w-2/3 h-full overflow-hidden">
+          <img 
+            src="/assets/images/hero/hero-background.webp" 
+            alt="Travel adventures background"
+            className="w-full h-full object-cover object-center"
+          />
+          {/* Curved Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white via-white to-transparent" 
+               style={{ borderTopLeftRadius: '50%', borderBottomLeftRadius: '50%' }} />
+        </div>
+
+        {/* Content */}
+        <div className="container relative z-10 mx-auto px-6 h-full flex items-center">
+          <div className="max-w-lg pr-8">
+            <h1 className="text-5xl font-black text-tamec-800 mb-6">
+              <MapPinned className="inline-block h-8 w-8 mr-3 mb-1 text-tamec-600" />
               {language === 'en' ? 'Discover Your Next Adventure' : 'Descubre Tu Próxima Aventura'}
             </h1>
-            <p className="text-lg md:text-xl text-tamec-100 dark:text-gray-300 max-w-2xl mx-auto font-inter animate-fade-up">
+            
+            <p className="text-lg text-gray-700 mb-8 max-w-md">
               {language === 'en' 
                 ? 'Explore unique destinations and create unforgettable memories.' 
                 : 'Explora destinos únicos y crea recuerdos inolvidables.'}
@@ -36,10 +50,11 @@ const DestinationsPage: React.FC = () => {
         </div>
       </div>
 
+
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 space-y-8">
         {/* Search and Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 -mt-12 relative z-20 animate-fade-up">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 -mt-24 relative z-20 animate-fade-up">
           <DestinationsFilter onFilterChange={handleFilterChange} />
         </div>
         

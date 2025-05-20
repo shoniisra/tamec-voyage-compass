@@ -45,7 +45,7 @@ const SpanishDestinationsPage: React.FC = () => {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 space-y-8">
         {/* Search and Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 -mt-12 relative z-20 animate-fade-up">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 -mt-24 relative z-20 animate-fade-up">
           <DestinationsFilter onFilterChange={handleFilterChange} />
         </div>
         
