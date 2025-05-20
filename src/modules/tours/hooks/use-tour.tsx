@@ -34,8 +34,7 @@ export function useTour(slug: string) {
               regalo:regalo_id(*)
             ),
             actividades(*),
-            adjuntos(*),
-            componentes:componentes_incluidos!componentes_incluidos_tour_id_fkey(*)
+            adjuntos(*)
           `)
           .eq('slug', slug)
           .single();
@@ -142,8 +141,7 @@ export const prefetchTour = async (slug: string): Promise<Tour | null> => {
           regalo:regalo_id(*)
         ),
         actividades(*),
-        adjuntos(*),
-        componentes:componentes_incluidos!componentes_incluidos_tour_id_fkey(*)
+        adjuntos(*)
       `)
       .eq('slug', slug)
       .single();

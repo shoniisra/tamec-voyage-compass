@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
@@ -19,22 +20,12 @@ export function useTourManagement() {
       forma_pago: 'efectivo' | 'tarjeta';
       precio: number;
     }>,
-    componentes: {
-      incluye_vuelo: boolean;
-      incluye_hotel: boolean;
-      incluye_transporte: boolean;
-      incluye_comida: boolean;
-      incluye_actividades: boolean;
-      incluye_maleta_10: boolean;
-      incluye_maleta_23: boolean;
-      incluye_articulo_personal: boolean;
-    },
     regalos: Array<{ regalo_id: number }>
   ) => {
     try {
       setIsLoading(true);
       
-      // Insert new tour
+      // Insert new tour with the component fields directly in the tour table
       const { data: tourResult, error: tourError } = await supabase
         .from('tours')
         .insert([
@@ -56,6 +47,10 @@ export function useTourManagement() {
             incluye_hospedaje: tourData.incluye_hospedaje || false,
             incluye_comida: tourData.incluye_comida || false,
             incluye_actividades: tourData.incluye_actividades || false,
+            incluye_hotel: tourData.incluye_hotel || false,
+            incluye_maleta_10: tourData.incluye_maleta_10 || false,
+            incluye_maleta_23: tourData.incluye_maleta_23 || false,
+            incluye_articulo_personal: tourData.incluye_articulo_personal || false,
           },
         ])
         .select()
@@ -113,23 +108,6 @@ export function useTourManagement() {
         if (preciosError) throw preciosError;
       }
       
-      // Insert included components
-      const { error: componentesError } = await supabase
-        .from('componentes_incluidos')
-        .insert([{
-          tour_id: tourId,
-          incluye_vuelo: componentes.incluye_vuelo,
-          incluye_hotel: componentes.incluye_hotel,
-          incluye_transporte: componentes.incluye_transporte,
-          incluye_comida: componentes.incluye_comida,
-          incluye_actividades: componentes.incluye_actividades,
-          incluye_maleta_10: componentes.incluye_maleta_10,
-          incluye_maleta_23: componentes.incluye_maleta_23,
-          incluye_articulo_personal: componentes.incluye_articulo_personal,
-        }]);
-      
-      if (componentesError) throw componentesError;
-      
       // Insert gifts
       if (regalos.length > 0) {
         const regalosData = regalos.map(r => ({
@@ -170,22 +148,12 @@ export function useTourManagement() {
       forma_pago: 'efectivo' | 'tarjeta';
       precio: number;
     }>,
-    componentes: {
-      incluye_vuelo: boolean;
-      incluye_hotel: boolean;
-      incluye_transporte: boolean;
-      incluye_comida: boolean;
-      incluye_actividades: boolean;
-      incluye_maleta_10: boolean;
-      incluye_maleta_23: boolean;
-      incluye_articulo_personal: boolean;
-    },
     regalos: Array<{ regalo_id: number }>
   ) => {
     try {
       setIsLoading(true);
       
-      // Update tour
+      // Update tour with the component fields directly in the tour table
       const { error: tourError } = await supabase
         .from('tours')
         .update({
@@ -206,6 +174,10 @@ export function useTourManagement() {
           incluye_hospedaje: tourData.incluye_hospedaje || false,
           incluye_comida: tourData.incluye_comida || false,
           incluye_actividades: tourData.incluye_actividades || false,
+          incluye_hotel: tourData.incluye_hotel || false,
+          incluye_maleta_10: tourData.incluye_maleta_10 || false,
+          incluye_maleta_23: tourData.incluye_maleta_23 || false,
+          incluye_articulo_personal: tourData.incluye_articulo_personal || false,
         })
         .eq('id', tourId);
       
@@ -279,30 +251,6 @@ export function useTourManagement() {
         
         if (preciosError) throw preciosError;
       }
-      
-      // Update included components
-      const { error: deleteComponentesError } = await supabase
-        .from('componentes_incluidos')
-        .delete()
-        .eq('tour_id', tourId);
-      
-      if (deleteComponentesError) throw deleteComponentesError;
-      
-      const { error: componentesError } = await supabase
-        .from('componentes_incluidos')
-        .insert([{
-          tour_id: tourId,
-          incluye_vuelo: componentes.incluye_vuelo,
-          incluye_hotel: componentes.incluye_hotel,
-          incluye_transporte: componentes.incluye_transporte,
-          incluye_comida: componentes.incluye_comida,
-          incluye_actividades: componentes.incluye_actividades,
-          incluye_maleta_10: componentes.incluye_maleta_10,
-          incluye_maleta_23: componentes.incluye_maleta_23,
-          incluye_articulo_personal: componentes.incluye_articulo_personal,
-        }]);
-      
-      if (componentesError) throw componentesError;
       
       // Update gifts (delete all and re-insert)
       const { error: deleteRegalosError } = await supabase

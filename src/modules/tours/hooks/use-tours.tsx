@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tour, TourFilterParams } from '@/modules/tours/types';
@@ -37,8 +38,7 @@ export const useTours = (filters?: TourFilterParams) => {
               tipo_habitacion,
               forma_pago,
               precio
-            ),
-            componentes_incluidos(*)
+            )
           `)
           .order('id', { ascending: false });
 
@@ -51,7 +51,7 @@ export const useTours = (filters?: TourFilterParams) => {
           
           // Filter by flight inclusion
           if (filters.incluye_vuelo !== undefined) {
-            query = query.eq('incluye_boleto_aereo', filters.incluye_vuelo);
+            query = query.eq('incluye_vuelo', filters.incluye_vuelo);
           }
           
           // Filter by maximum price will be done on the client side after fetching

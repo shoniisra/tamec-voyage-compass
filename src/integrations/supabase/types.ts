@@ -201,53 +201,6 @@ export type Database = {
         }
         Relationships: []
       }
-      componentes_incluidos: {
-        Row: {
-          id: number
-          incluye_actividades: boolean | null
-          incluye_articulo_personal: boolean | null
-          incluye_comida: boolean | null
-          incluye_hotel: boolean | null
-          incluye_maleta_10: boolean | null
-          incluye_maleta_23: boolean | null
-          incluye_transporte: boolean | null
-          incluye_vuelo: boolean | null
-          tour_id: number | null
-        }
-        Insert: {
-          id?: number
-          incluye_actividades?: boolean | null
-          incluye_articulo_personal?: boolean | null
-          incluye_comida?: boolean | null
-          incluye_hotel?: boolean | null
-          incluye_maleta_10?: boolean | null
-          incluye_maleta_23?: boolean | null
-          incluye_transporte?: boolean | null
-          incluye_vuelo?: boolean | null
-          tour_id?: number | null
-        }
-        Update: {
-          id?: number
-          incluye_actividades?: boolean | null
-          incluye_articulo_personal?: boolean | null
-          incluye_comida?: boolean | null
-          incluye_hotel?: boolean | null
-          incluye_maleta_10?: boolean | null
-          incluye_maleta_23?: boolean | null
-          incluye_transporte?: boolean | null
-          incluye_vuelo?: boolean | null
-          tour_id?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "componentes_incluidos_tour_id_fkey"
-            columns: ["tour_id"]
-            isOneToOne: true
-            referencedRelation: "tours"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       destinos: {
         Row: {
           ciudad: string | null
@@ -584,9 +537,13 @@ export type Database = {
           fecha_publicacion: string | null
           id: number
           incluye_actividades: boolean | null
+          incluye_articulo_personal: boolean | null
           incluye_boleto_aereo: boolean | null
           incluye_comida: boolean | null
           incluye_hospedaje: boolean | null
+          incluye_hotel: boolean | null
+          incluye_maleta_10: boolean | null
+          incluye_maleta_23: boolean | null
           incluye_transporte: boolean | null
           incluye_vuelo: boolean | null
           pdf_detalles_url: string | null
@@ -605,9 +562,13 @@ export type Database = {
           fecha_publicacion?: string | null
           id?: number
           incluye_actividades?: boolean | null
+          incluye_articulo_personal?: boolean | null
           incluye_boleto_aereo?: boolean | null
           incluye_comida?: boolean | null
           incluye_hospedaje?: boolean | null
+          incluye_hotel?: boolean | null
+          incluye_maleta_10?: boolean | null
+          incluye_maleta_23?: boolean | null
           incluye_transporte?: boolean | null
           incluye_vuelo?: boolean | null
           pdf_detalles_url?: string | null
@@ -626,9 +587,13 @@ export type Database = {
           fecha_publicacion?: string | null
           id?: number
           incluye_actividades?: boolean | null
+          incluye_articulo_personal?: boolean | null
           incluye_boleto_aereo?: boolean | null
           incluye_comida?: boolean | null
           incluye_hospedaje?: boolean | null
+          incluye_hotel?: boolean | null
+          incluye_maleta_10?: boolean | null
+          incluye_maleta_23?: boolean | null
           incluye_transporte?: boolean | null
           incluye_vuelo?: boolean | null
           pdf_detalles_url?: string | null

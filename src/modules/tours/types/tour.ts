@@ -41,15 +41,19 @@ export interface Tour {
   regalos?: Regalo[];
   incluye?: Incluye[];
   salidas?: Salida[];
-  componentes?: ComponentesIncluidos;
-  // Add missing properties that are used in the code
-  fotos?: Foto[];
-  precio_desde?: number;
+  // Direct properties that were previously in 'componentes'
   incluye_vuelo?: boolean;
+  incluye_hotel?: boolean;
   incluye_transporte?: boolean;
   incluye_hospedaje?: boolean;
   incluye_comida?: boolean; 
   incluye_actividades?: boolean;
+  incluye_maleta_10?: boolean;
+  incluye_maleta_23?: boolean;
+  incluye_articulo_personal?: boolean;
+  // Add missing properties that are used in the code
+  fotos?: Foto[];
+  precio_desde?: number;
 }
 
 export interface Foto {
@@ -108,15 +112,4 @@ export interface Precio {
   precio: number;
 }
 
-export interface ComponentesIncluidos {
-  id: number;
-  tour_id: number;
-  incluye_vuelo: boolean;
-  incluye_hotel: boolean;
-  incluye_transporte: boolean;
-  incluye_comida: boolean;
-  incluye_actividades: boolean;
-  incluye_maleta_10: boolean;
-  incluye_maleta_23: boolean;
-  incluye_articulo_personal: boolean;
-}
+// Removing ComponentesIncluidos interface as it's no longer needed
