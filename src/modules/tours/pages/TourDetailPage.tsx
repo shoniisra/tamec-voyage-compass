@@ -1,184 +1,193 @@
 
-import React from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
-import { useTour } from '@/modules/tours/hooks/use-tour';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Briefcase,
-  Calendar,
-  Clock,
-  FileText,
-  Globe,
-  Image,
-  MapPin,
-  Package,
-  Plane,
-  Utensils,
-  Bed,
-  Bus,
-  CheckCircle2,
-  XCircle,
-  Download,
-  AlertCircle,
-  PlaneTakeoff,
-  ArrowLeft
-} from 'lucide-react';
-import { Tour } from '../types';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTour } from '../hooks/use-tour';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TourHead from '@/components/seo/TourHead';
 import TourStructuredData from '@/components/seo/TourStructuredData';
+import {
+  MapPin,
+  Calendar,
+  Clock,
+  Users,
+  Plane,
+  Hotel,
+  Bus,
+  Utensils,
+  Sun,
+  Briefcase,
+  File,
+  FileText,
+  Info,
+  Download,
+  Star
+} from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
-// Default props interface
-interface TourDetailPageProps {
-  slug?: string;
-}
-
-const TourDetailPage: React.FC<TourDetailPageProps> = ({ slug: propSlug }) => {
-  // If slug was not passed as prop, try to get it from URL params
-  const { slug: paramSlug } = useParams<{ slug?: string }>();
-  const slug = propSlug || paramSlug || '';
-  const { tour, loading, error } = useTour(slug);
+const TourDetailPage = () => {
+  const { slug } = useParams<{ slug: string }>();
   const { language } = useLanguage();
-
-  // Format price to show cents only if needed
-  const formatPrice = (price: number) => {
-    return price % 1 === 0
-      ? `$${price.toFixed(0)}`
-      : `$${price.toFixed(2)}`;
-  };
-
-  // Tour details loader skeleton
+  const { tour, loading, error } = useTour(slug || '');
+  const [activeTab, setActiveTab] = useState('details');
+  
   if (loading) {
     return (
       <Layout>
-        <div className="container mx-auto max-w-7xl px-4 py-8">
-          <Skeleton className="h-96 w-full rounded-xl mb-8" />
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
-              <Skeleton className="h-12 w-3/4 mb-4" />
-              <Skeleton className="h-6 w-full mb-2" />
-              <Skeleton className="h-6 w-full mb-2" />
-              <Skeleton className="h-6 w-2/3 mb-6" />
-              <Skeleton className="h-10 w-48 mb-8" />
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-                {[...Array(6)].map((_, i) => (
-                  <Skeleton key={i} className="h-24 w-full rounded-lg" />
-                ))}
+        <div className="container mx-auto px-4 py-8">
+          {/* Skeleton Hero */}
+          <div className="w-full h-96 bg-gray-200 dark:bg-gray-800 rounded-xl mb-8 animate-pulse" />
+          
+          {/* Skeleton Content */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="md:col-span-2 space-y-6">
+              <Skeleton className="h-10 w-3/4" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-2/3" />
+              
+              <div className="flex gap-2 mt-4">
+                <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-8 w-24" />
               </div>
             </div>
-            <div className="lg:col-span-1">
-              <Skeleton className="h-72 w-full rounded-lg mb-4" />
-              <Skeleton className="h-12 w-full mb-4" />
+            
+            <div>
+              <Skeleton className="h-64 w-full" />
             </div>
           </div>
         </div>
       </Layout>
     );
   }
-
-  // Error state
+  
   if (error || !tour) {
     return (
       <Layout>
-        <div className="container mx-auto max-w-7xl px-4 py-16 text-center">
-        
-          <AlertCircle className="h-16 w-16 text-destructive mx-auto mb-4" />
-          <h1 className="text-2xl font-bold mb-4">
-            {language === 'en' ? 'Tour Not Found' : 'Tour No Encontrado'}
-          </h1>
-          <p className="text-muted-foreground mb-8">
-            {language === 'en'
-              ? 'The tour you are looking for does not exist or has been removed.'
-              : 'El tour que estás buscando no existe o ha sido eliminado.'}
-          </p>
-          <Button className="mb-4">
-                <Link to="/destinations">
-                  {language === 'en' ? 'Back to All Tours' : 'Volver a Todos los Tours'}
-                </Link>
-          </Button>
+        <div className="container mx-auto px-4 py-8">
+          <Card className="w-full max-w-2xl mx-auto">
+            <CardContent className="flex flex-col items-center p-6 text-center">
+              <Info className="h-12 w-12 text-muted-foreground mb-4" />
+              <h1 className="text-2xl font-bold mb-2">
+                {language === 'en' ? 'Tour Not Found' : 'Tour No Encontrado'}
+              </h1>
+              <p className="text-muted-foreground mb-6">
+                {language === 'en'
+                  ? 'The tour you are looking for does not exist or is no longer available.'
+                  : 'El tour que estás buscando no existe o ya no está disponible.'}
+              </p>
+              <Button asChild>
+                <a href="/destinations">
+                  {language === 'en' ? 'View All Tours' : 'Ver Todos los Tours'}
+                </a>
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </Layout>
     );
   }
 
-  // Find main destination
-  const mainDestination = tour.destinos?.length
-    ? tour.destinos.find(d => d.orden === 1)?.destino || tour.destinos[0].destino
-    : null;
-
+  // Create a canonicalUrl for SEO components
+  const canonicalUrl = `https://tamecviajes.com/${language}/destinations/${slug}`;
+  
+  // Get main destination
+  const mainDestination = tour.destinos?.[0]?.destino;
+  
+  // Get hero image
+  const heroImage = tour.fotos?.find(foto => foto.orden === 1)?.url_imagen || tour.fotos?.[0]?.url_imagen;
+  
+  // Handle tour dates
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat(language === 'en' ? 'en-US' : 'es-EC', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }).format(date);
+  };
+  
   return (
     <Layout>
-      {/* Add SEO metadata */}
-      <TourHead tour={tour} /> {/*todo: add canonical url*/} 
-      <TourStructuredData tour={tour} /> {/*todo: add canonical url*/} 
-
+      {/* SEO Components */}
+      <TourHead tour={tour} canonicalUrl={canonicalUrl} />
+      <TourStructuredData tour={tour} canonicalUrl={canonicalUrl} />
+      
       {/* Hero Section */}
-      <div className="relative w-full h-[40vh] md:h-[50vh] overflow-hidden">
-        {tour.fotos && tour.fotos.length > 0 ? (
+      <div className="relative h-[50vh] min-h-[400px] bg-gray-900">
+        {heroImage ? (
           <img
-            src={tour.fotos[0].url_imagen}
+            src={heroImage}
             alt={tour.titulo}
-            className="w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover opacity-70"
           />
         ) : (
-          <div className="w-full h-full bg-muted flex items-center justify-center">
-            <Package className="h-16 w-16 text-muted-foreground opacity-50" />
-          </div>
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-800 to-purple-800" />
         )}
-       
-        <div className="absolute  inset-0  bg-gradient-to-t from-black/70 to-transparent flex items-end">  
-        <Button asChild variant="ghost" className="mb-4 absolute top-0">
-            <Link to="/destinations">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {language === 'en' ? 'Back' : 'Volver'}
-            </Link>
-          </Button>      
-          <div className="container mx-auto px-4 pb-8 md:pb-12">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
-              {tour.titulo}
-            </h1>
-            {mainDestination && (
-              <div className="flex items-center text-white/90 mb-4">
-                <MapPin className="h-4 w-4 mr-1" />
-                <span>
-                  {mainDestination.ciudad || ''} {mainDestination.ciudad && mainDestination.pais && ','}{' '}
-                  {mainDestination.pais}
-                </span>
-              </div>
-            )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+        
+        <div className="container mx-auto px-4 relative h-full flex flex-col justify-end pb-12">
+          <div className="max-w-3xl text-white">
+            <div className="flex items-center mb-2">
+              <MapPin className="h-5 w-5 text-tamec-400 mr-2" />
+              <span className="text-tamec-400 font-semibold">
+                {mainDestination?.nombre || tour.destino_principal || 'Tour'}
+              </span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">{tour.titulo}</h1>
+            
+            <div className="flex flex-wrap items-center gap-4 text-sm">
+              {tour.dias_duracion && (
+                <div className="flex items-center">
+                  <Clock className="h-4 w-4 mr-1" />
+                  <span>
+                    {tour.dias_duracion}{' '}
+                    {language === 'en' 
+                      ? `day${tour.dias_duracion > 1 ? 's' : ''}` 
+                      : `día${tour.dias_duracion > 1 ? 's' : ''}`}
+                  </span>
+                </div>
+              )}
+              
+              {tour.aerolinea && (
+                <div className="flex items-center">
+                  <Plane className="h-4 w-4 mr-1" />
+                  <span>{tour.aerolinea.nombre}</span>
+                </div>
+              )}
+              
+              {tour.precio_desde && (
+                <div className="bg-tamec-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                  {language === 'en' ? 'From ' : 'Desde '}
+                  ${tour.precio_desde.toLocaleString()}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
-
+      
       {/* Main Content */}
-      <div className="container mx-auto max-w-7xl px-4 py-8">
-        <div className="max-w-5xl">
-            <Button asChild variant="ghost" className="mb-4">
-              <Link to="/destinations">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                {language === 'en' ? 'Back to All Tours' : 'Volver a Todos los Tours'}
-              </Link>
-            </Button>
-        </div>
+      <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column: Tour Details */}
+          {/* Left Column - Tour Details */}
           <div className="lg:col-span-2">
-            <Tabs defaultValue="details" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="mb-6">
                 <TabsTrigger value="details">
-                  <FileText className="h-4 w-4 mr-2" />
+                  <Info className="h-4 w-4 mr-2" />
                   {language === 'en' ? 'Details' : 'Detalles'}
                 </TabsTrigger>
                 <TabsTrigger value="itinerary">
-                  <Globe className="h-4 w-4 mr-2" />
+                  <Clock className="h-4 w-4 mr-2" />
                   {language === 'en' ? 'Itinerary' : 'Itinerario'}
                 </TabsTrigger>
                 <TabsTrigger value="gallery">
-                  <Image className="h-4 w-4 mr-2" />
+                  <Sun className="h-4 w-4 mr-2" />
                   {language === 'en' ? 'Gallery' : 'Galería'}
                 </TabsTrigger>
                 <TabsTrigger value="documents">
@@ -186,583 +195,427 @@ const TourDetailPage: React.FC<TourDetailPageProps> = ({ slug: propSlug }) => {
                   {language === 'en' ? 'Documents' : 'Documentos'}
                 </TabsTrigger>
               </TabsList>
-
-              {/* Details Tab */}
-              <TabsContent value="details" className="space-y-6">
-                {tour.descripcion && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>
-                        {language === 'en' ? 'Description' : 'Descripción'}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground whitespace-pre-line">
-                        {tour.descripcion}
+              
+              <TabsContent value="details" className="space-y-8">
+                {/* Tour Description */}
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-bold">
+                    {language === 'en' ? 'Tour Description' : 'Descripción del Tour'}
+                  </h2>
+                  <div className="prose prose-lg max-w-none dark:prose-invert">
+                    {tour.descripcion ? (
+                      <p>{tour.descripcion}</p>
+                    ) : (
+                      <p className="text-muted-foreground">
+                        {language === 'en' ? 'No description available.' : 'No hay descripción disponible.'}
                       </p>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Tour Basic Information */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>
-                      {language === 'en' ? 'Tour Information' : 'Información del Tour'}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {tour.dias_duracion && (
-                        <div className="flex items-center">
-                          <Clock className="h-5 w-5 mr-2 text-primary" />
-                          <div>
-                            <p className="text-sm font-medium">
-                              {language === 'en' ? 'Duration' : 'Duración'}
-                            </p>
-                            <p className="text-muted-foreground">
-                              {tour.dias_duracion}{' '}
-                              {language === 'en'
-                                ? `day${tour.dias_duracion > 1 ? 's' : ''}`
-                                : `día${tour.dias_duracion > 1 ? 's' : ''}`}
-                            </p>
-                          </div>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Includes Section */}
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-bold">
+                    {language === 'en' ? 'What\'s Included' : '¿Qué Incluye?'}
+                  </h2>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {tour.incluye_vuelo && (
+                      <div className="flex items-start">
+                        <div className="flex items-center justify-center rounded-full bg-primary/10 p-2 mr-3">
+                          <Plane className="h-5 w-5 text-primary" />
                         </div>
-                      )}
-
-                      {tour.aerolinea?.nombre && (
-                        <div className="flex items-center">
-                          <Plane className="h-5 w-5 mr-2 text-primary" />
-                          <div>
-                            <p className="text-sm font-medium">
-                              {language === 'en' ? 'Airline' : 'Aerolínea'}
-                            </p>
-                            <p className="text-muted-foreground">{tour.aerolinea.nombre}</p>
-                          </div>
+                        <div>
+                          <h3 className="font-semibold">
+                            {language === 'en' ? 'Flight' : 'Vuelo'}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            {tour.aerolinea?.nombre || 
+                              (language === 'en' ? 'Included' : 'Incluido')}
+                          </p>
                         </div>
-                      )}
-
-                      {tour.destinos && tour.destinos.length > 0 && (
-                        <div className="flex items-center">
-                          <MapPin className="h-5 w-5 mr-2 text-primary" />
-                          <div>
-                            <p className="text-sm font-medium">
-                              {language === 'en' ? 'Destinations' : 'Destinos'}
-                            </p>
-                            <p className="text-muted-foreground">
-                              {tour.destinos.length}{' '}
-                              {language === 'en'
-                                ? `destination${tour.destinos.length > 1 ? 's' : ''}`
-                                : `destino${tour.destinos.length > 1 ? 's' : ''}`}
-                            </p>
-                          </div>
+                      </div>
+                    )}
+                    
+                    {tour.incluye_hotel && (
+                      <div className="flex items-start">
+                        <div className="flex items-center justify-center rounded-full bg-primary/10 p-2 mr-3">
+                          <Hotel className="h-5 w-5 text-primary" />
                         </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* What's Included */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>
-                      {language === 'en' ? 'What\'s Included' : '¿Qué Incluye?'}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      <div className="flex items-center">
-                        {tour.incluye_vuelo || tour.incluye_boleto_aereo ? (
-                          <CheckCircle2 className="h-5 w-5 mr-2 text-green-500" />
-                        ) : (
-                          <XCircle className="h-5 w-5 mr-2 text-destructive" />
-                        )}
-                        <span>
-                          {language === 'en' ? 'Flights' : 'Vuelos'}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center">
-                        {tour.incluye_hospedaje || tour.incluye_hotel ? (
-                          <CheckCircle2 className="h-5 w-5 mr-2 text-green-500" />
-                        ) : (
-                          <XCircle className="h-5 w-5 mr-2 text-destructive" />
-                        )}
-                        <span>
-                          {language === 'en' ? 'Accommodation' : 'Hospedaje'}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center">
-                        {tour.incluye_comida ? (
-                          <CheckCircle2 className="h-5 w-5 mr-2 text-green-500" />
-                        ) : (
-                          <XCircle className="h-5 w-5 mr-2 text-destructive" />
-                        )}
-                        <span>
-                          {language === 'en' ? 'Meals' : 'Comidas'}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center">
-                        {tour.incluye_transporte ? (
-                          <CheckCircle2 className="h-5 w-5 mr-2 text-green-500" />
-                        ) : (
-                          <XCircle className="h-5 w-5 mr-2 text-destructive" />
-                        )}
-                        <span>
-                          {language === 'en' ? 'Transportation' : 'Transporte'}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center">
-                        {tour.incluye_actividades ? (
-                          <CheckCircle2 className="h-5 w-5 mr-2 text-green-500" />
-                        ) : (
-                          <XCircle className="h-5 w-5 mr-2 text-destructive" />
-                        )}
-                        <span>
-                          {language === 'en' ? 'Activities' : 'Actividades'}
-                        </span>
-                      </div>
-
-                      {(tour.incluye_maleta_10 || tour.incluye_maleta_23) && (
-                        <div className="flex items-center">
-                          <CheckCircle2 className="h-5 w-5 mr-2 text-green-500" />
-                          <span>
-                            {language === 'en' ? 'Luggage' : 'Equipaje'} 
-                            {tour.incluye_maleta_23 ? ' (23kg)' : ''} 
-                            {tour.incluye_maleta_10 ? ' (10kg)' : ''}
-                          </span>
+                        <div>
+                          <h3 className="font-semibold">
+                            {language === 'en' ? 'Hotel' : 'Hotel'}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            {language === 'en' ? 'Included' : 'Incluido'}
+                          </p>
                         </div>
-                      )}
-
-                      {tour.incluye_articulo_personal && (
-                        <div className="flex items-center">
-                          <CheckCircle2 className="h-5 w-5 mr-2 text-green-500" />
-                          <span>
-                            {language === 'en' ? 'Personal Item' : 'Artículo Personal'}
-                          </span>
+                      </div>
+                    )}
+                    
+                    {tour.incluye_transporte && (
+                      <div className="flex items-start">
+                        <div className="flex items-center justify-center rounded-full bg-primary/10 p-2 mr-3">
+                          <Bus className="h-5 w-5 text-primary" />
                         </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-
+                        <div>
+                          <h3 className="font-semibold">
+                            {language === 'en' ? 'Transport' : 'Transporte'}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            {language === 'en' ? 'Included' : 'Incluido'}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {tour.incluye_comida && (
+                      <div className="flex items-start">
+                        <div className="flex items-center justify-center rounded-full bg-primary/10 p-2 mr-3">
+                          <Utensils className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold">
+                            {language === 'en' ? 'Meals' : 'Comidas'}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            {language === 'en' ? 'Included' : 'Incluido'}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {tour.incluye_actividades && (
+                      <div className="flex items-start">
+                        <div className="flex items-center justify-center rounded-full bg-primary/10 p-2 mr-3">
+                          <Sun className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold">
+                            {language === 'en' ? 'Activities' : 'Actividades'}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            {language === 'en' ? 'Included' : 'Incluido'}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {tour.incluye_maleta_23 && (
+                      <div className="flex items-start">
+                        <div className="flex items-center justify-center rounded-full bg-primary/10 p-2 mr-3">
+                          <Briefcase className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold">
+                            {language === 'en' ? '23kg Luggage' : 'Maleta 23kg'}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            {language === 'en' ? 'Included' : 'Incluido'}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {tour.incluye_maleta_10 && (
+                      <div className="flex items-start">
+                        <div className="flex items-center justify-center rounded-full bg-primary/10 p-2 mr-3">
+                          <Briefcase className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold">
+                            {language === 'en' ? '10kg Luggage' : 'Maleta 10kg'}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            {language === 'en' ? 'Included' : 'Incluido'}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
                 {/* Activities */}
                 {tour.actividades && tour.actividades.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>
-                        {language === 'en' ? 'Activities' : 'Actividades'}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-2">
-                        {tour.actividades.map((actividad) => (
-                          <li key={actividad.id} className="flex items-start">
-                            {actividad.incluida ? (
-                              <CheckCircle2 className="h-5 w-5 mr-2 text-green-500 mt-0.5" />
-                            ) : (
-                              <AlertCircle className="h-5 w-5 mr-2 text-amber-500 mt-0.5" />
-                            )}
-                            <div>
-                              <p className="font-medium">{actividad.nombre}</p>
-                              {actividad.descripcion && (
-                                <p className="text-sm text-muted-foreground">
-                                  {actividad.descripcion}
-                                </p>
-                              )}
-                              {actividad.costo_adicional && !actividad.incluida && (
-                                <p className="text-sm font-medium text-primary">
-                                  {language === 'en' 
-                                    ? `Additional cost: ${formatPrice(actividad.costo_adicional)}`
-                                    : `Costo adicional: ${formatPrice(actividad.costo_adicional)}`}
-                                </p>
+                  <div className="space-y-4">
+                    <h2 className="text-2xl font-bold">
+                      {language === 'en' ? 'Activities' : 'Actividades'}
+                    </h2>
+                    
+                    <div className="space-y-4">
+                      {tour.actividades.map((actividad) => (
+                        <Card key={actividad.id}>
+                          <CardContent className="p-4">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h3 className="font-semibold text-lg">{actividad.nombre}</h3>
+                                {actividad.descripcion && (
+                                  <p className="text-sm text-muted-foreground mt-1">
+                                    {actividad.descripcion}
+                                  </p>
+                                )}
+                              </div>
+                              {actividad.costo_adicional !== undefined && actividad.costo_adicional > 0 && (
+                                <div className="bg-muted px-3 py-1 rounded text-sm">
+                                  {language === 'en' ? 'Extra ' : 'Extra '}
+                                  ${actividad.costo_adicional.toLocaleString()}
+                                </div>
                               )}
                             </div>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
                 )}
-
+                
                 {/* Terms and Conditions */}
                 {tour.terminos_condiciones && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>
-                        {language === 'en' 
-                          ? 'Terms & Conditions' 
-                          : 'Términos y Condiciones'}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="prose max-w-none dark:prose-invert">
-                        <div className="whitespace-pre-line text-muted-foreground">
-                          {tour.terminos_condiciones}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <div className="space-y-4">
+                    <h2 className="text-2xl font-bold">
+                      {language === 'en' ? 'Terms and Conditions' : 'Términos y Condiciones'}
+                    </h2>
+                    <div className="prose prose-lg max-w-none dark:prose-invert">
+                      <p>{tour.terminos_condiciones}</p>
+                    </div>
+                  </div>
                 )}
-
+                
                 {/* Cancellation Policy */}
                 {tour.politicas_cancelacion && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>
-                        {language === 'en' 
-                          ? 'Cancellation Policy' 
-                          : 'Política de Cancelación'}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="prose max-w-none dark:prose-invert">
-                        <div className="whitespace-pre-line text-muted-foreground">
-                          {tour.politicas_cancelacion}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Courtesy Items */}
-                {tour.coortesias && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>
-                        {language === 'en' ? 'Courtesy Items' : 'Cortesías'}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="prose max-w-none dark:prose-invert">
-                        <div className="whitespace-pre-line text-muted-foreground">
-                          {tour.coortesias}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <div className="space-y-4">
+                    <h2 className="text-2xl font-bold">
+                      {language === 'en' ? 'Cancellation Policy' : 'Políticas de Cancelación'}
+                    </h2>
+                    <div className="prose prose-lg max-w-none dark:prose-invert">
+                      <p>{tour.politicas_cancelacion}</p>
+                    </div>
+                  </div>
                 )}
               </TabsContent>
-
-              {/* Itinerary Tab */}
-              <TabsContent value="itinerary" className="space-y-6">
-                {tour.destinos && tour.destinos.length > 0 ? (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>
-                        {language === 'en' ? 'Destination Itinerary' : 'Itinerario de Destinos'}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-6">
-                        {/* Sort destinations by order field and map them */}
-                        {[...tour.destinos]
-                          .sort((a, b) => (a.orden || 0) - (b.orden || 0))
-                          .map((tourDestino) => (
-                            <div 
-                              key={tourDestino.id} 
-                              className="flex items-start border-b border-border last:border-0 pb-4 last:pb-0"
-                            >
-                              <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
-                                <span className="font-medium text-primary">
-                                  {tourDestino.orden || '-'}
-                                </span>
-                              </div>
-                              <div className="flex-1">
-                                <h3 className="text-lg font-medium">
-                                  {tourDestino.destino?.nombre || 
-                                    (language === 'en' ? 'Unknown Destination' : 'Destino Desconocido')}
-                                </h3>
-                                <p className="text-muted-foreground">
-                                  {tourDestino.destino?.ciudad || ''} 
-                                  {tourDestino.destino?.ciudad && tourDestino.destino?.pais ? ', ' : ''} 
-                                  {tourDestino.destino?.pais || ''}
-                                </p>
-                                {tourDestino.destino?.descripcion && (
-                                  <p className="mt-2 text-sm text-muted-foreground">
-                                    {tourDestino.destino.descripcion}
+              
+              <TabsContent value="itinerary" className="space-y-8">
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-bold">
+                    {language === 'en' ? 'Destinations' : 'Destinos'}
+                  </h2>
+                  
+                  {tour.destinos && tour.destinos.length > 0 ? (
+                    <div className="space-y-4">
+                      {tour.destinos
+                        .sort((a, b) => a.orden - b.orden)
+                        .map((tourDestino, index) => (
+                          <Card key={tourDestino.id}>
+                            <CardContent className="p-4">
+                              <div className="flex items-start gap-4">
+                                <div className="flex items-center justify-center rounded-full bg-primary/10 h-10 w-10 p-2 shrink-0">
+                                  <span className="font-semibold">{index + 1}</span>
+                                </div>
+                                <div>
+                                  <h3 className="font-semibold text-lg">
+                                    {tourDestino.destino?.nombre}
+                                  </h3>
+                                  <p className="text-sm text-muted-foreground">
+                                    {tourDestino.destino?.ciudad && tourDestino.destino.pais
+                                      ? `${tourDestino.destino.ciudad}, ${tourDestino.destino.pais}`
+                                      : tourDestino.destino?.pais}
                                   </p>
-                                )}
+                                  {tourDestino.destino?.descripcion && (
+                                    <p className="mt-2">{tourDestino.destino.descripcion}</p>
+                                  )}
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground">
+                      {language === 'en' 
+                        ? 'No destination details available.' 
+                        : 'No hay detalles de destino disponibles.'}
+                    </p>
+                  )}
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="gallery" className="space-y-8">
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-bold">
+                    {language === 'en' ? 'Gallery' : 'Galería'}
+                  </h2>
+                  
+                  {tour.fotos && tour.fotos.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {tour.fotos.map((foto) => (
+                        <div key={foto.id} className="aspect-video overflow-hidden rounded-lg">
+                          <img 
+                            src={foto.url_imagen} 
+                            alt={foto.descripcion || tour.titulo}
+                            className="w-full h-full object-cover transition-transform hover:scale-105"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground">
+                      {language === 'en' ? 'No photos available.' : 'No hay fotos disponibles.'}
+                    </p>
+                  )}
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="documents" className="space-y-8">
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-bold">
+                    {language === 'en' ? 'Documents' : 'Documentos'}
+                  </h2>
+                  
+                  {tour.adjuntos && tour.adjuntos.length > 0 ? (
+                    <div className="space-y-4">
+                      {tour.adjuntos.map((adjunto) => (
+                        <Card key={adjunto.id}>
+                          <CardContent className="p-4 flex justify-between items-center">
+                            <div className="flex items-center">
+                              <File className="h-6 w-6 text-primary mr-3" />
+                              <div>
+                                <p className="font-medium">
+                                  {adjunto.descripcion || language === 'en' ? 'Document' : 'Documento'}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  {adjunto.tipo_archivo || ''}
+                                </p>
                               </div>
                             </div>
-                          ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  <Card className="text-center py-12">
-                    <CardContent>
-                      <Globe className="h-12 w-12 mx-auto text-muted-foreground opacity-50 mb-4" />
-                      <p className="text-muted-foreground">
-                        {language === 'en' 
-                          ? 'No itinerary information available for this tour.' 
-                          : 'No hay información de itinerario disponible para este tour.'}
-                      </p>
-                    </CardContent>
-                  </Card>
-                )}
-              </TabsContent>
-
-              {/* Gallery Tab */}
-              <TabsContent value="gallery">
-                {tour.fotos && tour.fotos.length > 0 ? (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {tour.fotos.map((foto) => (
-                      <div 
-                        key={foto.id} 
-                        className="relative aspect-square rounded-md overflow-hidden bg-muted"
-                      >
-                        <img
-                          src={foto.url_imagen}
-                          alt={foto.descripcion || tour.titulo}
-                          className="w-full h-full object-cover transition-transform hover:scale-105"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <Card className="text-center py-12">
-                    <CardContent>
-                      <Image className="h-12 w-12 mx-auto text-muted-foreground opacity-50 mb-4" />
-                      <p className="text-muted-foreground">
-                        {language === 'en'
-                          ? 'No gallery images available for this tour.'
-                          : 'No hay imágenes de galería disponibles para este tour.'}
-                      </p>
-                    </CardContent>
-                  </Card>
-                )}
-              </TabsContent>
-
-              {/* Documents Tab */}
-              <TabsContent value="documents">
-                {(tour.adjuntos && tour.adjuntos.length > 0) || tour.pdf_detalles_url ? (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>
-                        {language === 'en' ? 'Documents' : 'Documentos'}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-2">
-                        {tour.pdf_detalles_url && (
-                          <li>
-                            <a 
-                              href={tour.pdf_detalles_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center p-3 border border-border rounded-md hover:bg-muted transition-colors"
-                            >
-                              <FileText className="h-5 w-5 mr-3 text-primary" />
-                              <div className="flex-1">
-                                <p className="font-medium">
-                                  {language === 'en' ? 'Tour Details PDF' : 'PDF de Detalles del Tour'}
-                                </p>
-                              </div>
-                              <Download className="h-4 w-4 text-muted-foreground" />
+                            <Button variant="outline" size="sm" asChild>
+                              <a href={adjunto.url_archivo} target="_blank" rel="noopener noreferrer">
+                                <Download className="h-4 w-4 mr-2" />
+                                {language === 'en' ? 'Download' : 'Descargar'}
+                              </a>
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground">
+                      {language === 'en' ? 'No documents available.' : 'No hay documentos disponibles.'}
+                    </p>
+                  )}
+                  
+                  {/* PDF Details */}
+                  {tour.pdf_detalles_url && (
+                    <div className="mt-6">
+                      <Card>
+                        <CardContent className="p-4 flex justify-between items-center">
+                          <div className="flex items-center">
+                            <FileText className="h-6 w-6 text-primary mr-3" />
+                            <div>
+                              <p className="font-medium">
+                                {language === 'en' ? 'Tour Details PDF' : 'PDF de Detalles del Tour'}
+                              </p>
+                            </div>
+                          </div>
+                          <Button variant="outline" size="sm" asChild>
+                            <a href={tour.pdf_detalles_url} target="_blank" rel="noopener noreferrer">
+                              <Download className="h-4 w-4 mr-2" />
+                              {language === 'en' ? 'Download' : 'Descargar'}
                             </a>
-                          </li>
-                        )}
-                        
-                        {tour.adjuntos && tour.adjuntos.map((adjunto) => (
-                          <li key={adjunto.id}>
-                            <a 
-                              href={adjunto.url_archivo}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center p-3 border border-border rounded-md hover:bg-muted transition-colors"
-                            >
-                              <FileText className="h-5 w-5 mr-3 text-primary" />
-                              <div className="flex-1">
-                                <p className="font-medium">
-                                  {adjunto.descripcion || (language === 'en' ? 'Document' : 'Documento')}
-                                </p>
-                                {adjunto.tipo_archivo && (
-                                  <p className="text-xs text-muted-foreground uppercase">
-                                    {adjunto.tipo_archivo}
-                                  </p>
-                                )}
-                              </div>
-                              <Download className="h-4 w-4 text-muted-foreground" />
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  <Card className="text-center py-12">
-                    <CardContent>
-                      <FileText className="h-12 w-12 mx-auto text-muted-foreground opacity-50 mb-4" />
-                      <p className="text-muted-foreground">
-                        {language === 'en'
-                          ? 'No documents available for this tour.'
-                          : 'No hay documentos disponibles para este tour.'}
-                      </p>
-                    </CardContent>
-                  </Card>
-                )}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  )}
+                </div>
               </TabsContent>
             </Tabs>
           </div>
-
-          {/* Right Column: Pricing and Booking */}
-          <div className="lg:col-span-1">
+          
+          {/* Right Column - Booking Info */}
+          <div className="space-y-6">
             {/* Price Card */}
-            <Card className="sticky top-4">
-              <CardHeader>
-                <CardTitle>
+            <Card className="bg-white dark:bg-gray-800 border border-border">
+              <CardContent className="p-6 space-y-4">
+                <h3 className="text-xl font-bold">
                   {language === 'en' ? 'Booking Information' : 'Información de Reserva'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Pricing */}
-                {tour.precios && tour.precios.length > 0 ? (
-                  <div className="space-y-4">
-                    <h3 className="font-semibold text-lg">
-                      {language === 'en' ? 'Prices' : 'Precios'}
-                    </h3>
-                    
-                    {/* Group prices by ciudad_salida */}
-                    {Object.entries(
-                      tour.precios.reduce((acc: any, precio) => {
-                        const key = precio.ciudad_salida;
-                        if (!acc[key]) acc[key] = [];
-                        acc[key].push(precio);
-                        return acc;
-                      }, {})
-                    ).map(([ciudad, precios]: [string, any[]]) => (
-                      <div key={ciudad} className="space-y-2">
-                        <h4 className="font-medium text-sm flex items-center">
-                          <PlaneTakeoff className="h-4 w-4 mr-2" />
-                          {language === 'en' ? 'From ' : 'Desde '} 
-                          {ciudad}
-                        </h4>
-                        
-                        <div className="grid grid-cols-2 gap-2 text-sm">
-                          {precios.map((precio) => (
-                            <div 
-                              key={`${precio.id}-${precio.tipo_habitacion}`} 
-                              className="bg-muted p-2 rounded-md"
-                            >
-                              <p className="font-medium">
-                                {(() => {
-                                  switch (precio.tipo_habitacion) {
-                                    case 'doble':
-                                      return language === 'en' ? 'Double Room' : 'Habitación Doble';
-                                    case 'triple':
-                                      return language === 'en' ? 'Triple Room' : 'Habitación Triple';
-                                    case 'individual':
-                                      return language === 'en' ? 'Single Room' : 'Habitación Individual';
-                                    case 'child':
-                                      return language === 'en' ? 'Child' : 'Niño';
-                                    default:
-                                      return precio.tipo_habitacion;
-                                  }
-                                })()}
-                              </p>
-                              <div className="flex justify-between items-center">
-                                <span className="text-primary text-lg font-semibold">
-                                  {formatPrice(precio.precio)}
-                                </span>
-                                <span className="text-xs text-muted-foreground">
-                                  {precio.forma_pago === 'efectivo' 
-                                    ? (language === 'en' ? 'Cash' : 'Efectivo')
-                                    : (language === 'en' ? 'Card' : 'Tarjeta')}
-                                </span>
-                              </div>
-                            </div>
-                          ))}
+                </h3>
+                
+                {/* Available Departures */}
+                {tour.salidas && tour.salidas.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold text-muted-foreground">
+                      {language === 'en' ? 'Available Departures' : 'Salidas Disponibles'}
+                    </h4>
+                    {tour.salidas.map((salida) => (
+                      <div key={salida.id} className="border rounded-md p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Calendar className="h-4 w-4 text-tamec-600" />
+                          <span className="font-medium">{formatDate(salida.fecha_salida)}</span>
+                        </div>
+                        <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+                          <div className="flex items-center">
+                            <Clock className="h-3 w-3 mr-1 text-muted-foreground" />
+                            <span>
+                              {salida.dias_duracion}{' '}
+                              {language === 'en'
+                                ? `day${salida.dias_duracion > 1 ? 's' : ''}`
+                                : `día${salida.dias_duracion > 1 ? 's' : ''}`}
+                            </span>
+                          </div>
+                          <div className="flex items-center">
+                            <Users className="h-3 w-3 mr-1 text-muted-foreground" />
+                            <span>
+                              {salida.cupos_disponibles}{' '}
+                              {language === 'en'
+                                ? 'available'
+                                : 'disponibles'}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <p className="text-muted-foreground italic">
-                    {language === 'en' 
-                      ? 'Contact us for pricing information' 
-                      : 'Contáctanos para información de precios'}
-                  </p>
                 )}
-
-                {/* Departure Dates */}
-                {tour.salidas && tour.salidas.length > 0 && (
-                  <div className="space-y-4">
-                    <h3 className="font-semibold text-lg">
-                      {language === 'en' ? 'Departure Dates' : 'Fechas de Salida'}
-                    </h3>
+                
+                {/* Prices */}
+                {tour.precios && tour.precios.length > 0 && (
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-semibold text-muted-foreground">
+                      {language === 'en' ? 'Prices' : 'Precios'}
+                    </h4>
+                    
                     <div className="space-y-2">
-                      {tour.salidas.map((salida) => (
-                        <div 
-                          key={salida.id}
-                          className="flex justify-between items-center bg-muted p-3 rounded-md"
-                        >
-                          <div className="space-y-1">
-                            <div className="flex items-center">
-                              <Calendar className="h-4 w-4 mr-2 text-primary" />
-                              <span className="font-medium">
-                                {new Date(salida.fecha_salida).toLocaleDateString(
-                                  language === 'en' ? 'en-US' : 'es-ES',
-                                  { 
-                                    year: 'numeric', 
-                                    month: 'long', 
-                                    day: 'numeric' 
-                                  }
-                                )}
-                              </span>
-                            </div>
-                            {salida.cupos_disponibles !== undefined && (
-                              <p className="text-xs text-muted-foreground">
-                                {language === 'en' ? 'Available spots: ' : 'Cupos disponibles: '}
-                                <span className="font-medium">{salida.cupos_disponibles}</span>
-                              </p>
-                            )}
-                          </div>
+                      {tour.precios.map((precio) => (
+                        <div key={precio.id} className="flex justify-between items-center">
                           <div>
-                            <span className="text-sm bg-primary/10 text-primary px-2 py-1 rounded">
-                              {salida.dias_duracion || tour.dias_duracion}{' '}
-                              {language === 'en' 
-                                ? `day${(salida.dias_duracion || tour.dias_duracion || 0) > 1 ? 's' : ''}` 
-                                : `día${(salida.dias_duracion || tour.dias_duracion || 0) > 1 ? 's' : ''}`}
-                            </span>
+                            <p className="font-medium">
+                              {precio.tipo_habitacion === 'doble' 
+                                ? language === 'en' ? 'Double Room' : 'Habitación Doble'
+                                : precio.tipo_habitacion === 'triple' 
+                                ? language === 'en' ? 'Triple Room' : 'Habitación Triple'
+                                : precio.tipo_habitacion === 'individual'
+                                ? language === 'en' ? 'Single Room' : 'Habitación Individual'
+                                : language === 'en' ? 'Child Price' : 'Precio Niño'}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {precio.forma_pago === 'efectivo' 
+                                ? language === 'en' ? 'Cash payment' : 'Pago en efectivo'
+                                : language === 'en' ? 'Card payment' : 'Pago con tarjeta'}
+                              {precio.ciudad_salida && ` - ${precio.ciudad_salida}`}
+                            </p>
                           </div>
+                          <div className="font-semibold">${precio.precio.toLocaleString()}</div>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
-
-                {/* Gifts/Rewards */}
-                {tour.regalos && tour.regalos.length > 0 && (
-                  <div className="space-y-3">
-                    <h3 className="font-semibold text-lg">
-                      {language === 'en' ? 'Gifts Included' : 'Regalos Incluidos'}
-                    </h3>
-                    <ul className="space-y-1 text-sm">
-                      {tour.regalos.map((regalo) => (
-                        <li key={regalo.id} className="flex items-center">
-                          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                          <span>{regalo.nombre}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Call to Action */}
-                <div className="pt-4">
-                  <Button className="w-full" size="lg">
-                    {language === 'en' ? 'Book Now' : 'Reservar Ahora'}
-                  </Button>
-                  <p className="text-xs text-center text-muted-foreground mt-2">
-                    {language === 'en' 
-                      ? 'Contact us for availability and booking' 
-                      : 'Contáctanos para disponibilidad y reservas'}
-                  </p>
-                </div>
+                
+                {/* Book Button */}
+                <Button className="w-full">
+                  <Star className="h-4 w-4 mr-2" />
+                  {language === 'en' ? 'Book Now' : 'Reservar Ahora'}
+                </Button>
               </CardContent>
             </Card>
           </div>

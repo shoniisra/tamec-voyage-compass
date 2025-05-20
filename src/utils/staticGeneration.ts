@@ -2,88 +2,93 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Tour, TourDestino } from '@/modules/tours/types';
 
-// Preload tour data for static generation
-export const preloadTourData = async (slug: string): Promise<Tour | null> => {
+/**
+ * Prefetches static pages for specific routes to be used with static generation
+ */
+export const prefetchStaticPages = async () => {
+  console.log('Prefetching static pages...');
+  try {
+    // Example: Prefetch tours for static tour pages
+    const { data: tours } = await supabase
+      .from('tours')
+      .select('*')
+      .eq('active', true);
+
+    if (tours) {
+      console.log(`Prefetched ${tours.length} tours`);
+      // Return data that could be used for static generation
+      return { 
+        tours,
+        paths: tours.map(tour => `/tours/${tour.slug}`)
+      };
+    }
+  } catch (error) {
+    console.error('Error prefetching static pages:', error);
+  }
+
+  return { tours: [], paths: [] };
+};
+
+/**
+ * Fetches a tour by slug
+ */
+export const getTourBySlug = async (slug: string): Promise<Tour | null> => {
   try {
     const { data, error } = await supabase
       .from('tours')
       .select(`
         *,
         aerolinea:aerolinea_id(*),
-        destinos:tour_destinos(
+        tour_destinos(
           id,
+          destino_id,
           orden,
           destino:destino_id(*)
         ),
-        fotos(*),
-        salidas(*),
-        precios(*),
-        regalos:tour_regalos(
-          regalo:regalo_id(*)
+        salidas(
+          id,
+          fecha_salida,
+          dias_duracion,
+          cupos_disponibles
+        ),
+        fotos(id, url_imagen, descripcion, orden),
+        precios(
+          id,
+          ciudad_salida,
+          tipo_habitacion,
+          forma_pago,
+          precio
         ),
         actividades(*),
         adjuntos(*)
       `)
       .eq('slug', slug)
       .single();
-      
+
     if (error) {
-      console.error('Error preloading tour data:', error);
+      console.error('Error getting tour by slug:', error);
       return null;
     }
-    
-    // Process and transform the data to match the Tour type
-    if (data) {
-      // Format destinos to match TourDestino type
-      const destinos: TourDestino[] = data.destinos?.map((item: any) => ({
-        id: item.id,
-        tour_id: data.id,
-        destino_id: item.destino.id,
-        orden: item.orden,
-        destino: item.destino
-      })) || [];
-      
-      // Return processed tour data
-      return {
-        ...data,
-        destinos
-      } as Tour;
-    }
-    
-    return null;
-  } catch (error) {
-    console.error('Error preloading tour data:', error);
-    return null;
-  }
-};
 
-// Function to prefetch data for static pages
-export const prefetchStaticPages = async (): Promise<void> => {
-  try {
-    console.log('Prefetching static pages data...');
-    
-    // Prefetch featured tours for homepage
-    const { data: featuredTours, error: featuredError } = await supabase
-      .from('tours')
-      .select('slug')
-      .limit(5);
-      
-    if (featuredError) {
-      console.error('Error prefetching featured tours:', featuredError);
-      return;
+    if (!data) {
+      return null;
     }
-    
-    // Prefetch tour data for each featured tour
-    if (featuredTours && featuredTours.length > 0) {
-      console.log(`Prefetching ${featuredTours.length} featured tours...`);
-      
-      await Promise.all(
-        featuredTours.map(tour => preloadTourData(tour.slug))
-      );
-    }
-    
-    console.log('Static pages data prefetched successfully');
+
+    // Process and transform the data
+    const transformedTour: Partial<Tour> = {
+      ...data,
+      destinos: data.tour_destinos?.map((td: any) => ({
+        id: td.id,
+        tour_id: data.id,
+        destino_id: td.destino_id,
+        orden: td.orden || 0,
+        destino: td.destino
+      })) || []
+    };
+
+    return transformedTour as Tour;
   } catch (error) {
-    console.error('Error prefetching static pages:', error);
+    console.error('Error in getTourBySlug:', error);
+    return null;
   }
 };

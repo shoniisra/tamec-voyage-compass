@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Tour, TourFilterParams, TourDestino } from '@/modules/tours/types';
+import { Tour, TourFilterParams } from '@/modules/tours/types';
 
 export const useTours = (filters?: TourFilterParams) => {
   const [tours, setTours] = useState<Tour[]>([]);
@@ -53,6 +53,11 @@ export const useTours = (filters?: TourFilterParams) => {
           if (filters.active !== undefined) {
             query = query.eq('active', filters.active === 'true');
           }
+
+          // Filter by includes flight
+          if (filters.incluye_vuelo === true) {
+            query = query.eq('incluye_vuelo', true);
+          }
         }
 
         const { data, error: supabaseError } = await query;
@@ -91,11 +96,11 @@ export const useTours = (filters?: TourFilterParams) => {
             } as Tour;
           });
 
-          // Apply client-side filtering for destination if needed
+          // Apply client-side filtering
           let filteredTours = transformedTours;
           
+          // Filter by destination
           if (filters && filters.destino && filters.destino.length > 0) {
-            // Use simple array filtering instead of complex type instantiation
             filteredTours = filteredTours.filter(tour => {
               if (!tour.destinos) return false;
               
@@ -104,6 +109,22 @@ export const useTours = (filters?: TourFilterParams) => {
                 const id = td.destino_id;
                 return id !== undefined && destinoIds.includes(id);
               });
+            });
+          }
+
+          // Filter by duration
+          if (filters && filters.duracion && filters.duracion.length > 0) {
+            filteredTours = filteredTours.filter(tour => {
+              return filters.duracion?.includes(tour.dias_duracion || 0);
+            });
+          }
+
+          // Filter by price range
+          if (filters && filters.precio_min !== undefined && filters.precio_max !== undefined) {
+            filteredTours = filteredTours.filter(tour => {
+              const precio = tour.precio_desde;
+              if (!precio) return false;
+              return precio >= (filters.precio_min || 0) && precio <= (filters.precio_max || Infinity);
             });
           }
 

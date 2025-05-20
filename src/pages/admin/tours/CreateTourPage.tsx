@@ -1,48 +1,61 @@
 
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import AdminLayout from '@/components/admin/layout/AdminLayout';
 import TourForm from '@/components/admin/tours/TourForm';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { useTourManagement } from '@/modules/tours';
-import { Tour } from '@/modules/tours';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
+import { Tour } from '@/modules/tours/types';
 
 const CreateTourPage: React.FC = () => {
   const { language } = useLanguage();
+  const { createTour } = useTourManagement();
+  const { toast } = useToast();
   const navigate = useNavigate();
-  const { createTour, isLoading } = useTourManagement();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const handleSubmit = async (tourData: Partial<Tour>) => {
+    setIsSubmitting(true);
     try {
-      const newTour = await createTour(tourData);
-      navigate(`/admin/tours/edit/${newTour.id}`);
+      const newTourId = await createTour(tourData);
+      toast({
+        title: language === 'en' ? 'Tour Created' : 'Tour Creado',
+        description: language === 'en' 
+          ? 'Tour has been created successfully' 
+          : 'El tour ha sido creado exitosamente',
+        variant: 'success',
+      });
+      navigate(`/admin/tours/edit/${newTourId}`);
     } catch (error) {
       console.error('Error creating tour:', error);
+      toast({
+        title: language === 'en' ? 'Error' : 'Error',
+        description: language === 'en' 
+          ? 'There was an error creating the tour' 
+          : 'Hubo un error creando el tour',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
   return (
     <AdminLayout>
-      <div>
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate('/admin/tours')}
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              {language === 'en' ? 'Back to Tours' : 'Volver a Tours'}
-            </Button>
-            <h1 className="text-2xl font-bold">
-              {language === 'en' ? 'Create New Tour' : 'Crear Nuevo Tour'}
-            </h1>
-          </div>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">
+            {language === 'en' ? 'Create Tour' : 'Crear Tour'}
+          </h1>
+          <p className="text-muted-foreground">
+            {language === 'en' 
+              ? 'Fill in the details to create a new tour.' 
+              : 'Complete los detalles para crear un nuevo tour.'}
+          </p>
         </div>
         
-        <TourForm onSubmit={handleSubmit} isSubmitting={isLoading} />
+        <TourForm onSubmit={handleSubmit} isSubmitting={isSubmitting} />
       </div>
     </AdminLayout>
   );

@@ -67,15 +67,6 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
     onFilterChange(filters);
   };
   
-  const handleResetFilters = () => {
-    setDuration('');
-    setDestinoId('');
-    setSearchQuery('');
-    setSelectedDestino(null);
-    
-    onFilterChange({});
-  };
-  
   const handleDestinationSelect = (destino: Destino) => {
     setSelectedDestino(destino);
     setDestinoId(destino.id.toString());
@@ -185,7 +176,8 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
                 // Apply filters immediately when duration is selected
                 onFilterChange({
                   duracion: value ? [parseInt(value)] : undefined,
-                  destino: destinoId ? [parseInt(destinoId)] : undefined
+                  destino: destinoId ? [parseInt(destinoId)] : undefined,
+                  search: searchQuery || undefined
                 });
               }}
             >
@@ -206,11 +198,8 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
           
           {/* Search Button */}
           <div className="flex items-end">
-            <div className="flex space-x-2 w-full">
-              <Button variant="outline" onClick={handleResetFilters} className="flex-1">
-                {language === 'en' ? 'Clear' : 'Limpiar'}
-              </Button>
-              <Button onClick={handleApplyFilters} className="flex-1">
+            <div className="w-full">
+              <Button onClick={handleApplyFilters} className="w-full">
                 <Search className="mr-2 h-4 w-4" />
                 {language === 'en' ? 'Search' : 'Buscar'}
               </Button>

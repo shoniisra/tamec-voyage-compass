@@ -91,6 +91,9 @@ export interface TourFilterParams {
   // Updated filter parameters
   duracion?: number[];
   destino?: number[];
+  incluye_vuelo?: boolean;
+  precio_min?: number;
+  precio_max?: number;
 }
 
 export interface Destino {
