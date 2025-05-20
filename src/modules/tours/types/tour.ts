@@ -41,6 +41,11 @@ export interface Tour {
   regalos?: Regalo[];
   incluye?: Incluye[];
   salidas?: Salida[];
+  // Add the missing properties
+  aerolinea?: Aerolinea;
+  actividades?: Actividad[];
+  adjuntos?: Adjunto[];
+  precios?: Precio[];
   // Direct properties that were previously in 'componentes'
   incluye_vuelo?: boolean;
   incluye_hotel?: boolean;
@@ -62,6 +67,23 @@ export interface Foto {
   url_imagen: string;
   descripcion?: string;
   orden?: number;
+}
+
+export interface Actividad {
+  id: number;
+  nombre: string;
+  descripcion?: string;
+  costo_adicional?: number;
+  incluida?: boolean;
+  tour_id?: number;
+}
+
+export interface Adjunto {
+  id: number;
+  url_archivo: string;
+  descripcion?: string;
+  tipo_archivo?: string;
+  tour_id?: number;
 }
 
 export interface TourFilterParams {
@@ -107,6 +129,3 @@ export interface Precio {
   forma_pago: 'efectivo' | 'tarjeta';
   precio: number;
 }
-
-// Componentes_incluidos interface has been removed as its properties were moved directly to Tour
-

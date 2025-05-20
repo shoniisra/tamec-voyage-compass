@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/admin/layout/AdminLayout';
 import TourForm from '@/components/admin/tours/TourForm';
-import { useTour } from '@/modules/tours';
+import { useTour, useTourManagement } from '@/modules/tours';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -11,8 +12,20 @@ import { Skeleton } from '@/components/ui/skeleton';
 const EditTourPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { tour, loading, error } = useTour(id || '');
+  const { updateTour, isLoading } = useTourManagement();
   const { language } = useLanguage();
   const navigate = useNavigate();
+  
+  const handleSubmit = async (tourData: any) => {
+    if (id && tour) {
+      try {
+        await updateTour(parseInt(id), tourData);
+        // Optionally show a success toast or redirect
+      } catch (error) {
+        console.error('Error updating tour:', error);
+      }
+    }
+  };
   
   if (loading) {
     return (
@@ -72,7 +85,7 @@ const EditTourPage: React.FC = () => {
           </div>
         </div>
         
-        <TourForm tour={tour} />
+        <TourForm onSubmit={handleSubmit} isSubmitting={isLoading} initialData={tour} />
       </div>
     </AdminLayout>
   );

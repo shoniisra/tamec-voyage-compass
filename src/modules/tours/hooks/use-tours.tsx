@@ -58,8 +58,6 @@ export const useTours = (filters?: TourFilterParams) => {
           if (filters.active !== undefined) {
             query = query.eq('active', filters.active === 'true');
           }
-          
-          // Filter by destination will be done through a client-side filter after fetching
         }
 
         const { data, error: supabaseError } = await query;
@@ -82,25 +80,31 @@ export const useTours = (filters?: TourFilterParams) => {
               });
             }
             
+            // Transform the destinos
+            const destinos = tour.tour_destinos?.map((td: any) => ({
+              id: td.id,
+              tour_id: tour.id,
+              destino_id: td.destino_id,
+              orden: td.orden || 0,
+              destino: td.destino
+            })) || [];
+            
             return {
               ...tour,
-              destinos: tour.tour_destinos?.map((td: any) => ({
-                ...td,
-                destino: td.destino
-              })) || [],
-              precio_desde: precioDesde !== Infinity ? precioDesde : null
-            };
+              destinos,
+              precio_desde: precioDesde !== Infinity ? precioDesde : undefined
+            } as Tour;
           });
 
-          // Apply client-side filtering
+          // Apply client-side filtering for destination if needed
           let filteredTours = transformedTours;
           
           if (filters && filters.destino && filters.destino.length > 0) {
-            filteredTours = filteredTours.filter(tour => {
-              return tour.destinos?.some(td => 
+            filteredTours = filteredTours.filter(tour => 
+              tour.destinos?.some(td => 
                 filters.destino?.includes(td.destino_id || 0)
-              );
-            });
+              )
+            );
           }
 
           setTours(filteredTours);

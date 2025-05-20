@@ -1,16 +1,27 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/admin/layout/AdminLayout';
 import TourForm from '@/components/admin/tours/TourForm';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useTours, useTour, useTourManagement, useDestinos } from '@/modules/tours';
-import { Tour, TourFilterParams } from '@/modules/tours';
+import { useTourManagement } from '@/modules/tours';
+import { Tour } from '@/modules/tours';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 
 const CreateTourPage: React.FC = () => {
   const { language } = useLanguage();
   const navigate = useNavigate();
+  const { createTour, isLoading } = useTourManagement();
+  
+  const handleSubmit = async (tourData: Partial<Tour>) => {
+    try {
+      const newTour = await createTour(tourData);
+      navigate(`/admin/tours/edit/${newTour.id}`);
+    } catch (error) {
+      console.error('Error creating tour:', error);
+    }
+  };
   
   return (
     <AdminLayout>
@@ -31,7 +42,7 @@ const CreateTourPage: React.FC = () => {
           </div>
         </div>
         
-        <TourForm />
+        <TourForm onSubmit={handleSubmit} isSubmitting={isLoading} />
       </div>
     </AdminLayout>
   );

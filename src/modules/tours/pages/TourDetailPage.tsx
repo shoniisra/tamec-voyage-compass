@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/layout/Layout';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useTour, prefetchTour } from '../hooks/use-tour';
+import { useTour } from '../hooks/use-tour';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
@@ -20,12 +20,12 @@ import {
   FileText, 
   Star, 
   Heart, 
-  Suitcase, 
+  Luggage, 
   Info 
 } from 'lucide-react';
 import TourHead from '@/components/seo/TourHead';
 import TourStructuredData from '@/components/seo/TourStructuredData';
-import { preloadTourData } from '@/utils/seoUtils';
+import { preloadTourImage } from '@/utils/seoUtils';
 import { supabase } from '@/integrations/supabase/client';
 
 const TourDetailPage: React.FC = () => {
@@ -68,7 +68,27 @@ const TourDetailPage: React.FC = () => {
               
             if (data && data.length > 0 && data[0].tours?.slug) {
               // Preload the related tour data
-              preloadTourData(data[0].tours.slug);
+              // We don't need to use prefetchTour as it's been removed
+              // Just preload the image
+              if (data[0].tours.slug) {
+                const { data: tourData } = await supabase
+                  .from('tours')
+                  .select('*')
+                  .eq('slug', data[0].tours.slug)
+                  .single();
+                  
+                if (tourData) {
+                  const { data: fotosData } = await supabase
+                    .from('fotos')
+                    .select('url_imagen')
+                    .eq('tour_id', tourData.id)
+                    .limit(1);
+                    
+                  if (fotosData && fotosData.length > 0 && fotosData[0].url_imagen) {
+                    preloadTourImage(fotosData[0].url_imagen);
+                  }
+                }
+              }
             }
           }
         } catch (error) {
@@ -358,7 +378,7 @@ const TourDetailPage: React.FC = () => {
                       {/* 23kg Luggage */}
                       <div className={`p-3 rounded-lg border ${tour.incluye_maleta_23 ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800' : 'bg-gray-50 border-gray-200 dark:bg-gray-800/50 dark:border-gray-700'}`}>
                         <div className="flex items-center">
-                          <Suitcase className={`h-5 w-5 mr-2 ${tour.incluye_maleta_23 ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}`} />
+                          <Luggage className={`h-5 w-5 mr-2 ${tour.incluye_maleta_23 ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}`} />
                           <span className={tour.incluye_maleta_23 ? 'font-medium' : 'text-gray-500'}>
                             {language === 'en' ? '23kg Luggage' : 'Maleta 23kg'}
                           </span>
@@ -368,7 +388,7 @@ const TourDetailPage: React.FC = () => {
                       {/* 10kg Luggage */}
                       <div className={`p-3 rounded-lg border ${tour.incluye_maleta_10 ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800' : 'bg-gray-50 border-gray-200 dark:bg-gray-800/50 dark:border-gray-700'}`}>
                         <div className="flex items-center">
-                          <Suitcase className={`h-5 w-5 mr-2 ${tour.incluye_maleta_10 ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}`} />
+                          <Luggage className={`h-5 w-5 mr-2 ${tour.incluye_maleta_10 ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}`} />
                           <span className={tour.incluye_maleta_10 ? 'font-medium' : 'text-gray-500'}>
                             {language === 'en' ? '10kg Luggage' : 'Maleta 10kg'}
                           </span>
@@ -378,7 +398,7 @@ const TourDetailPage: React.FC = () => {
                       {/* Personal Item */}
                       <div className={`p-3 rounded-lg border ${tour.incluye_articulo_personal ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800' : 'bg-gray-50 border-gray-200 dark:bg-gray-800/50 dark:border-gray-700'}`}>
                         <div className="flex items-center">
-                          <Suitcase className={`h-5 w-5 mr-2 ${tour.incluye_articulo_personal ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}`} />
+                          <Luggage className={`h-5 w-5 mr-2 ${tour.incluye_articulo_personal ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}`} />
                           <span className={tour.incluye_articulo_personal ? 'font-medium' : 'text-gray-500'}>
                             {language === 'en' ? 'Personal Item' : 'Artículo Personal'}
                           </span>
