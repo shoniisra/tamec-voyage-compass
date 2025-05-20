@@ -2,6 +2,8 @@ export interface Aerolinea {
   id: number;
   nombre: string;
   codigo?: string;
+  pais_origen?: string;
+  logo_url?: string;
 }
 
 export interface Regalo {

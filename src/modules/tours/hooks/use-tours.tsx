@@ -45,7 +45,8 @@ export const useTours = (filterParams: TourFilterParams = {}) => {
             // Convert to number if it's a numeric string
             const destinoIdNum = parseInt(destinoId, 10);
             if (!isNaN(destinoIdNum)) {
-              query = query.eq('tour_destinos.destino_id', destinoIdNum);
+              // Use .contains() for the JSON array of destinos
+              query = query.eq('tour_destinos.destino_id', destinoIdNum.toString());
             }
           }
         }
@@ -56,7 +57,7 @@ export const useTours = (filterParams: TourFilterParams = {}) => {
           // Convert to number if it's a numeric string
           const duracionNum = parseInt(duracionValue, 10);
           if (!isNaN(duracionNum)) {
-            query = query.eq('dias_duracion', duracionNum);
+            query = query.eq('dias_duracion', duracionNum.toString());
           }
         }
         

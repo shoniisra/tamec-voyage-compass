@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTour } from '../hooks/use-tour';
@@ -58,6 +57,9 @@ const TourDetailPage: React.FC<TourDetailPageProps> = ({ slug: propSlug }) => {
   // Get the main image
   const mainImage = tour.fotos?.length > 0 ? tour.fotos[0].url_imagen : '/placeholder.svg';
   
+  // Generate canonical URL for structured data
+  const canonicalUrl = `https://tamecviajes.com/${language === 'en' ? 'en/destinations' : 'es/destinos'}/${tour.slug || tour.id}`;
+  
   // Get first destination name
   const mainDestination = tour.destinos?.length > 0 
     ? tour.destinos.find(d => d.orden === 1)?.destino?.nombre || tour.destino_principal
@@ -83,7 +85,7 @@ const TourDetailPage: React.FC<TourDetailPageProps> = ({ slug: propSlug }) => {
         <meta property="og:image" content={mainImage} />
       </Helmet>
       
-      <TourStructuredData tour={tour} />
+      <TourStructuredData tour={tour} canonicalUrl={canonicalUrl} />
       
       {/* Hero Section */}
       <div className="relative h-[60vh] min-h-[400px] overflow-hidden bg-gray-900">
@@ -414,13 +416,7 @@ const TourDetailPage: React.FC<TourDetailPageProps> = ({ slug: propSlug }) => {
                   {language === 'en' ? 'Airline Partner' : 'Aerolínea Asociada'}
                 </h4>
                 <div className="p-4 bg-gray-50 rounded flex items-center justify-center">
-                  {tour.aerolinea.logo_url ? (
-                    <img 
-                      src={tour.aerolinea.logo_url} 
-                      alt={tour.aerolinea.nombre} 
-                      className="h-12 object-contain"
-                    />
-                  ) : (
+                  {tour.aerolinea.nombre && (
                     <span>{tour.aerolinea.nombre}</span>
                   )}
                 </div>
