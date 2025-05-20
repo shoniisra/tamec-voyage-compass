@@ -68,13 +68,9 @@ export interface TourFilterParams {
   search?: string;
   destino_id?: string;
   active?: string;
-  // Add missing properties that are used in the code
+  // Updated filter parameters
   duracion?: number[];
   destino?: number[];
-  precio_maximo?: number;
-  incluye_vuelo?: boolean;
-  fecha_inicio?: Date;
-  fecha_fin?: Date;
 }
 
 export interface Destino {
@@ -113,3 +109,4 @@ export interface Precio {
 }
 
 // Componentes_incluidos interface has been removed as its properties were moved directly to Tour
+
