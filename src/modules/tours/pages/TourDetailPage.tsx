@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { useTour } from '@/modules/tours/hooks/use-tour';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -24,7 +24,8 @@ import {
   XCircle,
   Download,
   AlertCircle,
-  PlaneTakeoff
+  PlaneTakeoff,
+  ArrowLeft
 } from 'lucide-react';
 import { Tour } from '../types';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -84,6 +85,7 @@ const TourDetailPage: React.FC<TourDetailPageProps> = ({ slug: propSlug }) => {
     return (
       <Layout>
         <div className="container mx-auto max-w-7xl px-4 py-16 text-center">
+        
           <AlertCircle className="h-16 w-16 text-destructive mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-4">
             {language === 'en' ? 'Tour Not Found' : 'Tour No Encontrado'}
@@ -93,8 +95,10 @@ const TourDetailPage: React.FC<TourDetailPageProps> = ({ slug: propSlug }) => {
               ? 'The tour you are looking for does not exist or has been removed.'
               : 'El tour que estás buscando no existe o ha sido eliminado.'}
           </p>
-          <Button href="/destinations">
-            {language === 'en' ? 'View All Tours' : 'Ver Todos Los Tours'}
+          <Button className="mb-4">
+                <Link to="/destinations">
+                  {language === 'en' ? 'Back to All Tours' : 'Volver a Todos los Tours'}
+                </Link>
           </Button>
         </div>
       </Layout>
@@ -109,8 +113,8 @@ const TourDetailPage: React.FC<TourDetailPageProps> = ({ slug: propSlug }) => {
   return (
     <Layout>
       {/* Add SEO metadata */}
-      <TourHead tour={tour} />
-      <TourStructuredData tour={tour} />
+      <TourHead tour={tour} /> {/*todo: add canonical url*/} 
+      <TourStructuredData tour={tour} /> {/*todo: add canonical url*/} 
 
       {/* Hero Section */}
       <div className="relative w-full h-[40vh] md:h-[50vh] overflow-hidden">
@@ -125,7 +129,14 @@ const TourDetailPage: React.FC<TourDetailPageProps> = ({ slug: propSlug }) => {
             <Package className="h-16 w-16 text-muted-foreground opacity-50" />
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
+       
+        <div className="absolute  inset-0  bg-gradient-to-t from-black/70 to-transparent flex items-end">  
+        <Button asChild variant="ghost" className="mb-4 absolute top-0">
+            <Link to="/destinations">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {language === 'en' ? 'Back' : 'Volver'}
+            </Link>
+          </Button>      
           <div className="container mx-auto px-4 pb-8 md:pb-12">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
               {tour.titulo}
@@ -145,6 +156,14 @@ const TourDetailPage: React.FC<TourDetailPageProps> = ({ slug: propSlug }) => {
 
       {/* Main Content */}
       <div className="container mx-auto max-w-7xl px-4 py-8">
+        <div className="max-w-5xl">
+            <Button asChild variant="ghost" className="mb-4">
+              <Link to="/destinations">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                {language === 'en' ? 'Back to All Tours' : 'Volver a Todos los Tours'}
+              </Link>
+            </Button>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column: Tour Details */}
           <div className="lg:col-span-2">
