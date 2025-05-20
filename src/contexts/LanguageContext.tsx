@@ -19,7 +19,7 @@ const translations: Translations = {
   en: {
     nav: {
       home: "Home",
-      destinations: "Destinations",
+      destinations: "Tours",
       services: "Services",
       about: "About Us",
       blog: "Blog",
@@ -218,7 +218,7 @@ const translations: Translations = {
   es: {
     nav: {
       home: "Inicio",
-      destinations: "Destinos",
+      destinations: "Tours",
       blog: "Blog",
       about: "Sobre Nosotros",
       services: "Servicios",

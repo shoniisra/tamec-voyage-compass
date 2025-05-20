@@ -72,12 +72,12 @@ const Header = () => {
       href: language === 'en' ? "/en/services/galapagos" : "/es/servicios/galapagos",
       icon: <Globe className="h-5 w-5 text-tamec-600" />,
     },
-    {
-      title: t("nav.toursPrograms"),
-      description: t("nav.toursProgramsDesc"),
-      href: "#",
-      icon: <Book className="h-5 w-5 text-tamec-600" />,
-    },
+    // {
+    //   title: t("nav.toursPrograms"),
+    //   description: t("nav.toursProgramsDesc"),
+    //   href: "#",
+    //   icon: <Book className="h-5 w-5 text-tamec-600" />,
+    // },
     {
       title: t("nav.exchangePrograms"),
       description: t("nav.exchangeProgramsDesc"),

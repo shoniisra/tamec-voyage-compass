@@ -97,12 +97,8 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
   }, [searchQuery, selectedDestino]);
   
   return (
-    <div className="mb-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
-        <h3 className="text-lg font-medium flex items-center mb-4">
-          <Search className="mr-2 h-5 w-5 text-tamec-600" /> 
-          {language === 'en' ? 'Search Tours' : 'Buscar Tours'}
-        </h3>
+    <div className="mb-2">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-2 shadow-sm">
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Destination Search with Suggestions */}
