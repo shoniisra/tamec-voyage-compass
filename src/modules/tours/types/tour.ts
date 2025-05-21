@@ -9,6 +9,7 @@ export interface Aerolinea {
 export interface Regalo {
   id: number;
   nombre: string;
+  descripcion?: string | null; // Made nullable/optional to match database
 }
 
 export interface Incluye {
@@ -99,11 +100,9 @@ export interface TourFilterParams {
 
 export interface Destino {
   id: number;
-  nombre: string;
-  descripcion?: string;
   pais: string;
-  ciudad?: string;
-  active?: boolean;
+  ciudad?: string | null;
+  nombre: string; // Formatted display name (pais, ciudad)
 }
 
 export interface TourDestino {

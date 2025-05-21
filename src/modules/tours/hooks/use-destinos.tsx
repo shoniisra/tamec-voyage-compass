@@ -26,7 +26,15 @@ export const useDestinos = () => {
           throw supabaseError;
         }
         
-        setDestinos(data || []);
+        // Transform the data to match the Destino interface
+        const transformedDestinos = data?.map(item => ({
+          id: item.id,
+          pais: item.pais,
+          ciudad: item.ciudad,
+          nombre: item.ciudad ? `${item.pais}, ${item.ciudad}` : item.pais
+        })) || [];
+        
+        setDestinos(transformedDestinos);
       } catch (err: any) {
         console.error('Error fetching destinations:', err);
         setError('Failed to fetch destinations');

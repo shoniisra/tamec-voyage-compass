@@ -90,7 +90,8 @@ const TourDestinationsForm: React.FC<TourDestinationsFormProps> = ({ destinos, s
     const destino = destinosList.find(d => d.id === destinoId);
     if (!destino) return '';
     
-    return `${destino.pais}${destino.ciudad ? `, ${destino.ciudad}` : ''}`;
+    // Use the nombre property which is formatted "{pais}, {ciudad}"
+    return destino.nombre || `${destino.pais}${destino.ciudad ? `, ${destino.ciudad}` : ''}`;
   };
   
   return (
@@ -112,7 +113,7 @@ const TourDestinationsForm: React.FC<TourDestinationsFormProps> = ({ destinos, s
             <SelectContent>
               {destinosList.map((destino) => (
                 <SelectItem key={destino.id} value={destino.id.toString()}>
-                  {destino.pais}{destino.ciudad ? `, ${destino.ciudad}` : ''}
+                  {destino.nombre || `${destino.pais}${destino.ciudad ? `, ${destino.ciudad}` : ''}`}
                 </SelectItem>
               ))}
             </SelectContent>
