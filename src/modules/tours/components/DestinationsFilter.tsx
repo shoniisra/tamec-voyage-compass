@@ -49,6 +49,13 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
   // Duration options
   const durationOptions = Array.from({ length: 14 }, (_, i) => (i + 1).toString());
   
+  // Filtered destinations based on search query
+  const filteredDestinations = destinos.filter(d => 
+    d.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (d.pais && d.pais.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (d.ciudad && d.ciudad.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+  
   const handleApplyFilters = () => {
     const filters: TourFilterParams = {};
     
@@ -93,58 +100,57 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
             </label>
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
-                <div className="relative">
-                  <div className="flex items-center border border-input rounded-md focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
-                    <Search className="ml-3 h-4 w-4 shrink-0 opacity-50" />
-                    <input
-                      placeholder={language === 'en' ? 'Search destinations' : 'Buscar destinos'}
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onFocus={() => setOpen(true)}
-                      className="w-full py-2 px-3 bg-transparent focus:outline-none"
-                    />
-                    {searchQuery && (
-                      <button
-                        onClick={() => {
-                          setSearchQuery('');
-                          setSelectedDestino(null);
-                        }}
-                        className="mr-2 text-gray-500 hover:text-gray-700"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    )}
+                <Button 
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={open}
+                  className="w-full justify-between font-normal bg-white hover:bg-gray-50 border-input"
+                >
+                  <div className="flex items-center w-full">
+                    <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                    <span className="truncate">
+                      {selectedDestino ? selectedDestino.nombre : 
+                       language === 'en' ? 'Search destinations' : 'Buscar destinos'}
+                    </span>
                   </div>
-                </div>
+                  {selectedDestino && (
+                    <X 
+                      className="h-4 w-4 opacity-50 hover:opacity-100" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedDestino(null);
+                        setSearchQuery('');
+                      }} 
+                    />
+                  )}
+                </Button>
               </PopoverTrigger>
               <PopoverContent className="w-full p-0" align="start">
                 <Command>
+                  <CommandInput
+                    placeholder={language === 'en' ? 'Search destinations' : 'Buscar destinos'}
+                    value={searchQuery}
+                    onValueChange={setSearchQuery}
+                  />
                   <CommandList>
                     <CommandEmpty>
                       {language === 'en' ? 'No destinations found' : 'No se encontraron destinos'}
                     </CommandEmpty>
                     <CommandGroup>
                       <ScrollArea className="h-64">
-                        {destinos
-                          .filter(d => 
-                            d.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            (d.pais && d.pais.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                            (d.ciudad && d.ciudad.toLowerCase().includes(searchQuery.toLowerCase()))
-                          )
-                          .map(destino => (
-                            <CommandItem 
-                              key={destino.id} 
-                              value={destino.id.toString()}
-                              onSelect={() => handleDestinationSelect(destino)}
-                              className="flex flex-col items-start p-2"
-                            >
-                              <div className="font-medium">{destino.nombre}</div>
-                              <div className="text-sm text-muted-foreground">
-                                {destino.ciudad ? `${destino.ciudad}, ${destino.pais}` : destino.pais}
-                              </div>
-                            </CommandItem>
-                          ))
-                        }
+                        {filteredDestinations.map(destino => (
+                          <CommandItem 
+                            key={destino.id} 
+                            value={destino.id.toString()}
+                            onSelect={() => handleDestinationSelect(destino)}
+                            className="flex flex-col items-start p-2"
+                          >
+                            <div className="font-medium">{destino.nombre}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {destino.ciudad ? `${destino.ciudad}, ${destino.pais}` : destino.pais}
+                            </div>
+                          </CommandItem>
+                        ))}
                       </ScrollArea>
                     </CommandGroup>
                   </CommandList>
@@ -170,7 +176,7 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
                 });
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger className="bg-white hover:bg-gray-50">
                 <SelectValue placeholder={language === 'en' ? 'Select days' : 'Seleccionar días'} />
               </SelectTrigger>
               <SelectContent>
