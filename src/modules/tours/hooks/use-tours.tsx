@@ -79,8 +79,9 @@ export const useTours = (filterParams: TourFilterParams = {}) => {
               ? tour.destinos.sort((a: any, b: any) => a.orden - b.orden)[0] 
               : null;
             
-            const destinoPrincipal = mainDestino?.destino?.nombre 
-              ? `${mainDestino.destino.nombre}${mainDestino.destino.ciudad ? `, ${mainDestino.destino.ciudad}` : ''}`
+            // Safely access the pais and ciudad properties which exist in our database schema
+            const destinoPrincipal = mainDestino?.destino?.pais 
+              ? `${mainDestino.destino.pais}${mainDestino.destino.ciudad ? `, ${mainDestino.destino.ciudad}` : ''}`
               : null;
 
             return {
