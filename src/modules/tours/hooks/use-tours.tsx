@@ -65,9 +65,6 @@ export const useTours = (filterParams: TourFilterParams = {}) => {
           query = query.eq('incluye_vuelo', filterParams.incluye_vuelo === true);
         }
         
-        // Apply price filter (when implemented)
-        // This would require a more complex query or client-side filtering
-        
         const { data, error: supabaseError } = await query;
         
         if (supabaseError) {
@@ -75,7 +72,24 @@ export const useTours = (filterParams: TourFilterParams = {}) => {
         }
         
         if (data) {
-          setTours(data as unknown as Tour[]);
+          // Process the tours data to extract destination information
+          const processedTours = data.map(tour => {
+            // Find the main destination
+            const mainDestino = tour.destinos && tour.destinos.length > 0 
+              ? tour.destinos.sort((a: any, b: any) => a.orden - b.orden)[0] 
+              : null;
+            
+            const destinoPrincipal = mainDestino?.destino?.nombre 
+              ? `${mainDestino.destino.nombre}${mainDestino.destino.ciudad ? `, ${mainDestino.destino.ciudad}` : ''}`
+              : null;
+
+            return {
+              ...tour,
+              destino_principal: destinoPrincipal
+            };
+          });
+          
+          setTours(processedTours as any);
         }
       } catch (err: any) {
         console.error('Error fetching tours:', err);

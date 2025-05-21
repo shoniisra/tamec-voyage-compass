@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Tour } from '@/modules/tours/types/tour';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { Edit, ExternalLink, CircleAlert, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Edit, ExternalLink, CircleAlert, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMobile } from '@/shared/hooks/use-mobile';
@@ -155,7 +155,9 @@ const ToursList: React.FC<ToursListProps> = ({ tours, loading, error }) => {
           {currentTours.map((tour) => (
             <TableRow key={tour.id}>
               <TableCell className="font-medium">{tour.titulo}</TableCell>
-              <TableCell>{tour.destino_principal || (language === 'en' ? '—' : '—')}</TableCell>
+              <TableCell>
+                {tour.destino_principal || (language === 'en' ? '—' : '—')}
+              </TableCell>
               <TableCell>{tour.dias_duracion || (language === 'en' ? '—' : '—')}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
