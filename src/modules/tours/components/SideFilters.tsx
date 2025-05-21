@@ -1,21 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TourFilterParams } from '@/modules/tours/types';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useDestinos } from '@/modules/tours/hooks';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
-import { MapPinned, Clock, X, DollarSign, Plane } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { MultiSelect, OptionType } from "@/components/ui/multi-select";
+import { FilterIcon, X } from 'lucide-react';
 
 interface SideFiltersProps {
   filters: TourFilterParams;
@@ -23,190 +16,137 @@ interface SideFiltersProps {
   onClearFilters: () => void;
 }
 
-const SideFilters = ({ filters, onFilterChange, onClearFilters }: SideFiltersProps) => {
+const SideFilters: React.FC<SideFiltersProps> = ({ filters, onFilterChange, onClearFilters }) => {
   const { language } = useLanguage();
-  const { destinos } = useDestinos();
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   
-  // Create duration options from 1 to 14 days
-  const durationOptions = Array.from({ length: 14 }, (_, i) => (i + 1).toString());
-  
-  // Price range options
-  const priceOptions = [
-    { label: language === 'en' ? 'All Prices' : 'Todos los precios', value: 'all' },
-    { label: '< $500', value: '1-500' },
-    { label: '$500 - $1000', value: '500-1000' },
-    { label: '$1000 - $2000', value: '1000-2000' },
-    { label: '> $2000', value: '2000-99999' }
-  ];
-  
-  // Handler for destination select
-  const handleDestinoChange = (value: string) => {
+  // Duration options for the filter
+  const durationOptions: OptionType[] = Array.from({ length: 14 }, (_, i) => ({
+    label: `${i + 1} ${language === 'en' ? 'days' : 'días'}`,
+    value: (i + 1).toString()
+  }));
+
+  const handleDurationChange = (selectedValues: string[]) => {
     onFilterChange({
       ...filters,
-      destino: value ? [parseInt(value)] : undefined
+      duracion: selectedValues.length > 0 ? selectedValues : undefined
     });
   };
-  
-  // Handler for duration select
-  const handleDurationChange = (value: string) => {
+
+  const handleIncludesFlightChange = (checked: boolean) => {
     onFilterChange({
       ...filters,
-      duracion: value ? [parseInt(value)] : undefined
+      incluye_vuelo: checked
     });
   };
-  
-  // Handler for price range select
-  const handlePriceRangeChange = (value: string) => {
-    if (value === 'all') {
-      const { precio_min, precio_max, ...restFilters } = filters;
-      onFilterChange(restFilters);
-      return;
-    }
-    
-    const [min, max] = value.split('-').map(Number);
-    onFilterChange({
-      ...filters,
-      precio_min: min,
-      precio_max: max
-    });
-  };
-  
-  // Handler for flight checkbox
-  const handleFlightChange = (checked: boolean) => {
-    onFilterChange({
-      ...filters,
-      incluye_vuelo: checked || undefined
-    });
-  };
-  
-  // Find the currently selected values
-  const selectedDestinoId = filters.destino?.[0]?.toString() || '';
-  const selectedDuration = filters.duracion?.[0]?.toString() || '';
-  const selectedPriceRange = filters.precio_min && filters.precio_max
-    ? `${filters.precio_min}-${filters.precio_max}`
-    : 'all';
   
   return (
-    <Card className="sticky top-24">
-      <CardHeader className="pb-3">
-        <div className="flex justify-between items-center">
-          <CardTitle className="text-lg">
-            {language === 'en' ? 'Filters' : 'Filtros'}
-          </CardTitle>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={onClearFilters}
-            className="h-8 px-2 text-muted-foreground"
-          >
-            <X className="h-4 w-4 mr-1" />
-            {language === 'en' ? 'Clear all' : 'Limpiar todo'}
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-5">
-        {/* Destination filter */}
-        <div className="space-y-1.5">
-          <Label className="flex items-center text-sm font-medium">
-            <MapPinned className="mr-2 h-4 w-4 text-tamec-600" />
-            {language === 'en' ? 'Destination' : 'Destino'}
-          </Label>
-          <Select
-            value={selectedDestinoId}
-            onValueChange={handleDestinoChange}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder={language === 'en' ? 'All destinations' : 'Todos los destinos'} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">
-                {language === 'en' ? 'All destinations' : 'Todos los destinos'}
-              </SelectItem>
-              <ScrollArea className="h-60">
-                {destinos.map((destino) => (
-                  <SelectItem key={destino.id} value={destino.id.toString()}>
-                    {destino.nombre}
-                  </SelectItem>
-                ))}
-              </ScrollArea>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        {/* Duration filter */}
-        <div className="space-y-1.5">
-          <Label className="flex items-center text-sm font-medium">
-            <Clock className="mr-2 h-4 w-4 text-tamec-600" />
-            {language === 'en' ? 'Duration' : 'Duración'}
-          </Label>
-          <Select
-            value={selectedDuration}
-            onValueChange={handleDurationChange}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder={language === 'en' ? 'Any duration' : 'Cualquier duración'} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">
-                {language === 'en' ? 'Any duration' : 'Cualquier duración'}
-              </SelectItem>
-              <ScrollArea className="h-60">
-                {durationOptions.map((days) => (
-                  <SelectItem key={days} value={days}>
-                    {days} {language === 'en' ? 'days' : 'días'}
-                  </SelectItem>
-                ))}
-              </ScrollArea>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        {/* Price range filter */}
-        <div className="space-y-1.5">
-          <Label className="flex items-center text-sm font-medium">
-            <DollarSign className="mr-2 h-4 w-4 text-tamec-600" />
-            {language === 'en' ? 'Price Range' : 'Rango de Precio'}
-          </Label>
-          <Select
-            value={selectedPriceRange}
-            onValueChange={handlePriceRangeChange}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder={language === 'en' ? 'All prices' : 'Todos los precios'} />
-            </SelectTrigger>
-            <SelectContent>
-              {priceOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        {/* Includes flight filter */}
-        <div className="space-y-1.5">
-          <Label className="flex items-center text-sm font-medium" htmlFor="flight">
-            <Plane className="mr-2 h-4 w-4 text-tamec-600" />
-            {language === 'en' ? 'Includes Flight' : 'Incluye Vuelo'}
-          </Label>
-          <div className="flex items-center space-x-2 pt-1">
-            <Checkbox 
-              id="flight" 
-              checked={filters.incluye_vuelo === true}
-              onCheckedChange={handleFlightChange}
-            />
-            <label 
-              htmlFor="flight" 
-              className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              {language === 'en' ? 'Only show tours with flights' : 'Solo mostrar tours con vuelos'}
-            </label>
+    <>
+      {/* Mobile Filter Button */}
+      <div className="md:hidden mb-4">
+        <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
+          <SheetTrigger asChild>
+            <Button variant="outline" className="w-full flex justify-between">
+              <span className="flex items-center">
+                <FilterIcon className="mr-2 h-4 w-4" />
+                {language === 'en' ? 'Filters' : 'Filtros'}
+              </span>
+              {Object.keys(filters).length > 0 && (
+                <span className="bg-primary text-primary-foreground w-5 h-5 rounded-full text-xs flex items-center justify-center">
+                  {Object.keys(filters).length}
+                </span>
+              )}
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="bottom" className="h-[80vh]">
+            <div className="pt-6 pb-20">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-medium">
+                  {language === 'en' ? 'Filter Options' : 'Opciones de Filtrado'}
+                </h3>
+                <Button variant="ghost" size="sm" onClick={onClearFilters}>
+                  <X className="h-4 w-4 mr-1" />
+                  {language === 'en' ? 'Clear All' : 'Limpiar Todo'}
+                </Button>
+              </div>
+              <div className="space-y-6">
+                {/* Mobile Filter Content */}
+                {renderFilterContent()}
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      {/* Desktop Filters */}
+      <div className="hidden md:block">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border p-4 sticky top-20">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-medium">
+              {language === 'en' ? 'Filters' : 'Filtros'}
+            </h3>
+            {Object.keys(filters).length > 0 && (
+              <Button variant="ghost" size="sm" onClick={onClearFilters} className="h-8 px-2">
+                <X className="h-3 w-3 mr-1" />
+                {language === 'en' ? 'Clear' : 'Limpiar'}
+              </Button>
+            )}
+          </div>
+          
+          <div className="space-y-6">
+            {/* Desktop Filter Content */}
+            {renderFilterContent()}
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </>
   );
+  
+  function renderFilterContent() {
+    return (
+      <>
+        {/* Duration Filter */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium">
+            {language === 'en' ? 'Duration' : 'Duración'}
+          </h4>
+          <MultiSelect
+            options={durationOptions}
+            selected={filters.duracion || []}
+            onChange={handleDurationChange}
+            placeholder={language === 'en' ? 'Select duration' : 'Seleccionar duración'}
+          />
+        </div>
+        
+        {/* Includes Flight Filter */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium">
+            {language === 'en' ? 'Includes' : 'Incluye'}
+          </h4>
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="incluye_vuelo"
+              checked={filters.incluye_vuelo || false}
+              onCheckedChange={handleIncludesFlightChange}
+            />
+            <Label htmlFor="incluye_vuelo">
+              {language === 'en' ? 'Flight included' : 'Incluye vuelo'}
+            </Label>
+          </div>
+        </div>
+        
+        {/* Price Range Filter - To be implemented in the future */}
+        {/* <div className="space-y-3">
+          <h4 className="text-sm font-medium">
+            {language === 'en' ? 'Price Range' : 'Rango de Precio'}
+          </h4>
+          <div className="px-2">
+            <Slider />
+          </div>
+        </div> */}
+      </>
+    );
+  }
 };
 
 export default SideFilters;

@@ -42,7 +42,6 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
   
   // Filter states
   const [duration, setDuration] = useState<string>('');
-  const [destinoId, setDestinoId] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedDestino, setSelectedDestino] = useState<Destino | null>(null);
   const [open, setOpen] = useState(false);
@@ -53,12 +52,12 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
   const handleApplyFilters = () => {
     const filters: TourFilterParams = {};
     
-    if (searchQuery && selectedDestino) {
-      filters.destino = [selectedDestino.id];
+    if (selectedDestino) {
+      filters.destino = [selectedDestino.id.toString()];
     }
     
     if (duration) {
-      filters.duracion = [parseInt(duration)];
+      filters.duracion = [duration];
     }
     
     onFilterChange(filters);
@@ -66,21 +65,19 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
   
   const handleDestinationSelect = (destino: Destino) => {
     setSelectedDestino(destino);
-    setDestinoId(destino.id.toString());
     setSearchQuery(destino.nombre);
     setOpen(false);
     
     // Apply filters immediately when destination is selected
     onFilterChange({
-      destino: [destino.id],
-      duracion: duration ? [parseInt(duration)] : undefined
+      destino: destino ? [destino.id.toString()] : undefined,
+      duracion: duration ? [duration] : undefined
     });
   };
   
   useEffect(() => {
     if (!searchQuery && selectedDestino) {
       setSelectedDestino(null);
-      setDestinoId('');
     }
   }, [searchQuery, selectedDestino]);
   
@@ -111,7 +108,6 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
                         onClick={() => {
                           setSearchQuery('');
                           setSelectedDestino(null);
-                          setDestinoId('');
                         }}
                         className="mr-2 text-gray-500 hover:text-gray-700"
                       >
@@ -123,11 +119,6 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
               </PopoverTrigger>
               <PopoverContent className="w-full p-0" align="start">
                 <Command>
-                  <CommandInput 
-                    placeholder={language === 'en' ? 'Search destinations' : 'Buscar destinos'} 
-                    value={searchQuery}
-                    onValueChange={setSearchQuery}
-                  />
                   <CommandList>
                     <CommandEmpty>
                       {language === 'en' ? 'No destinations found' : 'No se encontraron destinos'}
@@ -174,8 +165,8 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
                 setDuration(value);
                 // Apply filters immediately when duration is selected
                 onFilterChange({
-                  duracion: value ? [parseInt(value)] : undefined,
-                  destino: selectedDestino ? [selectedDestino.id] : undefined
+                  duracion: value ? [value] : undefined,
+                  destino: selectedDestino ? [selectedDestino.id.toString()] : undefined
                 });
               }}
             >
