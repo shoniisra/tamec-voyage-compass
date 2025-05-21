@@ -80,14 +80,7 @@ const EnglishDestinationsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Search bar when filters are active - Compact version */}
-      {hasActiveFilters && (
-        <div className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 py-4">
-          <div className="container mx-auto px-4">
-            <DestinationsFilter onFilterChange={handleFilterChange} />
-          </div>
-        </div>
-      )}
+   
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
