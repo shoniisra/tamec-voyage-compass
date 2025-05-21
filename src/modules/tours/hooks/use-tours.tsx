@@ -42,23 +42,16 @@ export const useTours = (filterParams: TourFilterParams = {}) => {
           // Get tours that have this destination
           const destinoId = filterParams.destino[0];
           if (destinoId !== 'all') {
-            // Convert to number if it's a numeric string
-            const destinoIdNum = parseInt(destinoId, 10);
-            if (!isNaN(destinoIdNum)) {
-              // Use .contains() for the JSON array of destinos
-              query = query.eq('tour_destinos.destino_id', destinoIdNum.toString());
-            }
+            // We'll work with string values consistently
+            query = query.eq('tour_destinos.destino_id', destinoId);
           }
         }
         
         // Apply duration filter if present
         if (filterParams.duracion && filterParams.duracion.length > 0) {
           const duracionValue = filterParams.duracion[0];
-          // Convert to number if it's a numeric string
-          const duracionNum = parseInt(duracionValue, 10);
-          if (!isNaN(duracionNum)) {
-            query = query.eq('dias_duracion', duracionNum.toString());
-          }
+          // We'll work with string values consistently
+          query = query.eq('dias_duracion', duracionValue);
         }
         
         // Apply incluye_vuelo filter if present

@@ -89,9 +89,9 @@ export interface TourFilterParams {
   search?: string;
   destino_id?: string;
   active?: string;
-  // Updated filter parameters
-  duracion?: number[];
-  destino?: number[];
+  // Updated filter parameters with consistent string types
+  duracion?: string[];
+  destino?: string[];
   incluye_vuelo?: boolean;
   precio_min?: number;
   precio_max?: number;
