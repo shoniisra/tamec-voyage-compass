@@ -92,8 +92,8 @@ const TourGiftsForm: React.FC<TourGiftsFormProps> = ({ regalos, setRegalos }) =>
       
       <div className="flex space-x-2">
         <Select 
-          value={selectedRegaloId?.toString() || ''} 
-          onValueChange={(value) => setSelectedRegaloId(value ? parseInt(value) : null)}
+          value={selectedRegaloId?.toString() || 'placeholder'} // Changed from empty string to 'placeholder'
+          onValueChange={(value) => setSelectedRegaloId(value !== 'placeholder' ? parseInt(value) : null)}
           disabled={loading}
         >
           <SelectTrigger className="flex-1">

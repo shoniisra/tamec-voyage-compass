@@ -209,14 +209,15 @@ const TourBasicInfoForm: React.FC<TourBasicInfoFormProps> = ({ tourData, onChang
             {language === 'en' ? 'Airline' : 'Aerolínea'}
           </Label>
           <Select 
-            value={tourData.aerolinea_id?.toString() || ''} 
+            value={tourData.aerolinea_id?.toString() || ''}
             onValueChange={(value) => onChange('aerolinea_id', value ? parseInt(value) : null)}
           >
             <SelectTrigger>
               <SelectValue placeholder={language === 'en' ? 'Select an airline' : 'Seleccionar aerolínea'} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">
+              {/* Changed from empty string to "none" */}
+              <SelectItem value="none">
                 {language === 'en' ? '-- None --' : '-- Ninguna --'}
               </SelectItem>
               {aerolineas.map((aerolinea) => (
@@ -233,14 +234,15 @@ const TourBasicInfoForm: React.FC<TourBasicInfoFormProps> = ({ tourData, onChang
             {language === 'en' ? 'Terms & Conditions' : 'Términos y Condiciones'}
           </Label>
           <Select 
-            value={tourData.terminos_condiciones_id?.toString() || ''} 
-            onValueChange={(value) => onChange('terminos_condiciones_id', value ? parseInt(value) : null)}
+            value={tourData.terminos_condiciones_id?.toString() || ''}
+            onValueChange={(value) => onChange('terminos_condiciones_id', value !== "none" ? parseInt(value) : null)}
           >
             <SelectTrigger>
               <SelectValue placeholder={language === 'en' ? 'Select terms & conditions' : 'Seleccionar términos y condiciones'} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">
+              {/* Changed from empty string to "none" */}
+              <SelectItem value="none">
                 {language === 'en' ? '-- None --' : '-- Ninguno --'}
               </SelectItem>
               {terminos.map((termino) => (

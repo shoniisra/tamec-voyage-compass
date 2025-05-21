@@ -171,12 +171,12 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
               {language === 'en' ? 'Duration (Days)' : 'Duración (Días)'}
             </label>
             <Select
-              value={duration}
+              value={duration || 'placeholder'} // Changed from empty string to 'placeholder'
               onValueChange={(value) => {
-                setDuration(value);
+                setDuration(value !== 'placeholder' ? value : '');
                 // Apply filters immediately when duration is selected
                 onFilterChange({
-                  duracion: value ? [value] : undefined,
+                  duracion: value !== 'placeholder' ? [value] : undefined,
                   destino: selectedDestino ? [selectedDestino.id.toString()] : undefined
                 });
               }}

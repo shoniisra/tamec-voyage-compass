@@ -103,8 +103,8 @@ const TourDestinationsForm: React.FC<TourDestinationsFormProps> = ({ destinos, s
         
         <div className="flex space-x-2">
           <Select 
-            value={destinoId?.toString() || ''} 
-            onValueChange={(value) => setDestinoId(parseInt(value))}
+            value={destinoId?.toString() || 'placeholder'} // Changed from empty string to 'placeholder'
+            onValueChange={(value) => setDestinoId(value !== 'placeholder' ? parseInt(value) : null)}
             disabled={loading}
           >
             <SelectTrigger className="flex-1">
