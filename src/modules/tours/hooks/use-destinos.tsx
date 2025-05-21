@@ -1,12 +1,12 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Destino } from '@/modules/tours/types/tour';
+import { Destino } from '../types/tour';
 import { useToast } from '@/components/ui/use-toast';
 
 export const useDestinos = () => {
   const [destinos, setDestinos] = useState<Destino[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   
@@ -19,30 +19,28 @@ export const useDestinos = () => {
         const { data, error: supabaseError } = await supabase
           .from('destinos')
           .select('*')
-          .order('pais', { ascending: true });
+          .order('pais', { ascending: true })
+          .order('ciudad', { ascending: true });
         
         if (supabaseError) {
           throw supabaseError;
         }
         
-        if (data) {
-          // Map the returned data to match the Destino interface
-          const mappedDestinos: Destino[] = data.map(item => ({
-            id: item.id,
-            nombre: item.ciudad || item.pais, // Use city as name, or country if no city
-            pais: item.pais,
-            ciudad: item.ciudad,
-            active: true
-          }));
-          
-          setDestinos(mappedDestinos);
-        }
+        // Transform the data to match the Destino interface
+        const transformedDestinos = data?.map(item => ({
+          id: item.id,
+          pais: item.pais,
+          ciudad: item.ciudad,
+          nombre: item.ciudad ? `${item.pais}, ${item.ciudad}` : item.pais
+        })) || [];
+        
+        setDestinos(transformedDestinos);
       } catch (err: any) {
-        console.error('Error fetching destinos:', err);
-        setError('Failed to fetch destinos');
+        console.error('Error fetching destinations:', err);
+        setError('Failed to fetch destinations');
         toast({
           variant: "destructive",
-          title: "Error fetching destinations",
+          title: "Error loading destinations",
           description: err.message || "Please try again later.",
         });
       } finally {

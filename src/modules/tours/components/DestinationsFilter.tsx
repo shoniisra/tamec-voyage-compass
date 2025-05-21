@@ -49,12 +49,17 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
   // Duration options
   const durationOptions = Array.from({ length: 14 }, (_, i) => (i + 1).toString());
   
-  // Filtered destinations based on search query
-  const filteredDestinations = destinos.filter(d => 
-    d.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (d.pais && d.pais.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    (d.ciudad && d.ciudad.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  // Filtered destinations based on search query - fixed to safely handle undefined values
+  const filteredDestinations = destinos.filter(d => {
+    if (!searchQuery) return true;
+    
+    const query = searchQuery.toLowerCase();
+    const nombre = d.nombre?.toLowerCase() || '';
+    const pais = d.pais?.toLowerCase() || '';
+    const ciudad = d.ciudad?.toLowerCase() || '';
+    
+    return nombre.includes(query) || pais.includes(query) || ciudad.includes(query);
+  });
   
   const handleApplyFilters = () => {
     const filters: TourFilterParams = {};
@@ -72,7 +77,7 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
   
   const handleDestinationSelect = (destino: Destino) => {
     setSelectedDestino(destino);
-    setSearchQuery(destino.nombre);
+    setSearchQuery(destino.nombre || '');
     setOpen(false);
     
     // Apply filters immediately when destination is selected
@@ -145,7 +150,7 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
                             onSelect={() => handleDestinationSelect(destino)}
                             className="flex flex-col items-start p-2"
                           >
-                            <div className="font-medium">{destino.nombre}</div>
+                            <div className="font-medium">{destino.nombre || destino.pais}</div>
                             <div className="text-sm text-muted-foreground">
                               {destino.ciudad ? `${destino.ciudad}, ${destino.pais}` : destino.pais}
                             </div>
@@ -166,12 +171,12 @@ const DestinationsFilter: React.FC<DestinationsFilterProps> = ({ onFilterChange 
               {language === 'en' ? 'Duration (Days)' : 'Duración (Días)'}
             </label>
             <Select
-              value={duration}
+              value={duration || 'placeholder'} // Changed from empty string to 'placeholder'
               onValueChange={(value) => {
-                setDuration(value);
+                setDuration(value !== 'placeholder' ? value : '');
                 // Apply filters immediately when duration is selected
                 onFilterChange({
-                  duracion: value ? [value] : undefined,
+                  duracion: value !== 'placeholder' ? [value] : undefined,
                   destino: selectedDestino ? [selectedDestino.id.toString()] : undefined
                 });
               }}

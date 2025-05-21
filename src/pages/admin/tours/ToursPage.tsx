@@ -66,7 +66,7 @@ const ToursPage: React.FC = () => {
           </div>
         </div>
         
-        <div>
+        <div className="border rounded-md">
           <ToursList tours={tours} loading={loading} error={error} />
         </div>
       </div>
