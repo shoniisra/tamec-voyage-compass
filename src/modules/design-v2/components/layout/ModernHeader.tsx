@@ -39,10 +39,10 @@ const ModernHeader = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-lg border-b border-border">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/v2" className="flex items-center space-x-2">
+      <div className="container mx-auto px-2 md:px-4">
+        <div className="flex items-center justify-between h-14 md:h-16">
+          {/* Logo - Hidden on mobile */}
+          <Link to="/v2" className="hidden md:flex items-center space-x-2">
             <img
               src={`/assets/images/logos/${theme === 'dark' ? 'dark' : 'light'} horizontal.png`}
               alt="TAMEC"
@@ -65,7 +65,7 @@ const ModernHeader = () => {
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 ml-auto">
             {/* Search Button - Mobile */}
             <Button variant="ghost" size="icon" className="md:hidden h-9 w-9">
               <Search className="h-4 w-4" />

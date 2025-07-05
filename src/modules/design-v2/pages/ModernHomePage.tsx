@@ -88,9 +88,9 @@ const ModernHomePage = () => {
     <ModernLayout>
       <div className="min-h-screen overflow-x-hidden">
         {/* Popular Options Section */}
-        <section className="py-4 md:py-8 px-4">
+        <section className="py-2 md:py-8 px-2 md:px-4">
           <div className="container mx-auto max-w-6xl">
-            <div className="mb-4 md:mb-6">
+            <div className="mb-3 md:mb-6">
               <h1 className="text-lg md:text-2xl font-bold mb-1 text-foreground">
                 {language === 'en' ? 'Popular Options' : 'Opciones Populares'}
               </h1>
@@ -103,7 +103,7 @@ const ModernHomePage = () => {
             </div>
 
             {/* Popular Options Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-6 md:mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 mb-4 md:mb-8">
               {popularOptions.map((option, index) => (
                 <Link key={index} to={option.href} className="group block">
                   <div className="flex items-center bg-card border border-border hover:shadow-md transition-all duration-200 group-hover:scale-[1.01] overflow-hidden rounded-lg">
@@ -132,9 +132,9 @@ const ModernHomePage = () => {
         </section>
 
         {/* Featured Section */}
-        <section className="py-6 md:py-12 px-4">
+        <section className="py-4 md:py-12 px-2 md:px-4">
           <div className="container mx-auto max-w-6xl">
-            <div className="flex items-center justify-between mb-4 md:mb-6">
+            <div className="flex items-center justify-between mb-3 md:mb-6">
               <div className="flex items-center space-x-2">
                 <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-tamec-600" />
                 <h2 className="text-lg md:text-xl font-bold">
@@ -164,18 +164,18 @@ const ModernHomePage = () => {
         </section>
 
         {/* Recent Activity - More compact on mobile */}
-        <section className="py-6 md:py-12 px-4 bg-muted/30">
+        <section className="py-4 md:py-12 px-2 md:px-4 bg-muted/30">
           <div className="container mx-auto max-w-6xl">
-            <div className="flex items-center space-x-2 mb-4 md:mb-6">
+            <div className="flex items-center space-x-2 mb-3 md:mb-6">
               <Clock className="h-4 w-4 md:h-5 md:w-5 text-tamec-600" />
               <h2 className="text-lg md:text-xl font-bold">
                 {language === 'en' ? 'Continue exploring' : 'Continúa explorando'}
               </h2>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
               {[1, 2, 3, 4].map((item) => (
-                <ModernCard key={item} className="group cursor-pointer p-3 md:p-4">
+                <ModernCard key={item} className="group cursor-pointer p-2 md:p-4">
                   <div className="flex items-center space-x-2">
                     <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-tamec-500 to-yellow-500 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Star className="h-3 w-3 md:h-4 md:w-4 text-white" />
