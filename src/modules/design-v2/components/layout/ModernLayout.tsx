@@ -15,12 +15,14 @@ const ModernLayout: React.FC<ModernLayoutProps> = ({
   showSidebar = true 
 }) => {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <ModernHeader />
-      <div className="flex">
+      <div className="flex w-full">
         {showSidebar && <ModernSidebar />}
-        <main className={`flex-1 ${showSidebar ? 'md:pl-64' : ''} pb-16 md:pb-0`}>
-          {children}
+        <main className={`flex-1 min-w-0 ${showSidebar ? 'md:pl-64' : ''} pb-16 md:pb-0 overflow-x-hidden`}>
+          <div className="w-full max-w-full">
+            {children}
+          </div>
         </main>
       </div>
       <MobileBottomNav />
