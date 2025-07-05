@@ -13,14 +13,39 @@ import {
   Info,
   Heart,
   Clock,
-  User
+  User,
+  Settings,
+  LogOut,
+  Moon,
+  Sun,
+  Languages
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTheme } from '@/providers/ThemeProvider';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const ModernSidebar = () => {
-  const { language } = useLanguage();
+  const { language, setLanguage } = useLanguage();
+  const { theme, setTheme } = useTheme();
   const location = useLocation();
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'en' ? 'es' : 'en');
+  };
 
   const sidebarItems = [
     {
@@ -108,8 +133,20 @@ const ModernSidebar = () => {
   }, {} as Record<string, typeof sidebarItems>);
 
   return (
-    <aside className="hidden md:block fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-background border-r border-border overflow-y-auto">
+    <aside className="hidden md:block fixed left-0 top-0 h-screen w-64 bg-background border-r border-border overflow-y-auto">
       <div className="p-4 space-y-6">
+        {/* Logo Section */}
+        <div className="pb-4 border-b border-border">
+          <Link to="/v2" className="flex items-center justify-center">
+            <img
+              src={`/assets/images/logos/${theme === 'dark' ? 'dark' : 'light'} horizontal.png`}
+              alt="TAMEC"
+              className="h-8"
+            />
+          </Link>
+        </div>
+
+        {/* Navigation Sections */}
         {Object.entries(groupedItems).map(([category, items]) => (
           <div key={category}>
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
@@ -137,6 +174,76 @@ const ModernSidebar = () => {
             </nav>
           </div>
         ))}
+
+        {/* Account Section */}
+        <div className="pt-4 border-t border-border">
+          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+            {language === 'en' ? 'Account' : 'Cuenta'}
+          </h3>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="w-full justify-start px-3 py-2 h-auto">
+                <Avatar className="h-8 w-8 mr-3">
+                  <AvatarImage src="" alt="Usuario" />
+                  <AvatarFallback className="bg-tamec-100 dark:bg-tamec-900">
+                    <User className="h-4 w-4 text-tamec-600" />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col items-start">
+                  <span className="text-sm font-medium">
+                    {language === 'en' ? 'My Account' : 'Mi Cuenta'}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    usuario@ejemplo.com
+                  </span>
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="start" forceMount>
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">
+                    {language === 'en' ? 'Account' : 'Cuenta'}
+                  </p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    usuario@ejemplo.com
+                  </p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              
+              <DropdownMenuItem onClick={toggleTheme} className="cursor-pointer">
+                {theme === 'dark' ? (
+                  <Sun className="mr-2 h-4 w-4" />
+                ) : (
+                  <Moon className="mr-2 h-4 w-4" />
+                )}
+                {theme === 'dark' 
+                  ? (language === 'en' ? 'Light Mode' : 'Modo Claro')
+                  : (language === 'en' ? 'Dark Mode' : 'Modo Oscuro')
+                }
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem onClick={toggleLanguage} className="cursor-pointer">
+                <Languages className="mr-2 h-4 w-4" />
+                {language === 'en' ? 'Español' : 'English'}
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem className="cursor-pointer">
+                <Settings className="mr-2 h-4 w-4" />
+                {language === 'en' ? 'Settings' : 'Configuración'}
+              </DropdownMenuItem>
+              
+              <DropdownMenuSeparator />
+              
+              <DropdownMenuItem className="cursor-pointer text-red-600">
+                <LogOut className="mr-2 h-4 w-4" />
+                {language === 'en' ? 'Sign Out' : 'Cerrar Sesión'}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </aside>
   );

@@ -7,6 +7,7 @@ import {
   Clock
 } from 'lucide-react';
 import ModernLayout from '../components/layout/ModernLayout';
+import InlineHeader from '../components/layout/InlineHeader';
 import ModernCard from '../components/common/ModernCard';
 import ServiceCard from '../components/common/ServiceCard';
 import MobileCarousel from '../components/common/MobileCarousel';
@@ -87,6 +88,11 @@ const ModernHomePage = () => {
   return (
     <ModernLayout>
       <div className="min-h-screen overflow-x-hidden">
+        {/* Inline Header */}
+        <InlineHeader 
+          title={language === 'en' ? 'Welcome' : 'Bienvenido'} 
+        />
+
         {/* Popular Options Section */}
         <section className="py-2 md:py-8 px-2 md:px-4">
           <div className="container mx-auto max-w-6xl">

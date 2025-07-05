@@ -1,6 +1,5 @@
 
 import React from 'react';
-import ModernHeader from './ModernHeader';
 import ModernSidebar from './ModernSidebar';
 import MobileBottomNav from './MobileBottomNav';
 import { ThemeProvider } from '@/providers/ThemeProvider';
@@ -16,7 +15,6 @@ const ModernLayout: React.FC<ModernLayoutProps> = ({
 }) => {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      <ModernHeader />
       <div className="flex w-full">
         {showSidebar && <ModernSidebar />}
         <main className={`flex-1 min-w-0 ${showSidebar ? 'md:pl-64' : ''} pb-16 md:pb-0 overflow-x-hidden`}>
