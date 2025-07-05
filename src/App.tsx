@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import HomePage from "@/pages/HomePage";
@@ -84,6 +83,9 @@ function App() {
       {/* Design V2 Routes */}
       <Route path="/v2" element={<ModernHomePage />} />
       <Route path="/v2/home" element={<ModernHomePage />} />
+      <Route path="/v2/search" element={<ModernHomePage />} />
+      <Route path="/v2/orders" element={<ModernHomePage />} />
+      <Route path="/v2/account" element={<ModernHomePage />} />
       <Route path="/v2/tours" element={<ModernToursPage />} />
       <Route path="/v2/flights" element={<ModernHomePage />} />
       <Route path="/v2/hotels" element={<ModernHomePage />} />

@@ -3,6 +3,8 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Home,
+  Search,
+  ShoppingBag,
   Plane,
   MapPin,
   Building2,
@@ -25,6 +27,18 @@ const ModernSidebar = () => {
       icon: <Home className="h-5 w-5" />,
       label: language === 'en' ? 'Home' : 'Inicio',
       href: '/v2',
+      category: 'main'
+    },
+    {
+      icon: <Search className="h-5 w-5" />,
+      label: language === 'en' ? 'Search' : 'Buscar',
+      href: '/v2/search',
+      category: 'main'
+    },
+    {
+      icon: <ShoppingBag className="h-5 w-5" />,
+      label: language === 'en' ? 'Orders' : 'Pedidos',
+      href: '/v2/orders',
       category: 'main'
     },
     {
@@ -94,7 +108,7 @@ const ModernSidebar = () => {
   }, {} as Record<string, typeof sidebarItems>);
 
   return (
-    <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-background border-r border-border overflow-y-auto">
+    <aside className="hidden md:block fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-background border-r border-border overflow-y-auto">
       <div className="p-4 space-y-6">
         {Object.entries(groupedItems).map(([category, items]) => (
           <div key={category}>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -14,12 +13,15 @@ import {
 import ModernLayout from '../components/layout/ModernLayout';
 import ModernCard from '../components/common/ModernCard';
 import ServiceCard from '../components/common/ServiceCard';
+import MobileCarousel from '../components/common/MobileCarousel';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const ModernHomePage = () => {
   const { language } = useLanguage();
+  const isMobile = useIsMobile();
 
   const quickActions = [
     {
@@ -125,7 +127,7 @@ const ModernHomePage = () => {
           </div>
         </section>
 
-        {/* Featured Section - Optimized for mobile */}
+        {/* Featured Section */}
         <section className="py-8 md:py-16 px-4">
           <div className="container mx-auto max-w-6xl">
             <div className="flex items-center justify-between mb-4 md:mb-8">
@@ -135,7 +137,7 @@ const ModernHomePage = () => {
                   {language === 'en' ? 'Featured for you' : 'Destacado para ti'}
                 </h2>
               </div>
-              <Button variant="ghost" asChild className="text-xs md:text-sm">
+              <Button variant="ghost" asChild className="text-xs md:text-sm hidden md:flex">
                 <Link to="/v2/tours" className="flex items-center">
                   {language === 'en' ? 'View all' : 'Ver todo'}
                   <ArrowRight className="ml-1 md:ml-2 h-3 w-3 md:h-4 md:w-4" />
@@ -143,14 +145,18 @@ const ModernHomePage = () => {
               </Button>
             </div>
 
-            {/* Mobile: 2 cards per row, Desktop: 3 cards per row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
-              {featuredServices.map((service, index) => (
-                <div key={index} className="w-full">
-                  <ServiceCard {...service} />
-                </div>
-              ))}
-            </div>
+            {/* Mobile Carousel / Desktop Grid */}
+            {isMobile ? (
+              <MobileCarousel services={featuredServices} />
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
+                {featuredServices.map((service, index) => (
+                  <div key={index} className="w-full">
+                    <ServiceCard {...service} />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
