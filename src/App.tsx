@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import HomePage from "@/pages/HomePage";
@@ -60,6 +61,9 @@ import AerolineasPage from "@/pages/admin/settings/AerolineasPage";
 import TerminosPage from "@/pages/admin/settings/TerminosPage";
 import ItemsPage from "@/pages/admin/settings/ItemsPage";
 
+// Design V2 Pages
+import { ModernHomePage, ModernToursPage } from "@/modules/design-v2";
+
 function App() {
   return (
     <Routes>
@@ -76,6 +80,18 @@ function App() {
       <Route path="/services/visa-processing" element={<VisaProcessingPage />} />
       <Route path="/services/flights" element={<FlightServicePage />} />
       <Route path="/services/galapagos" element={<GalapagosServicePage />} />
+      
+      {/* Design V2 Routes */}
+      <Route path="/v2" element={<ModernHomePage />} />
+      <Route path="/v2/home" element={<ModernHomePage />} />
+      <Route path="/v2/tours" element={<ModernToursPage />} />
+      <Route path="/v2/flights" element={<ModernHomePage />} />
+      <Route path="/v2/hotels" element={<ModernHomePage />} />
+      <Route path="/v2/visas" element={<ModernHomePage />} />
+      <Route path="/v2/jobs" element={<ModernHomePage />} />
+      <Route path="/v2/about" element={<ModernHomePage />} />
+      <Route path="/v2/favorites" element={<ModernHomePage />} />
+      <Route path="/v2/recent" element={<ModernHomePage />} />
       
       {/* English language routes */}
       <Route path="/en/about-us" element={<EnglishHomePage />} />
